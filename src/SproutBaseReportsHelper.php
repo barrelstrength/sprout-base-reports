@@ -18,7 +18,7 @@ abstract class SproutBaseReportsHelper
      */
     public static function registerModule()
     {
-        $moduleId = 'sproutbasereports';
+        $moduleId = 'sprout-base-reports';
 
         if (!Craft::$app->hasModule($moduleId)) {
 

@@ -8,14 +8,13 @@
 namespace barrelstrength\sproutbasereports;
 
 use barrelstrength\sproutbasereports\controllers\ImportController;
-use barrelstrength\sproutbasereports\console\controllers\ImportController as ConsoleImportController;
-use barrelstrength\sproutbasereports\console\controllers\SeedController as ConsoleSeedController;
+use barrelstrength\sproutbasereports\controllers\ReportsController;
 use barrelstrength\sproutbasereports\controllers\SeedController;
 use barrelstrength\sproutbasereports\controllers\SproutSeoController;
 use barrelstrength\sproutbasereports\controllers\WeedController;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
+use barrelstrength\sproutbasereports\services\App;
 use barrelstrength\sproutbasereports\web\twig\variables\SproutImportVariable;
-use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 use \yii\base\Module;
 use craft\web\View;
@@ -23,8 +22,6 @@ use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\ArrayHelper;
 use craft\i18n\PhpMessageSource;
 use Craft;
-
-use barrelstrength\sproutbasereports\services\App;
 
 class SproutBaseReports extends Module
 {
@@ -104,31 +101,17 @@ class SproutBaseReports extends Module
         // Setup Controllers
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->controllerNamespace = 'sproutbasereports\\console\\controllers';
-
-            $this->controllerMap = [
-                'import' => ConsoleImportController::class,
-                'seed' => ConsoleSeedController::class
-            ];
         } else {
             $this->controllerNamespace = 'sproutbasereports\\controllers';
 
             $this->controllerMap = [
-                'import' => ImportController::class,
-                'seed' => SeedController::class,
-                'weed' => WeedController::class,
-                'redirects-tool' => SproutSeoController::class,
+                'reports' => ReportsController::class,
             ];
         }
 
         // Setup Template Roots
         Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
             $e->roots['sprout-base-reports'] = $this->getBasePath().DIRECTORY_SEPARATOR.'templates';
-        });
-
-        // Setup Variables
-        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
-            $variable = $event->sender;
-            $variable->set('sproutImport', SproutImportVariable::class);
         });
 
         parent::init();
