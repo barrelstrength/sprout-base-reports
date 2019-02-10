@@ -46,10 +46,12 @@
                 </ul>
 
                 {% if report.id is not null %}
-                <hr>
-                <ul>
-                    <li><a class="formsubmit error" data-action="sprout-base-reports/reports/delete-report" data-confirm="{{ 'Are you sure you want to delete this report?'|t('sprout-base') }}" data-redirect="{{ reportIndexUrl|hash }}">{{ "Delete"|t('sprout-base') }}</a></li>
-                </ul>
+                    <hr>
+                    <ul>
+                        <li>
+                            <a class="formsubmit error" data-action="sprout-base-reports/reports/delete-report" data-confirm="{{ 'Are you sure you want to delete this report?'|t('sprout-base') }}" data-redirect="{{ reportIndexUrl|hash }}">{{ "Delete"|t('sprout-base') }}</a>
+                        </li>
+                    </ul>
                 {% endif %}
             </div>
         </div>

@@ -11,8 +11,8 @@
 
 {% block actionButton %}
 
-     {#@todo - where do we add a report edit permission to Sprout Integrations?#}
-       {#Can we have each integration define a permission with the same name?#}
+    {#@todo - where do we add a report edit permission to Sprout Integrations?#}
+    {#Can we have each integration define a permission with the same name?#}
     {% if currentUser.can('sproutReports-editReports') %}
 
         {% if newReportOptions|length > 1 %}
@@ -35,7 +35,7 @@
         {% else %}
             <div class="btngroup submit first">
                 {% if newReportOptions[0] is defined %}
-                <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base') }}</a>
+                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base') }}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -51,15 +51,15 @@
 
     var hideSidebar = false;
     if (pluginHandle.pluginHandle != 'sprout-reports') {
-        hideSidebar = true;
-        criteria = Object.assign(Craft.defaultIndexCriteria, pluginHandle);
+    hideSidebar = true;
+    criteria = Object.assign(Craft.defaultIndexCriteria, pluginHandle);
     }
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-        context:        '{{ context }}',
-        storageKey:     'elementindex.{{ elementType }}',
-        criteria:       criteria,
-        hideSidebar:    hideSidebar
+    context:        '{{ context }}',
+    storageKey:     'elementindex.{{ elementType }}',
+    criteria:       criteria,
+    hideSidebar:    hideSidebar
     });
 {% endblock %}
 

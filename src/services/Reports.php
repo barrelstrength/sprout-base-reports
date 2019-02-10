@@ -20,8 +20,8 @@ use yii\base\Exception;
 /**
  *
  * @property null|\barrelstrength\sproutbasereports\elements\Report[] $allReports
- * @property array                                                         $reportsAsSelectFieldOptions
- * @property \craft\db\Query                                               $reportsQuery
+ * @property array                                                    $reportsAsSelectFieldOptions
+ * @property \craft\db\Query                                          $reportsQuery
  */
 class Reports extends Component
 {

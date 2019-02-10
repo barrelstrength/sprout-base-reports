@@ -88,15 +88,15 @@
     var dataSourceId = $(this).attr('id');
 
     Craft.postActionRequest('sprout-reports/data-sources/save-data-source', {
-                dataSourceId: dataSourceId,
-                allowNew: allowNew
-            }, function(response) {
-                if (response)
-                {
-                    Craft.cp.displayNotice(Craft.t('sprout-reports', 'Data Source saved.'));
-                }
-            });
-        })
+    dataSourceId: dataSourceId,
+    allowNew: allowNew
+    }, function(response) {
+    if (response)
+    {
+    Craft.cp.displayNotice(Craft.t('sprout-reports', 'Data Source saved.'));
+    }
+    });
+    })
     });
 
 {% endjs %}
