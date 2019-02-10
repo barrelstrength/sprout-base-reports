@@ -9,7 +9,7 @@ Include Sprout Base Reports in your Sprout plugin composer.json file:
 ``` json
 {
   "require": {
-    "barrelstrength/sprout-base-import": "^1.0.0"
+    "barrelstrength/sprout-base-reports": "^1.0.0"
   }
 }
 ```

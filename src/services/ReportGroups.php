@@ -6,6 +6,7 @@ use yii\base\Component;
 use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use Craft;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class ReportGroups
@@ -20,11 +21,14 @@ class ReportGroups extends Component
      * @param ReportGroupModel $group
      *
      * @return bool
-     * @throws \Exception
      */
-    public function saveGroup(ReportGroupModel $group)
+    public function saveGroup(ReportGroupModel $group): bool
     {
-        $groupRecord = $this->_getGroupRecord($group);
+        $groupRecord = $this->getGroupRecord($group);
+
+        if (!$groupRecord) {
+            throw new \InvalidArgumentException(Craft::t('sprout-import', 'No report group found.'));
+        }
 
         $groupRecord->name = $group->name;
 
@@ -37,10 +41,10 @@ class ReportGroups extends Component
             }
 
             return true;
-        } else {
-            $group->addErrors($groupRecord->getErrors());
-            return false;
         }
+
+        $group->addErrors($groupRecord->getErrors());
+        return false;
     }
 
     /**
@@ -65,7 +69,7 @@ class ReportGroups extends Component
     /**
      * @return array|\yii\db\ActiveRecord[]
      */
-    public function getAllReportGroups()
+    public function getAllReportGroups(): array
     {
         return ReportGroupRecord::find()->indexBy('id')->all();
     }
@@ -78,20 +82,23 @@ class ReportGroups extends Component
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function deleteGroup($id)
+    public function deleteGroup($id): bool
     {
-        $record = ReportGroupRecord::findOne($id);
+        $reportGroupRecord = ReportGroupRecord::findOne($id);
 
-        return (bool)$record->delete();
+        if (!$reportGroupRecord) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Report Group not found.'));
+        }
+
+        return (bool)$reportGroupRecord->delete();
     }
 
     /**
      * @param ReportGroupModel $group
      *
-     * @return ReportGroupRecord|null|static
-     * @throws \Exception
+     * @return ReportGroupRecord|null
      */
-    private function _getGroupRecord(ReportGroupModel $group)
+    private function getGroupRecord(ReportGroupModel $group)
     {
         if ($group->id) {
             $groupRecord = ReportGroupRecord::findOne($group->id);

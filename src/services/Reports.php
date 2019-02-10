@@ -11,6 +11,7 @@ use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\db\Query;
+use craft\errors\ElementNotFoundException;
 use yii\base\Component;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
@@ -28,10 +29,15 @@ class Reports extends Component
      * @param $reportId
      *
      * @return Report
+     * @throws ElementNotFoundException
      */
-    public function getReport($reportId)
+    public function getReport($reportId): Report
     {
         $reportRecord = ReportRecord::findOne($reportId);
+
+        if (!$reportRecord) {
+            throw new ElementNotFoundException(Craft::t('sprout-base-reports', 'Unable to find Report.'));
+        }
 
         $report = new Report();
 
@@ -58,7 +64,7 @@ class Reports extends Component
      * @throws \Throwable
      * @throws \yii\db\Exception
      */
-    public function saveReport(Report $report)
+    public function saveReport(Report $report): bool
     {
         if (!$report) {
 
@@ -99,7 +105,7 @@ class Reports extends Component
      * @return bool
      * @throws Exception
      */
-    protected function validateSettings(Report $report)
+    protected function validateSettings(Report $report): bool
     {
         $errors = [];
 
@@ -119,7 +125,7 @@ class Reports extends Component
      *
      * @return array
      */
-    public function getReportsBySourceId($dataSourceId)
+    public function getReportsBySourceId($dataSourceId): array
     {
         $reportRecords = ReportRecord::find()->where(['dataSourceId' => $dataSourceId])->all();
 
@@ -136,18 +142,18 @@ class Reports extends Component
         return $this->populateReports($rows);
     }
 
-    private function getReportsQuery()
+    private function getReportsQuery(): Query
     {
         $query = new Query();
         // We only get reports that currently has dataSourceId or existing installed dataSource
         $query->select('reports.*')
             ->from('{{%sproutreports_reports}} as reports')
-            ->innerJoin('{{%sproutreports_datasources}} as datasource', "[[datasource.id]] = [[reports.dataSourceId]]");
+            ->innerJoin('{{%sproutreports_datasources}} as datasource', '[[datasource.id]] = [[reports.dataSourceId]]');
 
         return $query;
     }
 
-    private function populateReports($rows)
+    private function populateReports($rows): array
     {
         $reports = [];
 
@@ -169,7 +175,7 @@ class Reports extends Component
      * @return array
      * @throws Exception
      */
-    public function getReportsByGroupId($groupId)
+    public function getReportsByGroupId($groupId): array
     {
         $reports = [];
 
@@ -192,7 +198,7 @@ class Reports extends Component
         return $reports;
     }
 
-    public function getReportsAsSelectFieldOptions()
+    public function getReportsAsSelectFieldOptions(): array
     {
         $options = [];
 
@@ -217,7 +223,7 @@ class Reports extends Component
      * @return int
      *
      */
-    public function getCountByDataSourceId($dataSourceId)
+    public function getCountByDataSourceId($dataSourceId): int
     {
         return (int)ReportRecord::find()->where(['dataSourceId' => $dataSourceId])->count();
     }
@@ -227,7 +233,7 @@ class Reports extends Component
      *
      * @return array
      */
-    public function populateModels(array $records)
+    public function populateModels(array $records): array
     {
         $models = [];
 

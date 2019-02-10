@@ -8,6 +8,7 @@
 namespace barrelstrength\sproutbasereports\records;
 
 use craft\db\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * Class ReportGroup
@@ -28,12 +29,12 @@ class ReportGroup extends ActiveRecord
         return '{{%sproutreports_reportgroups}}';
     }
 
-    public function getReports()
+    public function getReports(): ActiveQuery
     {
         return $this->hasMany(Report::class, ['groupId' => 'id']);
     }
 
-    public function beforeDelete()
+    public function beforeDelete(): bool
     {
 //        $reports = SproutReports_ReportRecord::model()->findAll('groupId =:groupId', [
 //            ':groupId' => $this->id

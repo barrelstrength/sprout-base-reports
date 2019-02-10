@@ -14,10 +14,12 @@ use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 
+use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class ReportsController extends Controller
 {
@@ -28,7 +30,7 @@ class ReportsController extends Controller
      * @return \yii\web\Response
      * @throws \yii\base\Exception
      */
-    public function actionIndex($dataSourceId = null, $groupId = null)
+    public function actionIndex($dataSourceId = null, $groupId = null): Response
     {
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
@@ -84,11 +86,11 @@ class ReportsController extends Controller
      * @param int|null    $reportId
      *
      * @return \yii\web\Response
-     * @throws \HttpException
+     * @throws \craft\errors\ElementNotFoundException
      * @throws \yii\base\Exception
      * @throws \yii\base\InvalidConfigException
      */
-    public function actionResultsIndex(Report $report = null, int $reportId = null)
+    public function actionResultsIndex(Report $report = null, int $reportId = null): Response
     {
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
@@ -96,43 +98,47 @@ class ReportsController extends Controller
             $report = SproutBaseReports::$app->reports->getReport($reportId);
         }
 
-        if ($report) {
-            $dataSource = $report->getDataSource();
-
-            $labels = $dataSource->getDefaultLabels($report);
-
-            $variables['reportIndexUrl'] = $dataSource->getUrl($report->groupId);
-
-            if ($currentPluginHandle !== 'sprout-reports') {
-                $variables['reportIndexUrl'] = $dataSource->getUrl($dataSource->dataSourceId);
-            }
-
-            $variables['dataSource'] = null;
-            $variables['report'] = $report;
-            $variables['values'] = [];
-            $variables['reportId'] = $reportId;
-            $variables['redirectUrl'] = Craft::$app->getRequest()->getSegment(1).'/reports/view/'.$reportId;
-
-            if ($dataSource) {
-                $values = $dataSource->getResults($report);
-
-                if (empty($labels) && !empty($values)) {
-                    $firstItemInArray = reset($values);
-                    $labels = array_keys($firstItemInArray);
-                }
-
-                $variables['labels'] = $labels;
-                $variables['values'] = $values;
-                $variables['dataSource'] = $dataSource;
-            }
-
-            $this->getView()->registerAssetBundle(CpAsset::class);
-
-            // @todo Hand off to the export service when a blank page and 404 issues are sorted out
-            return $this->renderTemplate('sprout-base-reports/results/index', $variables);
+        if (!$report) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Report not found.'));
         }
 
-        throw new \HttpException(404, Craft::t('sprout-base', 'Report not found.'));
+        $dataSource = $report->getDataSource();
+
+        if (!$dataSource) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+        }
+
+        $labels = $dataSource->getDefaultLabels($report);
+
+        $variables['reportIndexUrl'] = $dataSource->getUrl($report->groupId);
+
+        if ($currentPluginHandle !== 'sprout-reports') {
+            $variables['reportIndexUrl'] = $dataSource->getUrl($dataSource->dataSourceId);
+        }
+
+        $variables['dataSource'] = null;
+        $variables['report'] = $report;
+        $variables['values'] = [];
+        $variables['reportId'] = $reportId;
+        $variables['redirectUrl'] = Craft::$app->getRequest()->getSegment(1).'/reports/view/'.$reportId;
+
+        if ($dataSource) {
+            $values = $dataSource->getResults($report);
+
+            if (empty($labels) && !empty($values)) {
+                $firstItemInArray = reset($values);
+                $labels = array_keys($firstItemInArray);
+            }
+
+            $variables['labels'] = $labels;
+            $variables['values'] = $values;
+            $variables['dataSource'] = $dataSource;
+        }
+
+        $this->getView()->registerAssetBundle(CpAsset::class);
+
+        // @todo Hand off to the export service when a blank page and 404 issues are sorted out
+        return $this->renderTemplate('sprout-base-reports/results/index', $variables);
     }
 
     /**
@@ -143,7 +149,7 @@ class ReportsController extends Controller
      * @return \yii\web\Response
      * @throws \yii\base\Exception
      */
-    public function actionEditReport(string $dataSourceId, Report $report = null, int $reportId = null)
+    public function actionEditReport(string $dataSourceId, Report $report = null, int $reportId = null): Response
     {
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
@@ -162,6 +168,10 @@ class ReportsController extends Controller
         }
 
         $dataSource = $reportElement->getDataSource();
+
+        if (!$dataSource) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+        }
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
@@ -213,7 +223,7 @@ class ReportsController extends Controller
             $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$reportElement) {
-                throw new \InvalidArgumentException(Craft::t('sprout-base', 'No report exists with the id “{id}”', ['id' => $reportId]));
+                throw new NotFoundHttpException(Craft::t('sprout-base', 'No report exists with the id “{id}”', ['id' => $reportId]));
             }
 
             $reportElement->settings = is_array($settings) ? $settings : [];
@@ -226,7 +236,7 @@ class ReportsController extends Controller
         }
 
         // Encode back to object after validation for getResults method to recognize option object
-        $reportElement->settings = json_encode($reportElement->settings);
+        $reportElement->settings = Json::encode($reportElement->settings);
 
         Craft::$app->getSession()->setError(Craft::t('sprout-base', 'Could not update report.'));
 
@@ -253,14 +263,10 @@ class ReportsController extends Controller
 
         $report = $this->prepareFromPost();
 
-        $session = Craft::$app->getSession();
+        if ($report->validate() && Craft::$app->getElements()->saveElement($report)) {
+            Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report saved.'));
 
-        if ($session AND $report->validate()) {
-            if (Craft::$app->getElements()->saveElement($report)) {
-                Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report saved.'));
-
-                return $this->redirectToPostedUrl($report);
-            }
+            return $this->redirectToPostedUrl($report);
         }
 
         Craft::$app->getSession()->setError(Craft::t('sprout-base', 'Couldn’t save report.'));
@@ -282,7 +288,7 @@ class ReportsController extends Controller
      * @throws \yii\db\StaleObjectException
      * @throws \yii\web\BadRequestHttpException
      */
-    public function actionDeleteReport()
+    public function actionDeleteReport(): Response
     {
         $this->requirePostRequest();
 
@@ -294,19 +300,19 @@ class ReportsController extends Controller
             Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report deleted.'));
 
             return $this->redirectToPostedUrl($record);
-        } else {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Report not found.'));
         }
+
+        throw new NotFoundHttpException(Craft::t('sprout-base', 'Report not found.'));
     }
 
     /**
      * Saves a Report Group
      *
-     * @return \yii\web\Response
-     * @throws \Exception
+     * @return Response
+     * @throws \craft\errors\MissingComponentException
      * @throws \yii\web\BadRequestHttpException
      */
-    public function actionSaveGroup()
+    public function actionSaveGroup(): Response
     {
         $this->requirePostRequest();
 
@@ -326,11 +332,11 @@ class ReportsController extends Controller
                 'success' => true,
                 'group' => $group->getAttributes(),
             ]);
-        } else {
-            return $this->asJson([
-                'errors' => $group->getErrors(),
-            ]);
         }
+
+        return $this->asJson([
+            'errors' => $group->getErrors(),
+        ]);
     }
 
     /**
@@ -342,7 +348,7 @@ class ReportsController extends Controller
      * @throws \yii\db\StaleObjectException
      * @throws \yii\web\BadRequestHttpException
      */
-    public function actionDeleteGroup()
+    public function actionDeleteGroup(): Response
     {
         $this->requirePostRequest();
 
@@ -388,7 +394,7 @@ class ReportsController extends Controller
      * @return Report
      * @throws \yii\base\Exception
      */
-    public function prepareFromPost()
+    public function prepareFromPost(): Report
     {
         $request = Craft::$app->getRequest();
 
@@ -419,6 +425,10 @@ class ReportsController extends Controller
         $report->groupId = $request->getBodyParam('groupId', null);
 
         $dataSource = $report->getDataSource();
+
+        if (!$dataSource) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Date Source not found.'));
+        }
 
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
 

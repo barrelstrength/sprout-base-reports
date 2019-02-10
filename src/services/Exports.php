@@ -7,6 +7,7 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use craft\helpers\Json;
 use League\Csv\Writer;
 use yii\base\Component;
 
@@ -21,7 +22,7 @@ class Exports extends Component
      * @throws \Twig_Error_Loader
      * @throws \yii\base\Exception
      */
-    public function toHtml(array &$values, array $labels = [], array $variables = [])
+    public function toHtml(array &$values, array $labels = [], array $variables = []): string
     {
         // @todo - reconsider this logic
         if (empty($labels) && !empty($values)) {
@@ -43,15 +44,9 @@ class Exports extends Component
      * @throws \Exception
      * @return string
      */
-    public function toJson(array &$values)
+    public function toJson(array &$values): string
     {
-        $json = json_encode($values);
-
-        if (json_last_error()) {
-            throw new \LogicException(json_last_error_msg());
-        }
-
-        return $json;
+        return Json::encode($values);
     }
 
     /**

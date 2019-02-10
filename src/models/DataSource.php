@@ -24,7 +24,7 @@ class DataSource extends Model
     /**
      * @return array
      */
-    public function safeAttributes()
+    public function safeAttributes(): array
     {
         return ['id', 'pluginHandle', 'type', 'settings', 'allowNew'];
     }

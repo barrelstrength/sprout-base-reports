@@ -21,6 +21,7 @@ use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
+use yii\web\NotFoundHttpException;
 
 /**
  * SproutReports - Report element type
@@ -75,7 +76,7 @@ class Report extends Element
     {
         if ($this->hasNameFormat && $this->nameFormat) {
             try {
-                return (string)$this->processNameFormat();
+                return $this->processNameFormat();
             } catch (\Exception $exception) {
                 return Craft::t('sprout-base', 'Invalid name format for report: '.$this->name);
             }
@@ -117,8 +118,7 @@ class Report extends Element
     /**
      * Returns the element's CP edit URL.
      *
-     * @return null|string
-     * @throws \yii\base\Exception
+     * @return string|null
      */
     public function getCpEditUrl()
     {
@@ -131,8 +131,6 @@ class Report extends Element
             // Used on Results page
             $pluginHandle = Craft::$app->getRequest()->getSegment(1) ?? 'sprout-reports';
         }
-
-        $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
 
         return UrlHelper::cpUrl($pluginHandle.'/reports/'.$this->dataSourceId.'/edit/'.$this->id);
     }
@@ -177,6 +175,10 @@ class Report extends Element
         if ($attribute === 'dataSourceId') {
 
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
+
+            if (!$dataSource) {
+                throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+            }
 
             return $dataSource->getName();
         }
@@ -256,7 +258,7 @@ class Report extends Element
     }
 
     /**
-     * @return DataSource
+     * @return DataSource|null
      * @throws \yii\base\Exception
      */
     public function getDataSource()
@@ -277,9 +279,13 @@ class Report extends Element
      * @throws \Throwable
      * @throws \yii\base\Exception
      */
-    public function processNameFormat()
+    public function processNameFormat(): string
     {
         $dataSource = $this->getDataSource();
+
+        if (!$dataSource) {
+            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+        }
 
         $settingsArray = Json::decode($this->settings);
 
@@ -296,7 +302,7 @@ class Report extends Element
         $settings = $this->settings;
 
         if (is_string($this->settings)) {
-            $settings = json_decode($this->settings, true);
+            $settings = Json::decode($this->settings, true);
         }
 
         return $settings;
@@ -320,7 +326,7 @@ class Report extends Element
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'handle'], 'required'],

@@ -94,7 +94,17 @@ abstract class DataSource
      *
      * @return string
      */
-    abstract public function getName();
+    abstract public function getName(): string;
+
+    /**
+     * A description for the Data Source
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return '';
+    }
 
     /**
      * Should return an string containing the necessary HTML to capture user input
@@ -114,7 +124,7 @@ abstract class DataSource
      *
      * @return array
      */
-    public function getDefaultLabels(Report $report, array $settings = [])
+    public function getDefaultLabels(Report $report, array $settings = []): array
     {
         return [];
     }
@@ -127,7 +137,7 @@ abstract class DataSource
      *
      * @return array
      */
-    public function getResults(Report $report, array $settings = [])
+    public function getResults(Report $report, array $settings = []): array
     {
         return [];
     }
@@ -152,7 +162,7 @@ abstract class DataSource
      *
      * @return bool
      */
-    public function validateSettings(array $settings = [], array &$errors)
+    public function validateSettings(array $settings = [], array &$errors = []): bool
     {
         return true;
     }
@@ -164,7 +174,7 @@ abstract class DataSource
      *
      * @return string
      */
-    public function getUrl($append = null)
+    public function getUrl($append = null): string
     {
         $pluginHandle = Craft::$app->getRequest()->getSegment(1);
 
@@ -180,7 +190,7 @@ abstract class DataSource
      *
      * @return bool
      */
-    public function isAllowHtmlEditable()
+    public function isAllowHtmlEditable(): bool
     {
         return false;
     }
@@ -191,7 +201,7 @@ abstract class DataSource
      *
      * @return bool
      */
-    public function getDefaultAllowHtml()
+    public function getDefaultAllowHtml(): bool
     {
         return false;
     }
@@ -217,7 +227,7 @@ abstract class DataSource
      *
      * @return int
      */
-    final public function getReportCount()
+    final public function getReportCount(): int
     {
         return SproutBaseReports::$app->reports->getCountByDataSourceId($this->dataSourceId);
     }

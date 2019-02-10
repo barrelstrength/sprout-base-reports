@@ -61,11 +61,11 @@ class DataSources extends Component
             $dataSource->dataSourceId = $dataSourceRecord->id;
 
             return $dataSource;
-        } else {
-            throw new Exception(Craft::t('sprout-base', 'Unable to find the class: {type}. Confirm the appropriate Data Source integrations are installed.', [
-                'type' => $dataSourceRecord->type
-            ]));
         }
+
+        throw new Exception(Craft::t('sprout-base', 'Unable to find the class: {type}. Confirm the appropriate Data Source integrations are installed.', [
+            'type' => $dataSourceRecord->type
+        ]));
     }
 
     /**
@@ -127,7 +127,7 @@ class DataSources extends Component
      *
      * @return string[]
      */
-    public function getAllDataSourceTypes()
+    public function getAllDataSourceTypes(): array
     {
         $event = new RegisterComponentTypesEvent([
             'types' => []
@@ -148,7 +148,7 @@ class DataSources extends Component
      * @return array
      * @throws \yii\db\Exception
      */
-    public function getAllDataSources()
+    public function getAllDataSources(): array
     {
         $dataSourceTypes = $this->getAllDataSourceTypes();
         $dataSourceRecords = DataSourceRecord::find()->all();
@@ -204,14 +204,17 @@ class DataSources extends Component
         return $dataSources;
     }
 
-    private function isDataSourceExists($dataSourceRecord)
+    private function isDataSourceExists($dataSourceRecord): bool
     {
         return class_exists($dataSourceRecord->type)
             AND isset($this->dataSources[$dataSourceRecord->type])
             AND $dataSourceRecord->type === get_class($this->dataSources[$dataSourceRecord->type]);
     }
 
-    public function getDataSourcePlugins()
+    /**
+     * @return array
+     */
+    public function getDataSourcePlugins(): array
     {
         $query = new Query();
 
@@ -231,7 +234,7 @@ class DataSources extends Component
      * @return bool
      * @throws \yii\db\Exception
      */
-    public function saveDataSource(DataSourceModel $dataSourceModel)
+    public function saveDataSource(DataSourceModel $dataSourceModel): bool
     {
         /**
          * @var $dataSourceRecord DataSourceRecord
@@ -274,10 +277,10 @@ class DataSources extends Component
      *
      * @param $type
      *
-     * @return int
+     * @return bool
      * @throws \yii\db\Exception
      */
-    public function deleteReportsByType($type)
+    public function deleteReportsByType($type): bool
     {
         $query = new Query();
 
