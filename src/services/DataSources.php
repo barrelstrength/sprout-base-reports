@@ -63,7 +63,7 @@ class DataSources extends Component
             return $dataSource;
         }
 
-        throw new Exception(Craft::t('sprout-base', 'Unable to find the class: {type}. Confirm the appropriate Data Source integrations are installed.', [
+        throw new Exception(Craft::t('sprout-base-reports', 'Unable to find the class: {type}. Confirm the appropriate Data Source integrations are installed.', [
             'type' => $dataSourceRecord->type
         ]));
     }

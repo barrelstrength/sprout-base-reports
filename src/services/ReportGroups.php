@@ -87,7 +87,7 @@ class ReportGroups extends Component
         $reportGroupRecord = ReportGroupRecord::findOne($id);
 
         if (!$reportGroupRecord) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Report Group not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report Group not found.'));
         }
 
         return (bool)$reportGroupRecord->delete();

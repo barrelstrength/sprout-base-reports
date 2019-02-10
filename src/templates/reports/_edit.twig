@@ -4,7 +4,7 @@
 {% set title = report['id'] is defined and report['id'] is not empty ? "Edit Report" : "New Report" %}
 
 {% set crumbs = [
-    { label: "Reports"|t('sprout-base'), url: reportIndexUrl }
+    { label: "Reports"|t('sprout-base-reports'), url: reportIndexUrl }
 ] %}
 
 {% set fullPageForm = true %}
@@ -31,17 +31,17 @@
     <div class="button">
         <div class="btngroup">
             <input type="submit" class="btn submit"
-                   value="{{ 'Save Report'|t('sprout-base') }}">
+                   value="{{ 'Save Report'|t('sprout-base-reports') }}">
 
             <div class="btn submit menubtn"></div>
             <div class="menu">
                 <ul>
                     <li><a class="formsubmit"
-                           data-redirect="{{ continueEditingUrl|hash }}">{{ "Save and continue editing"|t('sprout-base') }}</a>
+                           data-redirect="{{ continueEditingUrl|hash }}">{{ "Save and continue editing"|t('sprout-base-reports') }}</a>
                     </li>
                     <li><a class="formsubmit"
                            data-redirect="{{ dataSource.getUrl(dataSource.dataSourceId ~ '/new')|hash }}">
-                            {{ "Save and add another report"|t('sprout-base') }}</a>
+                            {{ "Save and add another report"|t('sprout-base-reports') }}</a>
                     </li>
                 </ul>
 
@@ -49,7 +49,7 @@
                     <hr>
                     <ul>
                         <li>
-                            <a class="formsubmit error" data-action="sprout-base-reports/reports/delete-report" data-confirm="{{ 'Are you sure you want to delete this report?'|t('sprout-base') }}" data-redirect="{{ reportIndexUrl|hash }}">{{ "Delete"|t('sprout-base') }}</a>
+                            <a class="formsubmit error" data-action="sprout-base-reports/reports/delete-report" data-confirm="{{ 'Are you sure you want to delete this report?'|t('sprout-base-reports') }}" data-redirect="{{ reportIndexUrl|hash }}">{{ "Delete"|t('sprout-base-reports') }}</a>
                         </li>
                     </ul>
                 {% endif %}
@@ -67,8 +67,8 @@
     {% endif %}
 
     {{ forms.textField({
-        label: "Name"|t('sprout-base'),
-        instructions: "What this report will be called in the CP."|t('sprout-base'),
+        label: "Name"|t('sprout-base-reports'),
+        instructions: "What this report will be called in the CP."|t('sprout-base-reports'),
         id: "name",
         name: 'name',
         value: report is defined ? report.name : "",
@@ -79,8 +79,8 @@
     }) }}
 
     {{ forms.textField({
-        label: "Description"|t('sprout-base'),
-        instructions: "A description of your report that will appear in the info bubble next to your Report Name on the Reports Index page."|t('sprout-base'),
+        label: "Description"|t('sprout-base-reports'),
+        instructions: "A description of your report that will appear in the info bubble next to your Report Name on the Reports Index page."|t('sprout-base-reports'),
         name: 'description',
         rows: 3,
         value: report is defined ? report.description : "",
@@ -88,7 +88,7 @@
     }) }}
 
     {{ forms.lightswitchField({
-        label: "Use a dynamic report name"|t('sprout-base'),
+        label: "Use a dynamic report name"|t('sprout-base-reports'),
         name: 'hasNameFormat',
         on: report.hasNameFormat,
         toggle: "name-format-field"
@@ -96,8 +96,8 @@
 
     <div id="name-format-field" class="{% if not report.hasNameFormat %}hidden{% endif %}">
         {{ forms.textField({
-            label: "Name Format"|t('sprout-base'),
-            instructions: "Auto-generate your report name using settings values, such as {startDate|date('F d, Y')}"|t('sprout-base'),
+            label: "Name Format"|t('sprout-base-reports'),
+            instructions: "Auto-generate your report name using settings values, such as {startDate|date('F d, Y')}"|t('sprout-base-reports'),
             name: 'nameFormat',
             value: report is defined ? report.nameFormat : "",
             errors: report is defined ? report.getErrors('nameFormat') : ""
@@ -129,7 +129,7 @@
 
             {{ forms.selectField({
                 first: true,
-                label: "Group <span class='info'>The group where this report should be displayed</span>"|t('sprout-base'),
+                label: "Group <span class='info'>The group where this report should be displayed</span>"|t('sprout-base-reports'),
                 id: 'groupId',
                 name: 'groupId',
                 options: groupOptions,
@@ -139,7 +139,7 @@
         {% endif %}
 
         {{ forms.textField({
-            label: "Handle"|t('sprout-base'),
+            label: "Handle"|t('sprout-base-reports'),
             id: 'handle',
             name: 'handle',
             required: true,
@@ -149,14 +149,14 @@
 
         {% if dataSource.isAllowHtmlEditable() %}
             {{ forms.lightSwitchField({
-                label: "Allow HTML <span class='info'>Render HTML in your report results. Don't enable this setting if you allow user submitted content.</span>"|t('sprout-base'),
+                label: "Allow HTML <span class='info'>Render HTML in your report results. Don't enable this setting if you allow user submitted content.</span>"|t('sprout-base-reports'),
                 name: 'allowHtml',
                 on: report.allowHtml is defined ? report.allowHtml : dataSource.getDefaultAllowHtml()
             }) }}
         {% endif %}
 
         {{ forms.lightSwitchField({
-            label: "Enabled"|t('sprout-base'),
+            label: "Enabled"|t('sprout-base-reports'),
             name: 'enabled',
             on: report.enabled
         }) }}
@@ -167,7 +167,7 @@
 
     <div class="meta read-only">
         <div class="data">
-            <h5 class="heading">{{ "Data Source"|t('sprout-base') }}</h5>
+            <h5 class="heading">{{ "Data Source"|t('sprout-base-reports') }}</h5>
             <div class="value">{{ dataSource.name }}</div>
         </div>
     </div>

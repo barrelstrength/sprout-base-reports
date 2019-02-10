@@ -3,7 +3,7 @@
 
 {#{% import 'sprout/_includes/sproutcp' as sprout %}#}
 
-{% set title  = "Reports"|t('sprout-base') %}
+{% set title  = "Reports"|t('sprout-base-reports') %}
 
 {% if currentPluginHandle == 'sprout-reports' %}
     {% set selectedTab = 'reports' %}
@@ -18,7 +18,7 @@
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
                 <a class="btn submit add icon"
-                   href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base') }}</a>
+                   href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
                 {% if dataSources %}
                     <div class="btn submit menubtn"></div>
                     <div class="menu">
@@ -35,7 +35,7 @@
         {% else %}
             <div class="btngroup submit first">
                 {% if newReportOptions[0] is defined %}
-                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base') }}</a>
+                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -78,9 +78,9 @@
                     {#<thead>#}
                     {#<tr>#}
                         {#<th class="sproutreports-reportname"#}
-                            {#style="width:60%;">{{ "Name"|t('sprout-base') }}</th>#}
+                            {#style="width:60%;">{{ "Name"|t('sprout-base-reports') }}</th>#}
                         {#<th class="sproutreports-datasource"#}
-                            {#style="width:35%;">{{ "Data Source"|t('sprout-base') }}</th>#}
+                            {#style="width:35%;">{{ "Data Source"|t('sprout-base-reports') }}</th>#}
                         {#<th class="thin"></th>#}
                         {#<th class="thin"></th>#}
                     {#</tr>#}
@@ -107,7 +107,7 @@
 
                             {#<td class="sproutreports-reportactions">#}
                                 {#<a href="{{ actionUrl('sprout/reports/export-report', {reportId: report.id}) }}"#}
-                                   {#class="btn small">{{ "Download"|t('sprout-base') }}</a>#}
+                                   {#class="btn small">{{ "Download"|t('sprout-base-reports') }}</a>#}
                             {#</td>#}
 
                             {#<td class="sproutreports-reportactions">#}
@@ -127,11 +127,11 @@
     {#{% else %}#}
 
         {#{% set boxBody %}#}
-            {#<p>{{ "Select the 'New Report' button in the top right to get started. Active Reports will be listed right here once they have been created."|t('sprout-base')|raw }}</p>#}
+            {#<p>{{ "Select the 'New Report' button in the top right to get started. Active Reports will be listed right here once they have been created."|t('sprout-base-reports')|raw }}</p>#}
         {#{% endset %}#}
 
         {#{{ sprout.mediaBox({#}
-            {#heading: "Create a custom report"|t('sprout-base'),#}
+            {#heading: "Create a custom report"|t('sprout-base-reports'),#}
             {#body: boxBody,#}
             {#resourcePath: '@sproutbase/web/assets/sproutreports/dist/images/icon.svg'#}
         {#}) }}#}
@@ -202,17 +202,17 @@
 
         {#newGroupAction: 'sprout/reports/save-group',#}
         {#newGroupOnSuccessUrlBase: 'sprout-reports/reports',#}
-        {#newGroupOnErrorMessage: Craft.t('sprout-base', 'Could not create the group:'),#}
+        {#newGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not create the group:'),#}
 
         {#renameGroupAction: 'sprout/reports/save-group',#}
-        {#renameGroupOnSuccessMessage: Craft.t('sprout-base', 'Group renamed.'),#}
-        {#renameGroupOnErrorMessage: Craft.t('sprout-base', 'Could not rename the group:'),#}
+        {#renameGroupOnSuccessMessage: Craft.t('sprout-base-reports', 'Group renamed.'),#}
+        {#renameGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not rename the group:'),#}
 
-        {#promptForGroupNameMessage: Craft.t('sprout-base', 'What do you want to name your group?'),#}
+        {#promptForGroupNameMessage: Craft.t('sprout-base-reports', 'What do you want to name your group?'),#}
 
         {#deleteGroupAction: 'sprout/reports/delete-group',#}
         {#deleteGroupOnSuccessUrl: 'sprout-reports/reports',#}
-        {#deleteGroupConfirmMessage: Craft.t('sprout-base', 'Are you sure you want to delete this group and all its reports?'),#}
-        {#deleteGroupOnErrorMessage: Craft.t('sprout-base', 'Could not delete the group.'),#}
+        {#deleteGroupConfirmMessage: Craft.t('sprout-base-reports', 'Are you sure you want to delete this group and all its reports?'),#}
+        {#deleteGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not delete the group.'),#}
     {#});#}
 {#{% endjs %}#}

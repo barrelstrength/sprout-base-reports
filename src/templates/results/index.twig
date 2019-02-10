@@ -1,7 +1,7 @@
 {% extends "_layouts/cp" %}
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
-{% set title  = 'Sprout Reports'|t('sprout-base') %}
+{% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
 
 {% set selectedSubnavItem = craft.app.request.segment(2) %}
 {% if dataSource is defined %}
@@ -9,8 +9,8 @@
 {% endif %}
 
 {% set crumbs = [
-    { label: "Reports"|t('sprout-base'), url: reportIndexUrl },
-    { label: "Edit "|t('sprout-base') ~ report.name, url: report.getCpEditUrl() }
+    { label: "Reports"|t('sprout-base-reports'), url: reportIndexUrl },
+    { label: "Edit "|t('sprout-base-reports') ~ report.name, url: report.getCpEditUrl() }
 ] %}
 
 {% block actionButton %}
@@ -46,7 +46,7 @@
                 <div class="button">
                     <div class="btngroup">
                         <input type="submit" class="btn submit"
-                               value="{{ 'Submit Report'|t('sprout-base') }}">
+                               value="{{ 'Submit Report'|t('sprout-base-reports') }}">
                     </div>
                 </div>
 
@@ -94,11 +94,11 @@
         {% else %}
 
             {% set boxBody %}
-                <p>{{ "This report currently has no results. Check your report settings and ensure you have content for the report you are trying to run. To quickly edit the Report Settings, click on the gear icon in the upper right."|t('sprout-base')|raw }}</p>
+                <p>{{ "This report currently has no results. Check your report settings and ensure you have content for the report you are trying to run. To quickly edit the Report Settings, click on the gear icon in the upper right."|t('sprout-base-reports')|raw }}</p>
             {% endset %}
 
             {{ sprout.mediaBox({
-                heading: "No results found"|t('sprout-base'),
+                heading: "No results found"|t('sprout-base-reports'),
                 body: boxBody,
                 resourcePath: '@sproutbasereports/web/assets/base/dist/images/icon.svg'
             }) }}

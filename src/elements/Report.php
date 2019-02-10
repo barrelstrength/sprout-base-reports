@@ -78,7 +78,7 @@ class Report extends Element
             try {
                 return $this->processNameFormat();
             } catch (\Exception $exception) {
-                return Craft::t('sprout-base', 'Invalid name format for report: '.$this->name);
+                return Craft::t('sprout-base-reports', 'Invalid name format for report: '.$this->name);
             }
         }
 
@@ -92,7 +92,7 @@ class Report extends Element
      */
     public static function displayName(): string
     {
-        return Craft::t('sprout-base', 'Reports (Sprout)');
+        return Craft::t('sprout-base-reports', 'Reports (Sprout)');
     }
 
     /**
@@ -155,10 +155,10 @@ class Report extends Element
     public static function defineTableAttributes($source = null): array
     {
         return [
-            'name' => Craft::t('sprout-base', 'Name'),
-            'results' => Craft::t('sprout-base', 'View Report'),
-            'download' => Craft::t('sprout-base', 'Export'),
-            'dataSourceId' => Craft::t('sprout-base', 'Data Source')
+            'name' => Craft::t('sprout-base-reports', 'Name'),
+            'results' => Craft::t('sprout-base-reports', 'View Report'),
+            'download' => Craft::t('sprout-base-reports', 'Export'),
+            'dataSourceId' => Craft::t('sprout-base-reports', 'Data Source')
         ];
     }
 
@@ -177,20 +177,20 @@ class Report extends Element
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
 
             if (!$dataSource) {
-                throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+                throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
             }
 
             return $dataSource->getName();
         }
 
         if ($attribute === 'download') {
-            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', ['reportId' => $this->id]).'" class="btn small">'.Craft::t('sprout-base', 'Download CSV').'</a>';
+            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', ['reportId' => $this->id]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
         }
 
         if ($attribute === 'results') {
             $resultsUrl = UrlHelper::cpUrl($pluginHandle.'/reports/view/'.$this->id);
 
-            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base', 'Run Report').'</a>';
+            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run Report').'</a>';
         }
 
         return parent::getTableAttributeHtml($attribute);
@@ -202,8 +202,8 @@ class Report extends Element
     protected static function defineSortOptions(): array
     {
         $attributes = [
-            'name' => Craft::t('sprout-base', 'Name'),
-            'dataSourceId' => Craft::t('sprout-base', 'Data Source')
+            'name' => Craft::t('sprout-base-reports', 'Name'),
+            'dataSourceId' => Craft::t('sprout-base-reports', 'Data Source')
         ];
 
         return $attributes;
@@ -217,7 +217,7 @@ class Report extends Element
         $sources = [
             [
                 'key' => '*',
-                'label' => Craft::t('sprout-base', 'All reports')
+                'label' => Craft::t('sprout-base-reports', 'All reports')
             ]
         ];
 
@@ -284,7 +284,7 @@ class Report extends Element
         $dataSource = $this->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
         }
 
         $settingsArray = Json::decode($this->settings);

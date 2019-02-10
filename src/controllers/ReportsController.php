@@ -99,13 +99,13 @@ class ReportsController extends Controller
         }
 
         if (!$report) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Report not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
         }
 
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
         }
 
         $labels = $dataSource->getDefaultLabels($report);
@@ -170,7 +170,7 @@ class ReportsController extends Controller
         $dataSource = $reportElement->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Data Source not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
         }
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
@@ -223,13 +223,13 @@ class ReportsController extends Controller
             $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$reportElement) {
-                throw new NotFoundHttpException(Craft::t('sprout-base', 'No report exists with the id “{id}”', ['id' => $reportId]));
+                throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'No report exists with the id “{id}”', ['id' => $reportId]));
             }
 
             $reportElement->settings = is_array($settings) ? $settings : [];
 
             if (SproutBaseReports::$app->reports->saveReport($reportElement)) {
-                Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Query updated.'));
+                Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Query updated.'));
 
                 return $this->redirectToPostedUrl($reportElement);
             }
@@ -238,7 +238,7 @@ class ReportsController extends Controller
         // Encode back to object after validation for getResults method to recognize option object
         $reportElement->settings = Json::encode($reportElement->settings);
 
-        Craft::$app->getSession()->setError(Craft::t('sprout-base', 'Could not update report.'));
+        Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Could not update report.'));
 
         // Send the report back to the template
         Craft::$app->getUrlManager()->setRouteParams([
@@ -264,12 +264,12 @@ class ReportsController extends Controller
         $report = $this->prepareFromPost();
 
         if ($report->validate() && Craft::$app->getElements()->saveElement($report)) {
-            Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report saved.'));
+            Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report saved.'));
 
             return $this->redirectToPostedUrl($report);
         }
 
-        Craft::$app->getSession()->setError(Craft::t('sprout-base', 'Couldn’t save report.'));
+        Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Couldn’t save report.'));
 
         // Send the report back to the template
         Craft::$app->getUrlManager()->setRouteParams([
@@ -297,12 +297,12 @@ class ReportsController extends Controller
         if ($record = ReportRecord::findOne($reportId)) {
             $record->delete();
 
-            Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report deleted.'));
+            Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report deleted.'));
 
             return $this->redirectToPostedUrl($record);
         }
 
-        throw new NotFoundHttpException(Craft::t('sprout-base', 'Report not found.'));
+        throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
     }
 
     /**
@@ -326,7 +326,7 @@ class ReportsController extends Controller
 
         if (SproutBaseReports::$app->reportGroups->saveGroup($group)) {
 
-            Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Report group saved.'));
+            Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report group saved.'));
 
             return $this->asJson([
                 'success' => true,
@@ -355,7 +355,7 @@ class ReportsController extends Controller
         $groupId = Craft::$app->getRequest()->getBodyParam('id');
         $success = SproutBaseReports::$app->reportGroups->deleteGroup($groupId);
 
-        Craft::$app->getSession()->setNotice(Craft::t('sprout-base', 'Group deleted..'));
+        Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Group deleted..'));
 
         return $this->asJson([
             'success' => $success,
@@ -404,7 +404,7 @@ class ReportsController extends Controller
             $report = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$report) {
-                $report->addError('id', Craft::t('sprout-base', 'Could not find a report with id {reportId}', [
+                $report->addError('id', Craft::t('sprout-base-reports', 'Could not find a report with id {reportId}', [
                     'reportId' => $reportId
                 ]));
             }
@@ -427,7 +427,7 @@ class ReportsController extends Controller
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base', 'Date Source not found.'));
+            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Date Source not found.'));
         }
 
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
