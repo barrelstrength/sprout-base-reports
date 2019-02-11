@@ -71,7 +71,7 @@ class DataSources extends Component
     /**
      * @param $dataSourceClass
      *
-     * @return null
+     * @return DataSource|null
      */
     public function getDataSourceByType($dataSourceClass)
     {
