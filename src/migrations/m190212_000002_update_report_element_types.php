@@ -5,9 +5,9 @@ namespace barrelstrength\sproutbasereports\migrations;
 use craft\db\Migration;
 
 /**
- * m191202_000002_update_report_element_types migration.
+ * m190212_000002_update_report_element_types migration.
  */
-class m191202_000002_update_report_element_types extends Migration
+class m190212_000002_update_report_element_types extends Migration
 {
     /**
      * @inheritdoc
@@ -35,7 +35,7 @@ class m191202_000002_update_report_element_types extends Migration
      */
     public function safeDown(): bool
     {
-        echo "m191202_000002_update_report_element_types cannot be reverted.\n";
+        echo "m190212_000002_update_report_element_types cannot be reverted.\n";
         return false;
     }
 }
