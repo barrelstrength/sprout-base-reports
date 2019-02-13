@@ -14,17 +14,17 @@ class m190212_000002_update_report_element_types extends Migration
      */
     public function safeUp(): bool
     {
-        $seedClasses = [
+        $elements = [
             0 => [
                 'oldType' => 'barrelstrength\sproutbase\app\reports\elements\Report',
                 'newType' => 'barrelstrength\sproutbasereports\elements\Report'
             ]
         ];
 
-        foreach ($seedClasses as $seedClass) {
+        foreach ($elements as $element) {
             $this->update('{{%elements}}', [
-                'type' => $seedClass['newType']
-            ], ['type' => $seedClass['oldType']], [], false);
+                'type' => $element['newType']
+            ], ['type' => $element['oldType']], [], false);
         }
 
         return true;
