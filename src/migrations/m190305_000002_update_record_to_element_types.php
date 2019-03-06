@@ -21,6 +21,7 @@ class m190305_000002_update_record_to_element_types extends Migration
         $query = new Query();
         $db = Craft::$app->getDb();
 
+        // Get all reports from the report table
         $reports = $query->select('*')
             ->from(['{{%sproutreports_reports}}'])
             ->all();
@@ -28,6 +29,7 @@ class m190305_000002_update_record_to_element_types extends Migration
         if (!empty($reports)) {
             foreach ($reports as $report) {
 
+                // Only convert report record to element if it doesn't exist in the elements table
                 $elementExist = $query->select('id')
                     ->from('{{%elements}}')
                     ->where(['id' =>$report['id']])
@@ -35,6 +37,7 @@ class m190305_000002_update_record_to_element_types extends Migration
 
                 if ($elementExist) continue;
 
+                // Delete report record then convert it to report element
                 $db->createCommand()->delete('{{%sproutreports_reports}}',
                     ['id' => $report['id']])->execute();
 
