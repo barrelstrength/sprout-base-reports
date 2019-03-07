@@ -180,6 +180,13 @@ class Report extends Element
                 throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
             }
 
+            $plugin = $dataSource->getPlugin();
+
+            if ($plugin === null) {
+                return Craft::t('sprout-reports',
+                    '<span class="error">Missing Plugin or Class ' . get_class($dataSource)) . '</span>';
+            }
+
             return $dataSource->getName();
         }
 
