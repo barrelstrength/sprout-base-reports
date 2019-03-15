@@ -1,6 +1,6 @@
 {% import "_includes/forms" as forms %}
 
-{% if not currentUser.can('sproutReports-editSettings') %}
+{% if not currentUser.admin %}
     {% redirect 'sprout-reports' %}
 {% endif %}
 
