@@ -60,9 +60,7 @@ class Reports extends Component
      * @param Report $report
      *
      * @return bool
-     * @throws \Exception
      * @throws \Throwable
-     * @throws \yii\db\Exception
      */
     public function saveReport(Report $report): bool
     {

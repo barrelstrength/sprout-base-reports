@@ -311,7 +311,7 @@ class Report extends Element
         $settings = $this->settings;
 
         if (is_string($this->settings)) {
-            $settings = Json::decode($this->settings, true);
+            $settings = Json::decode($this->settings);
         }
 
         return $settings;

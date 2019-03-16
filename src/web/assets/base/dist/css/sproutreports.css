@@ -46,15 +46,6 @@
     overflow: auto;
 }
 
-.tableview th.sproutreports-reportname {
-    vertical-align: top;
-}
-
-.tableview td.sproutreports-reportname,
-.tableview td.sproutreports-reportactions {
-    vertical-align: text-top;
-}
-
 .tableview.sproutreports {
     height: auto;
     max-height: 800px;

@@ -202,10 +202,11 @@ class ReportsController extends Controller
     /**
      * Saves a report query to the database
      *
-     * @return null|\yii\web\Response
-     * @throws \Exception
+     * @return Response|null
+     * @throws NotFoundHttpException
      * @throws \Throwable
-     * @throws \yii\db\Exception
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \craft\errors\MissingComponentException
      * @throws \yii\web\BadRequestHttpException
      */
     public function actionUpdateReport()
@@ -422,7 +423,7 @@ class ReportsController extends Controller
         $report->settings = is_array($settings) ? $settings : [];
         $report->dataSourceId = $request->getBodyParam('dataSourceId');
         $report->enabled = $request->getBodyParam('enabled', false);
-        $report->groupId = $request->getBodyParam('groupId', null);
+        $report->groupId = $request->getBodyParam('groupId');
 
         $dataSource = $report->getDataSource();
 
