@@ -32,6 +32,8 @@ class ReportsController extends Controller
      */
     public function actionIndex($dataSourceId = null, $groupId = null): Response
     {
+        $this->requirePermission('sproutReports-viewReports');
+
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
         $dataSources = [];
@@ -92,6 +94,8 @@ class ReportsController extends Controller
      */
     public function actionResultsIndex(Report $report = null, int $reportId = null): Response
     {
+        $this->requirePermission('sproutReports-viewReports');
+
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
         if ($report === null) {
@@ -151,6 +155,8 @@ class ReportsController extends Controller
      */
     public function actionEditReport(string $dataSourceId, Report $report = null, int $reportId = null): Response
     {
+        $this->requirePermission('sproutReports-editReports');
+
         $currentPluginHandle = Craft::$app->request->getSegment(1);
 
         $reportElement = new Report();
@@ -212,6 +218,7 @@ class ReportsController extends Controller
     public function actionUpdateReport()
     {
         $this->requirePostRequest();
+        $this->requirePermission('sproutReports-editReports');
 
         $request = Craft::$app->getRequest();
 
@@ -261,6 +268,7 @@ class ReportsController extends Controller
     public function actionSaveReport()
     {
         $this->requirePostRequest();
+        $this->requirePermission('sproutReports-editReports');
 
         $report = $this->prepareFromPost();
 
@@ -292,6 +300,7 @@ class ReportsController extends Controller
     public function actionDeleteReport(): Response
     {
         $this->requirePostRequest();
+        $this->requirePermission('sproutReports-editReports');
 
         $reportId = Craft::$app->getRequest()->getBodyParam('id');
 
@@ -312,10 +321,12 @@ class ReportsController extends Controller
      * @return Response
      * @throws \craft\errors\MissingComponentException
      * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionSaveGroup(): Response
     {
         $this->requirePostRequest();
+        $this->requirePermission('sproutReports-editReports');
 
         $request = Craft::$app->getRequest();
 
@@ -352,6 +363,7 @@ class ReportsController extends Controller
     public function actionDeleteGroup(): Response
     {
         $this->requirePostRequest();
+        $this->requirePermission('sproutReports-editReports');
 
         $groupId = Craft::$app->getRequest()->getBodyParam('id');
         $success = SproutBaseReports::$app->reportGroups->deleteGroup($groupId);
@@ -370,6 +382,8 @@ class ReportsController extends Controller
      */
     public function actionExportReport()
     {
+        $this->requirePermission('sproutReports-viewReports');
+
         $reportId = Craft::$app->getRequest()->getParam('reportId');
         $report = SproutBaseReports::$app->reports->getReport($reportId);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];

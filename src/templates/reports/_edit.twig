@@ -1,3 +1,5 @@
+{% requirePermission 'sproutReports-editReports' %}
+
 {% extends "sprout-base-reports/_layouts/base" %}
 {% import "_includes/forms" as forms %}
 
@@ -160,9 +162,7 @@
             name: 'enabled',
             on: report.enabled
         }) }}
-
     </div>
-
     <hr>
 
     <div class="meta read-only">
@@ -171,9 +171,7 @@
             <div class="value">{{ dataSource.name }}</div>
         </div>
     </div>
-
     <hr>
-
 
 {% endblock %}
 
