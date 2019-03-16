@@ -1,32 +1,39 @@
-{% requirePermission 'sproutReports-viewReports' %}
+{% requirePermission viewReportsPermission %}
 
 {% extends "_layouts/cp" %}
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
 {% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
 
-{% set selectedSubnavItem = craft.app.request.segment(2) %}
+{% set selectedSubnavItem = craft.app.request.getSegment(2) %}
 {% if dataSource is defined %}
     {% set settingsHtml = dataSource.getSettingsHtml() %}
 {% endif %}
 
 {% set crumbs = [
-    { label: "Reports"|t('sprout-base-reports'), url: reportIndexUrl },
-    { label: "Edit "|t('sprout-base-reports') ~ report.name, url: report.getCpEditUrl() }
+    { label: "Reports"|t('sprout-base-reports'), url: reportIndexUrl }
 ] %}
+
+{% if currentUser.can(editReportsPermission) %}
+    {% set crumbs = crumbs|merge([
+        { label: "Edit "|t('sprout-base-reports') ~ report.name, url: report.getCpEditUrl() }
+    ]) %}
+{% endif %}
 
 {% block actionButton %}
     <form method="post" accept-charset="UTF-8">
         {{ csrfInput() }}
         <input type="hidden" name="action"
                value="sprout-base-reports/reports/export-report">
-        <input type="hidden" name="reportId" value="{{ reportId }}">
+        <input type="hidden" name="reportId" value="{{ report.id }}">
 
         <a id="btn-download-csv" class="btn">
             {{ "Download"|t('sprout-base-reports') }}
         </a>
 
-        <a id="modify-settings-icon" class="btn" data-icon="settings"></a>
+        {% if currentUser.can(editReportsPermission) %}
+            <a id="modify-settings-icon" class="btn" data-icon="settings"></a>
+        {% endif %}
     </form>
 {% endblock %}
 
@@ -41,7 +48,7 @@
                 {{ redirectInput(redirectUrl) }}
                 <input type="hidden" name="action"
                        value="sprout-base-reports/reports/update-report">
-                <input type="hidden" name="reportId" value="{{ reportId }}">
+                <input type="hidden" name="reportId" value="{{ report.id }}">
 
                 {{ settingsHtml | raw }}
 

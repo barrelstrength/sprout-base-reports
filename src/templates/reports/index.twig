@@ -1,19 +1,15 @@
-{% requirePermission 'sproutReports-viewReports' %}
+{% requirePermission viewReportsPermission %}
 
 {% extends "sprout-base-reports/_layouts/elementindex" %}
-{% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
 {% set title  = "Reports"|t('sprout-base-reports') %}
+{% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
-{% if currentPluginHandle == 'sprout-reports' %}
-    {% set selectedTab = 'reports' %}
-{% endif %}
+{% set currentPluginHandle = craft.app.request.getSegment(1) %}
 
 {% block actionButton %}
 
-    {#@todo - where do we add a report edit permission to Sprout Integrations?#}
-    {#Can we have each integration define a permission with the same name?#}
-    {% if currentUser.can('sproutReports-editReports') %}
+    {% if currentUser.can(editReportsPermission) %}
 
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
@@ -49,16 +45,16 @@
     var pluginHandle = {'pluginHandle': '{{ craft.app.request.getSegment(1) }}'};
     var criteria = Craft.defaultIndexCriteria
 
-    var hideSidebar = false;
     if (pluginHandle.pluginHandle != 'sprout-reports') {
-    hideSidebar = true;
-    criteria = Object.assign(Craft.defaultIndexCriteria, pluginHandle);
+        criteria = Object.assign(Craft.defaultIndexCriteria, pluginHandle);
     }
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-    context:        '{{ context }}',
-    storageKey:     'elementindex.{{ elementType }}',
-    criteria:       criteria,
-    hideSidebar:    hideSidebar
+        context:        '{{ context }}',
+        storageKey:     'elementindex.{{ elementType }}',
+        criteria:       criteria,
+        hideSidebar:    '{{ hideSidebar ?? false }}'
     });
+
+    $('#main-content').removeClass('has-sidebar');
 {% endblock %}
