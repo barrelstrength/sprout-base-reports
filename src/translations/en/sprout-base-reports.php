@@ -62,5 +62,20 @@ return [
     'New Report' => 'New Report',
     'Data Source' => 'Data Source',
     'What this report will be called in the CP.' => 'What this report will be called in the CP.',
-    'Create a custom report' => 'Create a custom report'
+    'Create a custom report' => 'Create a custom report',
+    'Migrate to Craft with all of your existing website metadata using Sprout SEO and <a href=\'{url}\' target=\'_blank\'>Sprout Import</a>. Sprout Import makes it easy to keep your Search, Social Sharing, Geo, and Robots metadata, and gives you the opportunity to enhance it with additional Structured Data and improve your workflow.' => 'Migrate to Craft with all of your existing website metadata using Sprout SEO and <a href=\'{url}\' target=\'_blank\'>Sprout Import</a>. Sprout Import makes it easy to keep your Search, Social Sharing, Geo, and Robots metadata, and gives you the opportunity to enhance it with additional Structured Data and improve your workflow.',
+    'Results Template' => 'Results Template',
+    'Data Sources' => 'Data Sources',
+    'Allow users to create a new Report from this Data Source from the New Report dropdown. If disabled, any existing Reports using this Data Source will still be visible to all users in the list of Reports. Users with the \'Edit Data Sources\' permission can always create a new Report from this page. ' => 'Allow users to create a new Report from this Data Source from the New Report dropdown. If disabled, any existing Reports using this Data Source will still be visible to all users in the list of Reports. Users with the \'Edit Data Sources\' permission can always create a new Report from this page. ',
+    'Plugin Name' => 'Plugin Name',
+    'Custom Query' => 'Custom Query',
+    'Template Settings' => 'Template Settings',
+    'Data Source class not found: {className}' => 'Data Source class not found: {className}',
+    'Intuitive, human-readable plugin name for the end user.' => 'Intuitive, human-readable plugin name for the end user.',
+    'Give your users the ability to refine their results with a date range, lightswitch, and more. Build custom Twig Template reports with a Craft-friendly look and feel. [Learn more]({url}).' => 'Give your users the ability to refine their results with a date range, lightswitch, and more. Build custom Twig Template reports with a Craft-friendly look and feel. [Learn more]({url}).',
+    'Settings Template' => 'Settings Template',
+    'Total Reports' => 'Total Reports',
+    'Give your users options' => 'Give your users options',
+    'Allow New?' => 'Allow New?',
+    'Plugin' => 'Plugin'
 ];
