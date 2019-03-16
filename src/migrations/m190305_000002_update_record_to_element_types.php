@@ -14,6 +14,9 @@ class m190305_000002_update_record_to_element_types extends Migration
 {
     /**
      * @return bool
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
      * @throws \yii\db\Exception
      */
     public function safeUp(): bool
@@ -26,28 +29,31 @@ class m190305_000002_update_record_to_element_types extends Migration
             ->from(['{{%sproutreports_reports}}'])
             ->all();
 
-        if (!empty($reports)) {
-            foreach ($reports as $report) {
+        if (empty($reports)) {
+            return true;
+        }
 
-                // Only convert report record to element if it doesn't exist in the elements table
-                $elementExist = $query->select('id')
-                    ->from('{{%elements}}')
-                    ->where(['id' =>$report['id']])
-                    ->one();
+        foreach ($reports as $report) {
 
-                if ($elementExist) continue;
+            // Only convert report record to element if it doesn't exist in the elements table
+            $elementExist = $query->select('id')
+                ->from('{{%elements}}')
+                ->where(['id' =>$report['id']])
+                ->one();
 
-                // Delete report record then convert it to report element
-                $db->createCommand()->delete('{{%sproutreports_reports}}',
-                    ['id' => $report['id']])->execute();
-
-                $reportElement = new Report();
-                unset($report['id']);
-                $reportElement->setAttributes($report, false);
-
-                Craft::$app->getElements()->saveElement($reportElement, false);
-
+            if ($elementExist) {
+                continue;
             }
+
+            // Delete report record then convert it to report element
+            $db->createCommand()->delete('{{%sproutreports_reports}}',
+                ['id' => $report['id']])->execute();
+
+            $reportElement = new Report();
+            unset($report['id']);
+            $reportElement->setAttributes($report, false);
+
+            Craft::$app->getElements()->saveElement($reportElement, false);
         }
 
         return true;
