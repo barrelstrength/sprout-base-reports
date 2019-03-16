@@ -5,7 +5,7 @@
     {% redirect 'sprout-reports' %}
 {% endif %}
 
-{% set title  = "Data Sources"|t('sprout-reports') %}
+{% set title  = "Data Sources"|t('sprout-base-reports') %}
 {% set groups = craft.sproutReports.getReportGroups() %}
 
 {% set selectedSubnavItem = 'datasources' %}
@@ -26,16 +26,16 @@
             <thead>
             <tr>
                 <th scope="col"
-                    data-attribute="datasource">{{ "Data Source"|t('sprout-reports') }}</th>
+                    data-attribute="datasource">{{ "Data Source"|t('sprout-base-reports') }}</th>
                 <th scope="col"
-                    data-attribute="description">{{ "Description"|t('sprout-reports') }}</th>
+                    data-attribute="description">{{ "Description"|t('sprout-base-reports') }}</th>
                 <th scope="col"
-                    data-attribute="plugin">{{ "Plugin"|t('sprout-reports') }}</th>
+                    data-attribute="plugin">{{ "Plugin"|t('sprout-base-reports') }}</th>
                 <th scope="col"
-                    data-attribute="totalReports">{{ "Total Reports"|t('sprout-reports') }}</th>
+                    data-attribute="totalReports">{{ "Total Reports"|t('sprout-base-reports') }}</th>
                 <th scope="col"
-                    data-attribute="allowNew">{{ "Allow New?"|t('sprout-reports') }}
-                    <span class="info">{{ "Allow users to create a new Report from this Data Source from the New Report dropdown. If disabled, any existing Reports using this Data Source will still be visible to all users in the list of Reports. Users with the 'Edit Data Sources' permission can always create a new Report from this page. "|t('sproutreports') }}</span>
+                    data-attribute="allowNew">{{ "Allow New?"|t('sprout-base-reports') }}
+                    <span class="info">{{ "Allow users to create a new Report from this Data Source from the New Report dropdown. If disabled, any existing Reports using this Data Source will still be visible to all users in the list of Reports. Users with the 'Edit Data Sources' permission can always create a new Report from this page. "|t('sprout-base-reports') }}</span>
                 </th>
                 <th class="thin"></th>
             </tr>
@@ -63,7 +63,7 @@
                     </td>
                     <td>
                         <a href="{{ dataSource.getUrl(dataSource.dataSourceId ~ '/new') }}"
-                           class="btn small">{{ "New Report"|t('sprout-reports') }}</a>
+                           class="btn small">{{ "New Report"|t('sprout-base-reports') }}</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -93,7 +93,7 @@
     }, function(response) {
     if (response)
     {
-    Craft.cp.displayNotice(Craft.t('sprout-reports', 'Data Source saved.'));
+    Craft.cp.displayNotice(Craft.t('sprout-base-reports', 'Data Source saved.'));
     }
     });
     })
