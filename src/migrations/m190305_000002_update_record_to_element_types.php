@@ -38,7 +38,7 @@ class m190305_000002_update_record_to_element_types extends Migration
             // Only convert report record to element if it doesn't exist in the elements table
             $elementExist = $query->select('id')
                 ->from('{{%elements}}')
-                ->where(['id' =>$report['id']])
+                ->where(['id' => $report['id']])
                 ->one();
 
             if ($elementExist) {

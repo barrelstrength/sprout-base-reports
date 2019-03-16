@@ -183,10 +183,10 @@ class Report extends Element
             $plugin = $dataSource->getPlugin();
 
             if ($plugin === null) {
-                $message = Craft::t('sprout-base-reports','Data Source class not found: {className}', [
+                $message = Craft::t('sprout-base-reports', 'Data Source class not found: {className}', [
                     'className' => get_class($dataSource)
                 ]);
-                return '<span class="error">' . $message . '</span>';
+                return '<span class="error">'.$message.'</span>';
             }
 
             return $dataSource->getName();
