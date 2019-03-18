@@ -25,13 +25,15 @@ use yii\web\Response;
 
 class ReportsController extends Controller
 {
-    public $permissions = [];
+    private $permissions = [];
 
     public function init()
     {
         $permissionNames = Settings::getSharedPermissions();
         $currentPluginHandle = Craft::$app->request->getSegment(1);
         $this->permissions = SproutBase::$app->settings->getSharedPermissions($permissionNames, 'sprout-reports', $currentPluginHandle);
+
+        parent::init();
     }
 
     /**
