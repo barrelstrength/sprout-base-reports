@@ -17,6 +17,7 @@ use barrelstrength\sproutreports\models\Settings;
 use Craft;
 
 use craft\helpers\Json;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
@@ -415,7 +416,9 @@ class ReportsController extends Controller
             if ($dataSource) {
                 $date = date('Ymd-his');
 
-                $filename = $report->name.'-'.$date;
+                // Name the report using the $report toString method that will check both nameFormat and name
+                $filename = $report.'-'.$date;
+
                 $labels = $dataSource->getDefaultLabels($report, $settings);
                 $values = $dataSource->getResults($report, $settings);
 
