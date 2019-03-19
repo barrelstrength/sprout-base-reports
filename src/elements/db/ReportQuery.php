@@ -14,6 +14,8 @@ use Craft;
 
 class ReportQuery extends ElementQuery
 {
+    public $pluginHandle;
+
     public $id;
 
     public $name;
@@ -44,8 +46,6 @@ class ReportQuery extends ElementQuery
 
     public $results;
 
-    public $pluginHandle;
-
     /**
      * @inheritdoc
      */
@@ -68,21 +68,15 @@ class ReportQuery extends ElementQuery
 
         $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
 
-        $pluginHandleRequest = Craft::$app->request->getBodyParam('criteria.pluginHandle');
-
-        $pluginHandle = null;
-
-        if ($pluginHandleRequest) {
-            $pluginHandle = $pluginHandleRequest;
+        // Property is used for Element Sources in sidebar
+        if (!$this->pluginHandle) {
+            // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
+            $this->pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
         }
 
         if ($this->pluginHandle) {
-            $pluginHandle = $this->pluginHandle;
-        }
-
-        if ($pluginHandle != null) {
             $this->query->andWhere(Db::parseParam(
-                'sproutreports_datasources.pluginHandle', $pluginHandle)
+                'sproutreports_datasources.pluginHandle', $this->pluginHandle)
             );
         }
 

@@ -13,11 +13,9 @@ use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutreports\models\Settings;
+use barrelstrength\sproutbasereports\models\Settings;
 use Craft;
-
 use craft\helpers\Json;
-use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
@@ -31,13 +29,14 @@ class ReportsController extends Controller
     public function init()
     {
         $permissionNames = Settings::getSharedPermissions();
-        $currentPluginHandle = Craft::$app->request->getSegment(1);
-        $this->permissions = SproutBase::$app->settings->getSharedPermissions($permissionNames, 'sprout-reports', $currentPluginHandle);
+        $pluginHandle = Craft::$app->request->getSegment(1);
+        $this->permissions = SproutBase::$app->settings->getSharedPermissions($permissionNames, 'sprout-reports', $pluginHandle);
 
         parent::init();
     }
 
     /**
+     * @param string $pluginHandle
      * @param null   $dataSourceId
      * @param null   $groupId
      * @param bool   $hideSidebar
@@ -47,15 +46,13 @@ class ReportsController extends Controller
      * @throws \yii\db\Exception
      * @throws \yii\web\ForbiddenHttpException
      */
-    public function actionIndex($dataSourceId = null, $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate(string $pluginHandle, $dataSourceId = null, $groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
-        $currentPluginHandle = Craft::$app->request->getSegment(1);
-
         $dataSources = [];
 
-        if ($currentPluginHandle !== 'sprout-reports') {
+        if ($pluginHandle !== 'sprout-reports') {
 
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($dataSourceId);
 
@@ -83,7 +80,7 @@ class ReportsController extends Controller
              * @var $dataSource DataSource
              */
             // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource AND (bool)$dataSource->allowNew() OR $currentPluginHandle !== 'sprout-reports') {
+            if ($dataSource AND (bool)$dataSource->allowNew() OR $pluginHandle !== 'sprout-reports') {
                 $newReportOptions[] = [
                     'name' => $dataSource->getName(),
                     'url' => $dataSource->getUrl($dataSource->dataSourceId.'/new')
@@ -96,7 +93,6 @@ class ReportsController extends Controller
             'groupId' => $groupId,
             'reports' => $reports,
             'newReportOptions' => $newReportOptions,
-            'currentPluginHandle' => $currentPluginHandle,
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'hideSidebar' => $hideSidebar
@@ -104,6 +100,7 @@ class ReportsController extends Controller
     }
 
     /**
+     * @param string      $pluginHandle
      * @param Report|null $report
      * @param int|null    $reportId
      *
@@ -114,11 +111,9 @@ class ReportsController extends Controller
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\web\ForbiddenHttpException
      */
-    public function actionResultsIndex(Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $pluginHandle, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
-
-        $currentPluginHandle = Craft::$app->request->getSegment(1);
 
         if ($report === null) {
             $report = SproutBaseReports::$app->reports->getReport($reportId);
@@ -138,7 +133,7 @@ class ReportsController extends Controller
 
         $reportIndexUrl = $dataSource->getUrl($report->groupId);
 
-        if ($currentPluginHandle !== 'sprout-reports') {
+        if ($pluginHandle !== 'sprout-reports') {
             $reportIndexUrl = $dataSource->getUrl($dataSource->dataSourceId);
         }
 
@@ -164,6 +159,7 @@ class ReportsController extends Controller
     }
 
     /**
+     * @param string      $pluginHandle
      * @param string      $dataSourceId
      * @param Report|null $report
      * @param int|null    $reportId
@@ -174,11 +170,9 @@ class ReportsController extends Controller
      * @throws \yii\base\Exception
      * @throws \yii\web\ForbiddenHttpException
      */
-    public function actionEditReport(string $dataSourceId, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $pluginHandle, string $dataSourceId, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
-
-        $currentPluginHandle = Craft::$app->request->getSegment(1);
 
         $reportElement = new Report();
         $reportElement->enabled = 1;
@@ -202,7 +196,7 @@ class ReportsController extends Controller
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
-        if ($currentPluginHandle !== 'sprout-reports') {
+        if ($pluginHandle !== 'sprout-reports') {
             $reportIndexUrl = $dataSource->getUrl($dataSource->dataSourceId);
         }
 

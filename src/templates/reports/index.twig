@@ -5,8 +5,6 @@
 {% set title  = "Reports"|t('sprout-base-reports') %}
 {% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
-{% set currentPluginHandle = craft.app.request.getSegment(1) %}
-
 {% block actionButton %}
 
     {% if currentUser.can(editReportsPermission) %}
@@ -42,11 +40,13 @@
 
 {% block initJs %}
     // Pass segment to the NotificationEmailQuery class to filter notification entries
-    var pluginHandle = {'pluginHandle': '{{ craft.app.request.getSegment(1) }}'};
-    var criteria = Craft.defaultIndexCriteria
+    var params = {'pluginHandle': '{{ craft.app.request.getSegment(1) }}'};
+    var criteria = Craft.defaultIndexCriteria;
 
-    if (pluginHandle.pluginHandle != 'sprout-reports') {
-        criteria = Object.assign(Craft.defaultIndexCriteria, pluginHandle);
+    {# Only apply these values on a plugin integration. We will use the default values above
+       in Sprout Email so the Source filtering works as expected. #}
+    if (params.pluginHandle !== 'sprout-reports') {
+        criteria = Object.assign(Craft.defaultIndexCriteria, params);
     }
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
