@@ -16,6 +16,7 @@ use yii\base\Component;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use yii\base\Exception;
+use craft\helpers\DateTimeHelper;
 
 /**
  *
@@ -246,5 +247,19 @@ class Reports extends Component
         }
 
         return $models;
+    }
+
+    /**
+     * Convert DateTime to UTC to get correct result when querying SQL. SQL data is always on UTC.
+     * @param $dateSetting
+     *
+     * @return \DateTime|false
+     * @throws \Exception
+     */
+    public function getUtcDateTime($dateSetting)
+    {
+        $timeZone =  new \DateTimeZone('UTC');
+
+        return DateTimeHelper::toDateTime($dateSetting)->setTimezone($timeZone);
     }
 }
