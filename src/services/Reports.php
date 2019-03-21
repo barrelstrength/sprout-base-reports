@@ -262,4 +262,140 @@ class Reports extends Component
 
         return DateTimeHelper::toDateTime($dateSetting)->setTimezone($timeZone);
     }
+
+    public function getStartEndDateRange($value)
+    {
+        $dateTime = [
+            'startDate' => date('Y-m-d H:i:s'),
+            'endDate'   => date('Y-m-d H:i:s')
+        ];
+
+        switch ($value) {
+
+            case 'thisWeek':
+                $dateTime['startDate'] = date('Y-m-d H:i:s', strtotime('-7 days'));
+            break;
+
+            case 'lastWeek':
+                $dateTime['startDate'] = date('Y-m-d H:i:s', strtotime('-8 days'));
+                $dateTime['endDate']   = date('Y-m-d H:i:s', strtotime('-1 days'));
+            break;
+
+            case 'thisMonth':
+
+                $dateTime['startDate'] = date('Y-m-1 00:00:00');
+                $dateTime['endDate'] = date('Y-m-t 00:00:00');
+
+            break;
+
+            case 'lastMonth':
+
+                $dateTime['startDate'] = date('Y-m-1 00:00:00', strtotime('-1 month'));
+                $dateTime['endDate'] = date('Y-m-t 00:00:00', strtotime('-1 month'));
+
+            break;
+
+            case 'thisQuarter':
+                $dateTime = $this->thisQuarter();
+            break;
+
+            case 'lastQuarter':
+                $dateTime = $this->lastQuarter();
+            break;
+
+            case 'thisYear':
+                $dateTime['startDate'] = date('Y-1-1 00:00:00');
+                $dateTime['endDate'] = date('Y-12-t 00:00:00');
+            break;
+
+            case 'lastYear':
+                $dateTime['startDate'] = date('Y-1-1 00:00:00', strtotime('-1 year'));
+                $dateTime['endDate'] = date('Y-12-t 00:00:00', strtotime('-1 year'));
+            break;
+        }
+
+        return $dateTime;
+    }
+
+    private function thisQuarter()
+    {
+        $startDate = '';
+        $endDate   = '';
+        $current_month = date('m');
+        $current_year = date('Y');
+        if($current_month>=1 && $current_month<=3)
+        {
+            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-Januray 12:00:00 AM
+            $endDate = strtotime('31-March-'.$current_year);  // timestamp or 1-April 12:00:00 AM means end of 31 March
+        }
+        else  if($current_month>=4 && $current_month<=6)
+        {
+            $startDate = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM
+            $endDate = strtotime('30-June-'.$current_year);  // timestamp or 1-July 12:00:00 AM means end of 30 June
+        }
+        else  if($current_month>=7 && $current_month<=9)
+        {
+            $startDate = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM
+            $endDate = strtotime('30-September-'.$current_year);  // timestamp or 1-October 12:00:00 AM means end of 30 September
+        }
+        else  if($current_month>=10 && $current_month<=12)
+        {
+            $startDate = strtotime('1-October-'.$current_year);  // timestamp or 1-October 12:00:00 AM
+            $endDate = strtotime('31-December-'.($current_year+1));  // timestamp or 1-January Next year 12:00:00 AM means end of 31 December this year
+        }
+
+        return [
+            'startDate' => date('Y-m-d H:i:s', $startDate),
+            'endDate'   => date('Y-m-d H:i:s', $endDate)
+        ];
+    }
+
+    private function lastQuarter()
+    {
+        $startDate = '';
+        $endDate   = '';
+        $current_month = date('m');
+        $current_year = date('Y');
+
+        if($current_month>=1 && $current_month<=3)
+        {
+            $startDate = strtotime('1-October-'.($current_year-1));  // timestamp or 1-October Last Year 12:00:00 AM
+            $endDate = strtotime('31-December-'.$current_year);  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
+        }
+        else if($current_month>=4 && $current_month<=6)
+        {
+            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-Januray 12:00:00 AM
+            $endDate = strtotime('31-March-'.$current_year);  // timestamp or 1-April 12:00:00 AM means end of 31 March
+        }
+        else  if($current_month>=7 && $current_month<=9)
+        {
+            $startDate = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM
+            $endDate = strtotime('30-June-'.$current_year);  // timestamp or 1-July 12:00:00 AM means end of 30 June
+        }
+        else  if($current_month>=10 && $current_month<=12)
+        {
+            $startDate = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM
+            $endDate = strtotime('30-September-'.$current_year);  // timestamp or 1-October 12:00:00 AM means end of 30 September
+        }
+
+        return [
+            'startDate' => date('Y-m-d H:i:s',$startDate),
+            'endDate'   => date('Y-m-d H:i:s', $endDate)
+        ];
+    }
+
+    public function getDateRanges()
+    {
+        return [
+            'thisWeek' => Craft::t('sprout-reports-commerce', 'This Week'),
+            'lastWeek' => Craft::t('sprout-reports-commerce', 'Last Week'),
+            'thisMonth' => Craft::t('sprout-reports-commerce', 'This Month'),
+            'lastMonth' => Craft::t('sprout-reports-commerce', 'Last Month'),
+            'thisQuarter' => Craft::t('sprout-reports-commerce', 'This Quarter'),
+            'lastQuarter' => Craft::t('sprout-reports-commerce', 'Last Quarter'),
+            'thisYear' => Craft::t('sprout-reports-commerce', 'This Year'),
+            'lastYear' => Craft::t('sprout-reports-commerce', 'Last Week'),
+            'customRange' => Craft::t('sprout-reports-commerce', 'Custom Date Range')
+        ];
+    }
 }
