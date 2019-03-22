@@ -34,8 +34,6 @@ class ReportQuery extends ElementQuery
 
     public $dataSourceId;
 
-    public $dataSourceSlug;
-
     public $enabled;
 
     public $groupId;

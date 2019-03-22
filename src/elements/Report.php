@@ -53,8 +53,6 @@ class Report extends Element
 
     public $dataSourceId;
 
-    public $dataSourceSlug;
-
     public $enabled;
 
     public $groupId;

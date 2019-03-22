@@ -29,11 +29,6 @@ abstract class DataSource
     public $dataSourceId;
 
     /**
-     * @var string
-     */
-    protected $dataSourceSlug;
-
-    /**
      * @var Plugin
      */
     protected $plugin;
@@ -53,16 +48,11 @@ abstract class DataSource
         // Get plugin class
         $pluginHandle = Craft::$app->getPlugins()->getPluginHandleByClass(get_class($this));
 
-        $this->plugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
-
-        // Build $dataSourceSlug: pluginname-datasourceclassname
-        $pluginHandleWithoutSpaces = str_replace('-', '', $pluginHandle);
-
-        $dataSourceClass = (new \ReflectionClass($this))->getShortName();
-
-        $dataSourceSlug = $pluginHandleWithoutSpaces.'-'.$dataSourceClass;
-
-        $this->dataSourceSlug = strtolower($dataSourceSlug);
+        if ($pluginHandle !== null) {
+            $this->plugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
+        } else {
+            $this->plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
+        }
     }
 
     /**
