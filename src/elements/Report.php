@@ -7,10 +7,12 @@
 
 namespace barrelstrength\sproutbasereports\elements;
 
+use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\db\ReportQuery;
+use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
@@ -142,6 +144,12 @@ class Report extends Element
             $pluginHandle = Craft::$app->getRequest()->getSegment(1) ?? 'sprout-reports';
         }
 
+        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
+
+        if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
+            return null;
+        }
+
         return UrlHelper::cpUrl($pluginHandle.'/reports/'.$this->dataSourceId.'/edit/'.$this->id);
     }
 
@@ -203,7 +211,10 @@ class Report extends Element
         }
 
         if ($attribute === 'download') {
-            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', ['reportId' => $this->id]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
+            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
+                    'reportId' => $this->id,
+                    'pluginHandle' => $pluginHandle
+                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
         }
 
         if ($attribute === 'results') {

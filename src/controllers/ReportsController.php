@@ -28,9 +28,7 @@ class ReportsController extends Controller
 
     public function init()
     {
-        $permissionNames = Settings::getSharedPermissions();
-        $pluginHandle = Craft::$app->request->getSegment(1);
-        $this->permissions = SproutBase::$app->settings->getSharedPermissions($permissionNames, 'sprout-reports', $pluginHandle);
+        $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
 
         parent::init();
     }
