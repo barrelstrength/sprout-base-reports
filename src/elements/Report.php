@@ -64,6 +64,16 @@ class Report extends Element
     public $results;
 
     /**
+     * @var \DateTime
+     */
+    public $startDate = null;
+
+    /**
+     * @var \DateTime
+     */
+    public $endDate = null;
+
+    /**
      * @var string Plugin Handle as defined in the Data Sources table
      */
     public $pluginHandle;
@@ -405,5 +415,39 @@ class Report extends Element
         $actions[] = DeleteReport::class;
 
         return $actions;
+    }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
+    public function getStartEndDate()
+    {
+        $dateRange = $this->getSetting('dateRange');
+
+        if ($dateRange !== null && $dateRange == 'customRange') {
+            $startDateSetting = $this->getSetting('startDate');
+            $endDateSetting   = $this->getSetting('endDate');
+        } else {
+            $startEndDate = SproutBaseReports::$app->reports->getStartEndDateRange($dateRange);
+
+            $startDateSetting = $startEndDate['startDate'];
+            $endDateSetting = $startEndDate['endDate'];
+        }
+
+        $this->startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
+        $this->endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
+
+        return $this;
+    }
+
+    public function getStartDate()
+    {
+        return $this->startDate;
+    }
+
+    public function getEndDate()
+    {
+        return $this->endDate;
     }
 }

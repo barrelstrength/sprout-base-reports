@@ -24,6 +24,10 @@ class SproutReportsAsset extends AssetBundle
             'css/sproutreports.css'
         ];
 
+        $this->js = [
+            'js/reports.js'
+        ];
+
         parent::init();
     }
 }

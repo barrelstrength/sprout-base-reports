@@ -265,6 +265,7 @@ class Reports extends Component
 
     public function getStartEndDateRange($value)
     {
+        // The date function still return date based on the cpPanel timezone settings
         $dateTime = [
             'startDate' => date('Y-m-d H:i:s'),
             'endDate'   => date('Y-m-d H:i:s')

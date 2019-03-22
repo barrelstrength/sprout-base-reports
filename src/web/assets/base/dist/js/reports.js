@@ -13,13 +13,11 @@ var SproutReport = {
     },
 
     selectDateRange: function() {
-        $('.custom-date-range').hide();
+        $('#custom-date-range').hide();
         var dateVal = this.button.val();
 
         if (dateVal != undefined && dateVal == 'customRange') {
-            var eventVal = notificationVal.replace(/\\/g, '-').toLowerCase();
-
-            $('.' + eventVal).show();
+            $('#custom-date-range').show();
         }
-    },
+    }
 };
