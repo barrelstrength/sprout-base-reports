@@ -260,7 +260,7 @@ class Reports extends Component
     {
         $timeZone =  new \DateTimeZone('UTC');
 
-        return DateTimeHelper::toDateTime($dateSetting)->setTimezone($timeZone);
+        return DateTimeHelper::toDateTime($dateSetting, true)->setTimezone($timeZone);
     }
 
     public function getStartEndDateRange($value)
@@ -342,7 +342,7 @@ class Reports extends Component
         else  if($current_month>=10 && $current_month<=12)
         {
             $startDate = strtotime('1-October-'.$current_year);  // timestamp or 1-October 12:00:00 AM
-            $endDate = strtotime('31-December-'.($current_year+1));  // timestamp or 1-January Next year 12:00:00 AM means end of 31 December this year
+            $endDate = strtotime('31-December-'.$current_year);  // timestamp or 1-January Next year 12:00:00 AM means end of 31 December this year
         }
 
         return [
@@ -361,7 +361,7 @@ class Reports extends Component
         if($current_month>=1 && $current_month<=3)
         {
             $startDate = strtotime('1-October-'.($current_year-1));  // timestamp or 1-October Last Year 12:00:00 AM
-            $endDate = strtotime('31-December-'.$current_year);  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
+            $endDate = strtotime('31-December-'.($current_year-1));  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
         }
         else if($current_month>=4 && $current_month<=6)
         {
@@ -395,7 +395,7 @@ class Reports extends Component
             'thisQuarter' => Craft::t('sprout-reports-commerce', 'This Quarter'),
             'lastQuarter' => Craft::t('sprout-reports-commerce', 'Last Quarter'),
             'thisYear' => Craft::t('sprout-reports-commerce', 'This Year'),
-            'lastYear' => Craft::t('sprout-reports-commerce', 'Last Week'),
+            'lastYear' => Craft::t('sprout-reports-commerce', 'Last Year'),
             'customRange' => Craft::t('sprout-reports-commerce', 'Custom Date Range')
         ];
     }
