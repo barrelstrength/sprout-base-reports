@@ -388,15 +388,15 @@ class Reports extends Component
     public function getDateRanges()
     {
         return [
-            'thisWeek' => Craft::t('sprout-reports-commerce', 'This Week'),
-            'lastWeek' => Craft::t('sprout-reports-commerce', 'Last Week'),
-            'thisMonth' => Craft::t('sprout-reports-commerce', 'This Month'),
-            'lastMonth' => Craft::t('sprout-reports-commerce', 'Last Month'),
-            'thisQuarter' => Craft::t('sprout-reports-commerce', 'This Quarter'),
-            'lastQuarter' => Craft::t('sprout-reports-commerce', 'Last Quarter'),
-            'thisYear' => Craft::t('sprout-reports-commerce', 'This Year'),
-            'lastYear' => Craft::t('sprout-reports-commerce', 'Last Year'),
-            'customRange' => Craft::t('sprout-reports-commerce', 'Custom Date Range')
+            'thisWeek' => Craft::t('sprout-base-reports', 'This Week'),
+            'lastWeek' => Craft::t('sprout-base-reports', 'Last Week'),
+            'thisMonth' => Craft::t('sprout-base-reports', 'This Month'),
+            'lastMonth' => Craft::t('sprout-base-reports', 'Last Month'),
+            'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter'),
+            'lastQuarter' => Craft::t('sprout-base-reports', 'Last Quarter'),
+            'thisYear' => Craft::t('sprout-base-reports', 'This Year'),
+            'lastYear' => Craft::t('sprout-base-reports', 'Last Week'),
+            'customRange' => Craft::t('sprout-base-reports', 'Custom Date Range')
         ];
     }
 }
