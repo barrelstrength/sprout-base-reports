@@ -46,12 +46,13 @@
     {# Only apply these values on a plugin integration. We will use the default values above
        in Sprout Email so the Source filtering works as expected. #}
     if (params.pluginHandle !== 'sprout-reports') {
-        criteria = Object.assign(Craft.defaultIndexCriteria, params);
+        criteria = $.extend({}, Craft.defaultIndexCriteria);
+        criteria.pluginHandle = params.pluginHandle;
     }
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
         context:        '{{ context }}',
-        storageKey:     'elementindex.{{ elementType }}',
+        storageKey:     'elementindex.{{ elementType|e("js") }}',
         criteria:       criteria,
         hideSidebar:    '{{ hideSidebar ?? false }}'
     });
