@@ -292,7 +292,7 @@ class DataSources extends Component
 
         if ($source) {
             $query->createCommand()
-                ->delete('{{%sproutreports_reports}}', ['dataSourceId' => $source['id']])
+                ->delete('{{%sproutreports_reports}}', ['[[dataSourceId]]' => $source['id']])
                 ->execute();
         }
 
