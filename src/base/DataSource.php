@@ -123,7 +123,9 @@ abstract class DataSource
      * Should return an array of records to use in the report
      *
      * @param Report $report
-     * @param array  $settings
+     * @param array  $settings  Not in use. Use $report->getSettings() instead.
+     *
+     * @deprecated $settings param in 1.0. Will be removed in 2.0.
      *
      * @return array
      */
