@@ -32,7 +32,6 @@ return [
     'Run Report' => 'Run Report',
     'Handle' => 'Handle',
     'Reports (Sprout)' => 'Reports (Sprout)',
-    'Submit Report' => 'Submit Report',
     'Data Source not found.' => 'Data Source not found.',
     'Sprout Reports' => 'Sprout Reports',
     'Could not update report.' => 'Could not update report.',
