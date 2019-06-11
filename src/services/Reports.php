@@ -277,11 +277,6 @@ class Reports extends Component
                 $dateTime['startDate'] = date('Y-m-d H:i:s', strtotime('-7 days'));
             break;
 
-            case 'lastWeek':
-                $dateTime['startDate'] = date('Y-m-d H:i:s', strtotime('-8 days'));
-                $dateTime['endDate']   = date('Y-m-d H:i:s', strtotime('-1 days'));
-            break;
-
             case 'thisMonth':
 
                 $dateTime['startDate'] = date('Y-m-1 00:00:00');
@@ -380,23 +375,55 @@ class Reports extends Component
         }
 
         return [
-            'startDate' => date('Y-m-d H:i:s',$startDate),
+            'startDate' => date('Y-m-d H:i:s', $startDate),
             'endDate'   => date('Y-m-d H:i:s', $endDate)
         ];
     }
 
-    public function getDateRanges()
+    public function getDateRanges($withQuarter = true)
     {
-        return [
-            'thisWeek' => Craft::t('sprout-base-reports', 'This Week'),
-            'lastWeek' => Craft::t('sprout-base-reports', 'Last Week'),
-            'thisMonth' => Craft::t('sprout-base-reports', 'This Month'),
-            'lastMonth' => Craft::t('sprout-base-reports', 'Last Month'),
-            'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter'),
-            'lastQuarter' => Craft::t('sprout-base-reports', 'Last Quarter'),
-            'thisYear' => Craft::t('sprout-base-reports', 'This Year'),
-            'lastYear' => Craft::t('sprout-base-reports', 'Last Week'),
-            'customRange' => Craft::t('sprout-base-reports', 'Custom Date Range')
+        $currentMonth = date('F');
+        $lastMonth = date('F', strtotime(date('Y-m')." -1 month"));
+        $thisQuarter = $this->thisQuarter();
+        $thisQuarterInitialMonth = date('F', strtotime($thisQuarter['startDate']));
+        $thisQuarterFinalMonth = date('F', strtotime($thisQuarter['endDate']));
+        $thisQuarterYear = date('Y', strtotime($thisQuarter['endDate']));
+
+        $lastQuarter = $this->lastQuarter();
+        $lastQuarterInitialMonth = date('F', strtotime($lastQuarter['startDate']));
+        $lastQuarterFinalMonth = date('F', strtotime($lastQuarter['endDate']));
+        $lastQuarterYear = date('Y', strtotime($lastQuarter['endDate']));
+
+        $currentYear = date("Y");
+        $previousYear = date("Y", strtotime("-1 year"));
+
+        $ranges = [
+            'thisWeek' => Craft::t('sprout-base-reports', 'Last 7 Days'),
+            'thisMonth' => Craft::t('sprout-base-reports', 'This Month ({month})', ['month' => $currentMonth]),
+            'lastMonth' => Craft::t('sprout-base-reports', 'Last Month ({month})', ['month' => $lastMonth])
         ];
+
+        if ($withQuarter){
+            $ranges = array_merge($ranges,[
+                'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter ({iMonth} - {fMonth} {year})', [
+                    'iMonth' => $thisQuarterInitialMonth,
+                    'fMonth' => $thisQuarterFinalMonth,
+                    'year' => $thisQuarterYear
+                ]),
+                'lastQuarter' => Craft::t('sprout-base-reports', 'Last Quarter ({iMonth} - {fMonth} {year})', [
+                    'iMonth' => $lastQuarterInitialMonth,
+                    'fMonth' => $lastQuarterFinalMonth,
+                    'year' => $lastQuarterYear
+                ]),
+            ]);
+        }
+
+        $ranges = array_merge($ranges, [
+            'thisYear' => Craft::t('sprout-base-reports', 'This Year ({year})', ['year' => $currentYear]),
+            'lastYear' => Craft::t('sprout-base-reports', 'Last Year ({year})', ['year' => $previousYear]),
+            'customRange' => Craft::t('sprout-base-reports', 'Custom Date Range')
+        ]);
+
+        return $ranges;
     }
 }
