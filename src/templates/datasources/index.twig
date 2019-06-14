@@ -4,19 +4,8 @@
 {% import "_includes/forms" as forms %}
 
 {% set title  = "Data Sources"|t('sprout-base-reports') %}
-{% set groups = craft.sproutReports.getReportGroups() %}
 
 {% set selectedSubnavItem = 'datasources' %}
-
-{% if groupId is defined %}
-    {% if groups[groupId] is not defined %}
-        {% exit 404 %}
-    {% endif %}
-
-    {% set reports = craft.sproutReports.getReportsByGroupId(groupId) %}
-{% else %}
-    {% set reports = craft.sproutReports.getReports() %}
-{% endif %}
 
 {% block content %}
     <div class="tableview">
@@ -42,22 +31,20 @@
             </tr>
             </thead>
             <tbody>
-            {% set dataSources = craft.sproutReports.getDataSources() %}
 
-            {% for id, dataSource in dataSources %}
+            {% for id, dataSource in installedDataSources %}
                 <tr>
-                    <td><strong>{{ dataSource.getName() }}</strong></td>
-                    <td>{{ dataSource.getDescription() }}</td>
+                    <td><strong>{{ dataSource.displayName() }}</strong></td>
+                    <td>{{ dataSource.getDescription()|markdown }}</td>
                     <td>
                         <span class="light">{{ dataSource.getPlugin().name }}</span>
                     </td>
 
                     <td>{{ dataSource.getReportCount() }}</td>
-                    <td>
-                        {% set allowNew = dataSource.allowNew() %}
+                    <td data-type="{{ className(dataSource) }}">
                         {{ forms.lightswitchField({
-                            id: dataSource.dataSourceId,
-                            on: allowNew,
+                            id: dataSource.id,
+                            on: dataSource.allowNew,
                             name: 'allowNew',
                             small: true
                         }) }}
@@ -65,14 +52,69 @@
 
                     {% if currentUser.can('sproutReports-editReports') %}
                         <td>
-                            <a href="{{ dataSource.getUrl(dataSource.dataSourceId ~ '/new') }}"
-                               class="btn small">{{ "New Report"|t('sprout-base-reports') }}</a>
+                            {% if className(dataSource) == 'barrelstrength\\sproutbasereports\\datasources\\MissingDataSource' %}
+                                <form method="post" accept-charset="UTF-8">
+                                    {{ csrfInput() }}
+                                    {{ redirectInput('sprout-reports/datasources') }}
+                                    <input type="hidden" name="action" value="sprout-reports/data-sources/delete-data-source">
+                                    <input type="hidden" name="dataSourceId" value="{{ dataSource.id }}">
+                                    <input class="btn small" type="submit"  value="{{ "Remove"|t('sprout-base-reports') }}">
+                                </form>
+                            {% else %}
+                                <a href="{{ dataSource.getUrl(dataSource.id ~ '/new') }}"
+                                    class="btn small">{{ "New Report"|t('sprout-base-reports') }}</a>
+                            {% endif %}
                         </td>
                     {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+
+        {% if uninstalledDataSources|length %}
+            <br>
+            <br>
+            <h3 style="text-transform: uppercase;">{{ "Uninstalled"|t('sprout-base-reports') }}</h3>
+
+            <table class="data fullwidth">
+                <thead>
+                <tr>
+                    <th scope="col"
+                        data-attribute="datasource">{{ "Data Source"|t('sprout-base-reports') }}</th>
+                    <th scope="col"
+                        data-attribute="description">{{ "Description"|t('sprout-base-reports') }}</th>
+                    <th scope="col"
+                        data-attribute="plugin">{{ "Plugin"|t('sprout-base-reports') }}</th>
+                    {% if currentUser.can('sproutReports-editReports') %}
+                        <th class="thin"></th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for id, dataSource in uninstalledDataSources %}
+                    {% set dataSource = create(dataSource) %}
+                    <tr>
+                        <td><strong>{{ dataSource.displayName() }}</strong></td>
+                        <td>{{ dataSource.getDescription()|markdown }}</td>
+                        <td>
+                            <span class="light">{{ dataSource.getPlugin().name }}</span>
+                        </td>
+                        {% if currentUser.can('sproutReports-editReports') %}
+                            <td>
+                                <form method="post" accept-charset="UTF-8">
+                                    {{ csrfInput() }}
+                                    {{ redirectInput('sprout-reports/datasources') }}
+                                    <input type="hidden" name="action" value="sprout-reports/data-sources/install-data-source">
+                                    <input type="hidden" name="type" value="{{ className(dataSource) }}">
+                                    <input class="btn small" type="submit"  value="{{ "Install"|t('sprout-base-reports') }}">
+                                </form>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 
     <div class="grid">
@@ -89,10 +131,10 @@
     $('.lightswitch').change(function() {
 
     var allowNew = $(this).find("[name='allowNew']").val();
-    var dataSourceId = $(this).attr('id');
+    var dataSourceType = $(this).closest('td').data('type');
 
     Craft.postActionRequest('sprout-reports/data-sources/save-data-source', {
-    dataSourceId: dataSourceId,
+    dataSourceType: dataSourceType,
     allowNew: allowNew
     }, function(response) {
     if (response)

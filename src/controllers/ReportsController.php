@@ -48,27 +48,12 @@ class ReportsController extends Controller
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
-        $dataSources = [];
+        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources($pluginHandle);
 
-        if ($pluginHandle !== 'sprout-reports') {
-
-            $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($dataSourceId);
-
-            // Update to match the multi-datasource syntax
-            if ($dataSource) {
-                $dataSources[get_class($dataSource)] = $dataSource;
-            }
-
-            $reports = SproutBaseReports::$app->reports->getReportsBySourceId($dataSourceId);
+        if ($groupId !== null) {
+            $reports = SproutBaseReports::$app->reports->getReportsByGroupId($groupId);
         } else {
-
-            $dataSources = SproutBaseReports::$app->dataSources->getAllDataSources();
-
-            if ($groupId !== null) {
-                $reports = SproutBaseReports::$app->reports->getReportsByGroupId($groupId);
-            } else {
-                $reports = SproutBaseReports::$app->reports->getAllReports();
-            }
+            $reports = SproutBaseReports::$app->reports->getAllReports();
         }
 
         $newReportOptions = [];
@@ -78,10 +63,10 @@ class ReportsController extends Controller
              * @var $dataSource DataSource
              */
             // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource AND (bool)$dataSource->allowNew() OR $pluginHandle !== 'sprout-reports') {
+            if ($dataSource->allowNew || $pluginHandle !== 'sprout-reports') {
                 $newReportOptions[] = [
-                    'name' => $dataSource->getName(),
-                    'url' => $dataSource->getUrl($dataSource->dataSourceId.'/new')
+                    'name' => $dataSource::displayName(),
+                    'url' => $dataSource->getUrl($dataSource->id.'/new')
                 ];
             }
         }
@@ -132,7 +117,7 @@ class ReportsController extends Controller
         $reportIndexUrl = $dataSource->getUrl($report->groupId);
 
         if ($pluginHandle !== 'sprout-reports') {
-            $reportIndexUrl = $dataSource->getUrl($dataSource->dataSourceId);
+            $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
         $values = $dataSource->getResults($report);
@@ -195,12 +180,12 @@ class ReportsController extends Controller
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
         if ($pluginHandle !== 'sprout-reports') {
-            $reportIndexUrl = $dataSource->getUrl($dataSource->dataSourceId);
+            $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
         // Make sure you navigate to the right plugin page after saving and breadcrumb
         if (Craft::$app->request->getSegment(1) == 'sprout-reports') {
-            $reportIndexUrl = UrlHelper::cpUrl('/sprout-reports/reports');
+            $reportIndexUrl = UrlHelper::cpUrl('sprout-reports/reports');
         }
 
         $groups = [];
@@ -286,7 +271,7 @@ class ReportsController extends Controller
 
         $report = $this->prepareFromPost();
 
-        if ($report->validate() && Craft::$app->getElements()->saveElement($report)) {
+        if (Craft::$app->getElements()->saveElement($report)) {
             Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report saved.'));
 
             return $this->redirectToPostedUrl($report);
@@ -431,7 +416,7 @@ class ReportsController extends Controller
 
         $reportId = $request->getBodyParam('id');
 
-        if ($reportId && is_numeric($reportId)) {
+        if ($reportId) {
             $report = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$report) {

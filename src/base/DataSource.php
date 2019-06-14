@@ -13,35 +13,25 @@ use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use craft\base\Plugin;
+use craft\base\SavableComponent;
 use craft\helpers\UrlHelper;
 
 /**
  * Class DataSource
  *
  * @package Craft
+ *
+ * @property string $description
+ * @property int    $reportCount
+ * @property bool   $defaultAllowHtml
  */
-abstract class DataSource
+abstract class DataSource extends SavableComponent implements DataSourceInterface
 {
     use BaseSproutTrait;
-    /**
-     * @var int
-     */
-    public $dataSourceId;
-
-    /**
-     * @var Plugin
-     */
-    protected $plugin;
-
-    /**
-     * @var Report()
-     */
-    protected $report;
+    use DataSourceTrait;
 
     /**
      * DataSource constructor.
-     *
-     * @throws \ReflectionException
      */
     public function __construct()
     {
@@ -80,16 +70,7 @@ abstract class DataSource
     }
 
     /**
-     * Should return a human readable name for your data source
-     *
-     * @return string
-     */
-    abstract public function getName(): string;
-
-    /**
-     * A description for the Data Source
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getDescription(): string
     {
@@ -97,22 +78,7 @@ abstract class DataSource
     }
 
     /**
-     * Should return an string containing the necessary HTML to capture user input
-     *
-     * @return null|string
-     */
-    public function getSettingsHtml()
-    {
-        return null;
-    }
-
-    /**
-     * Should return an array of strings to be used as column headings in display/output
-     *
-     * @param Report $report
-     * @param array  $settings
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getDefaultLabels(Report $report, array $settings = []): array
     {
@@ -120,14 +86,7 @@ abstract class DataSource
     }
 
     /**
-     * Should return an array of records to use in the report
-     *
-     * @param Report $report
-     * @param array  $settings  Not in use. Use $report->getSettings() instead.
-     *
-     * @todo - Deprecated $settings param in 1.0. Will be removed in 2.0.
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getResults(Report $report, array $settings = []): array
     {
@@ -199,28 +158,12 @@ abstract class DataSource
     }
 
     /**
-     * Allows a user to disable a Data Source from displaying in the New Report dropdown
-     *
-     * @return bool|mixed
-     */
-    public function allowNew()
-    {
-        $dataSourceRecord = DataSourceRecord::findOne(['id' => $this->dataSourceId]);
-
-        if ($dataSourceRecord != null) {
-            return $dataSourceRecord->allowNew;
-        }
-
-        return true;
-    }
-
-    /**
      * Returns the total count of reports created based on the given data source
      *
      * @return int
      */
     final public function getReportCount(): int
     {
-        return SproutBaseReports::$app->reports->getCountByDataSourceId($this->dataSourceId);
+        return SproutBaseReports::$app->reports->getCountByDataSourceId($this->id);
     }
 }
