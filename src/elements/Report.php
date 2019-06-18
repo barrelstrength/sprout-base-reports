@@ -205,7 +205,7 @@ class Report extends Element
                 return '<span class="error">'.$message.'</span>';
             }
 
-            return $dataSource->getName();
+            return $dataSource::displayName();
         }
 
         if ($attribute === 'download') {

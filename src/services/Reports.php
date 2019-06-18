@@ -8,8 +8,10 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutforms\elements\Form as FormElement;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
+use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\errors\ElementNotFoundException;
 use yii\base\Component;
@@ -29,32 +31,15 @@ class Reports extends Component
     /**
      * @param $reportId
      *
-     * @return Report
-     * @throws ElementNotFoundException
+     * @return Report|ElementInterface|null
      */
     public function getReport($reportId): Report
     {
-        $reportRecord = ReportRecord::findOne($reportId);
+        $query = Report::find();
+        $query->id($reportId);
+        $query->siteId(null);
 
-        if (!$reportRecord) {
-            throw new ElementNotFoundException(Craft::t('sprout-base-reports', 'Unable to find Report.'));
-        }
-
-        $report = new Report();
-
-        $report->id = $reportRecord->id;
-        $report->dataSourceId = $reportRecord->dataSourceId;
-        $report->groupId = $reportRecord->groupId;
-        $report->name = $reportRecord->name;
-        $report->hasNameFormat = $reportRecord->hasNameFormat;
-        $report->nameFormat = $reportRecord->nameFormat;
-        $report->handle = $reportRecord->handle;
-        $report->description = $reportRecord->description;
-        $report->allowHtml = $reportRecord->allowHtml;
-        $report->settings = $reportRecord->settings;
-        $report->enabled = $reportRecord->enabled;
-
-        return $report;
+        return $query->one();
     }
 
     /**

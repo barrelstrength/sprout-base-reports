@@ -42,7 +42,7 @@
                            data-redirect="{{ continueEditingUrl|hash }}">{{ "Save and continue editing"|t('sprout-base-reports') }}</a>
                     </li>
                     <li><a class="formsubmit"
-                           data-redirect="{{ dataSource.getUrl(dataSource.dataSourceId ~ '/new')|hash }}">
+                           data-redirect="{{ dataSource.getUrl(dataSource.id ~ '/new')|hash }}">
                             {{ "Save and add another report"|t('sprout-base-reports') }}</a>
                     </li>
                 </ul>
@@ -62,7 +62,7 @@
 
 {% block content %}
 
-    <input type="hidden" name="dataSourceId" value="{{ dataSource.dataSourceId }}">
+    <input type="hidden" name="dataSourceId" value="{{ dataSource.id }}">
 
     {% if report is defined %}
         <input type="hidden" name="id" value="{{ report.id }}">
@@ -168,7 +168,7 @@
     <div class="meta read-only">
         <div class="data">
             <h5 class="heading">{{ "Data Source"|t('sprout-base-reports') }}</h5>
-            <div class="value">{{ dataSource.name }}</div>
+            <div class="value">{{ dataSource.displayName() }}</div>
         </div>
     </div>
     <hr>

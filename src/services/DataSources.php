@@ -8,10 +8,12 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\base\DataSource;
-use barrelstrength\sproutbasereports\models\DataSource as DataSourceModel;
+use barrelstrength\sproutbasereports\base\DataSourceInterface;
+use barrelstrength\sproutbasereports\datasources\MissingDataSource;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
-use barrelstrength\sproutbase\SproutBase;
-
+use barrelstrength\sproutbasereports\SproutBaseReports;
+use craft\errors\MissingComponentException;
+use craft\helpers\Component as ComponentHelper;
 use yii\base\Component;
 use craft\events\RegisterComponentTypesEvent;
 use craft\db\Query;
@@ -37,18 +39,18 @@ class DataSources extends Component
     private $dataSources;
 
     /**
-     * @param int $dataSourceId
+     * @param int $id
      *
      * @return DataSource|null
      * @throws Exception
      */
-    public function getDataSourceById($dataSourceId)
+    public function getDataSourceById($id)
     {
         /**
          * @var DataSourceRecord $dataSourceRecord
          */
         $dataSourceRecord = DataSourceRecord::find()->where([
-            'id' => $dataSourceId
+            'id' => $id
         ])->one();
 
         if ($dataSourceRecord === null) {
@@ -57,15 +59,11 @@ class DataSources extends Component
 
         if (class_exists($dataSourceRecord->type)) {
             $dataSource = new $dataSourceRecord->type;
-
-            $dataSource->dataSourceId = $dataSourceRecord->id;
-
+            $dataSource->id = $dataSourceRecord->id;
             return $dataSource;
         }
 
-        throw new Exception(Craft::t('sprout-base-reports', 'Unable to find the class: {type}. Confirm the appropriate Data Source integrations are installed.', [
-            'type' => $dataSourceRecord->type
-        ]));
+        return null;
     }
 
     /**
@@ -75,9 +73,7 @@ class DataSources extends Component
      */
     public function getDataSourceByType($dataSourceClass)
     {
-        /**
-         * @var $dataSourceRecord DataSourceRecord
-         */
+        /** @var $dataSourceRecord DataSourceRecord */
         $dataSourceRecord = DataSourceRecord::find()->where([
             'type' => $dataSourceClass
         ])->one();
@@ -90,36 +86,6 @@ class DataSources extends Component
         $dataSource->dataSourceId = $dataSourceRecord->id;
 
         return $dataSource;
-    }
-
-    /**
-     * @param array $dataSourceClasses
-     *
-     * @return DataSourceModel|null
-     * @throws \yii\db\Exception
-     */
-    public function installDataSources(array $dataSourceClasses = [])
-    {
-        $dataSources = null;
-
-        foreach ($dataSourceClasses as $dataSourceClass) {
-
-            /** @var DataSource $dataSource */
-            $dataSource = new $dataSourceClass();
-
-            $dataSourceModel = new DataSourceModel();
-            $dataSourceModel->type = $dataSourceClass;
-            $dataSourceModel->allowNew = 1;
-
-            // Set all pre-built class to sprout-reports pluginHandle
-            $dataSourceModel->pluginHandle = $dataSource->getPlugin()->handle ?? 'sprout-reports';
-
-            $this->saveDataSource($dataSourceModel);
-
-            $dataSources = $dataSourceModel;
-        }
-
-        return $dataSources;
     }
 
     /**
@@ -141,74 +107,54 @@ class DataSources extends Component
     /**
      * Returns all Data Sources
      *
-     * @todo - refactor
-     *       Using too many foreach loops as arrays aren't indexed by class name. We could probably
-     *       simplify this if we could get certain arrays indexed by class name / type.
+     * @param string $pluginHandle
      *
      * @return array
-     * @throws \yii\db\Exception
+     * @throws \yii\base\ExitException
      */
-    public function getAllDataSources(): array
+    public function getInstalledDataSources(string $pluginHandle = 'sprout-reports'): array
     {
-        $dataSourceTypes = $this->getAllDataSourceTypes();
-        $dataSourceRecords = DataSourceRecord::find()->all();
+        $query = (new Query())
+            ->select(['*'])
+            ->from(['{{%sproutreports_datasources}}']);
+
+        if ($pluginHandle !== 'sprout-reports') {
+            $query->where([
+                'pluginHandle' => $pluginHandle
+            ]);
+        }
 
         $dataSources = [];
-        $savedDataSources = [];
 
-        foreach ($dataSourceTypes as $dataSourceType) {
-            $dataSources[$dataSourceType] = new $dataSourceType;
+        foreach ($query->all() as $dataSource) {
+            $dataSourceType = $dataSource['type'];
+
+            if (class_exists($dataSourceType)) {
+                $dataSources[$dataSourceType] = new $dataSourceType();
+                $dataSources[$dataSourceType]->id = $dataSource['id'];
+                $dataSources[$dataSourceType]->pluginHandle = $dataSource['pluginHandle'];
+                $dataSources[$dataSourceType]->allowNew = $dataSource['allowNew'];
+            } else {
+                Craft::error(Craft::t('sprout-base-reports', 'Unable to find Data Source: {type}', [
+                    'type' => $dataSourceType
+                ]));
+                $dataSources[MissingDataSource::class] = new MissingDataSource();
+                $dataSources[MissingDataSource::class]->id = $dataSource['id'];
+                $dataSources[MissingDataSource::class]->setDescription($dataSourceType);
+            }
         }
 
         $this->dataSources = $dataSources;
 
-        /**
-         * Add the additional data we store in the database to the Data Source classes
-         *
-         * @var $dataSourceRecord DataSourceRecord
-         */
-        foreach ($dataSourceRecords as $dataSourceRecord) {
-            try {
-                if ($this->isDataSourceExists($dataSourceRecord)) {
-                    $dataSources[$dataSourceRecord->type]->dataSourceId = $dataSourceRecord->id;
-                    $dataSources[$dataSourceRecord->type]->allowNew = $dataSourceRecord->allowNew;
-                }
-            } catch (\Exception $exception) {
-                SproutBase::error($exception->getMessage());
-            }
-        }
-
-        // Make sure all registered datasources have a record in the database
-        foreach ($dataSources as $dataSourceClass => $dataSource) {
-
-            if ($dataSource->dataSourceId === null) {
-                $savedDataSources[] = $this->installDataSources([$dataSourceClass]);
-            }
-        }
-
-        // Make sure we assign any new dataSource IDs so we can build our URLs
-        foreach ($savedDataSources as $savedDataSource) {
-            if ($savedDataSource->type === get_class($dataSources[$savedDataSource->type])) {
-                $dataSources[$savedDataSource->type]->dataSourceId = $savedDataSource->id;
-            }
-        }
-
-        uasort($dataSources, function($a, $b) {
+        uasort($dataSources, static function($a, $b) {
             /**
              * @var $a DataSource
              * @var $b DataSource
              */
-            return $a->getName() <=> $b->getName();
+            return $a::displayName() <=> $b::displayName();
         });
 
         return $dataSources;
-    }
-
-    private function isDataSourceExists($dataSourceRecord): bool
-    {
-        return class_exists($dataSourceRecord->type)
-            AND isset($this->dataSources[$dataSourceRecord->type])
-            AND $dataSourceRecord->type === get_class($this->dataSources[$dataSourceRecord->type]);
     }
 
     /**
@@ -227,49 +173,66 @@ class DataSources extends Component
     }
 
     /**
+     * @param array $dataSourceTypes
+     *
+     * @return DataSource|null
+     */
+    public function installDataSources(array $dataSourceTypes = [])
+    {
+        $dataSources = null;
+
+        foreach ($dataSourceTypes as $dataSourceClass) {
+
+            /** @var DataSource $dataSource */
+            $dataSource = new $dataSourceClass();
+
+            // Set all pre-built class to sprout-reports pluginHandle
+            $dataSource->pluginHandle = $dataSource->getPlugin()->handle ?? 'sprout-reports';
+
+            $this->saveDataSource($dataSource);
+
+            $dataSources = $dataSource;
+        }
+
+        return $dataSources;
+    }
+
+    /**
      * Save attributes to datasources record table
      *
-     * @param DataSourceModel $dataSourceModel
+     * @param DataSource $dataSource
      *
      * @return bool
-     * @throws \yii\db\Exception
      */
-    public function saveDataSource(DataSourceModel $dataSourceModel): bool
+    public function saveDataSource(DataSource $dataSource): bool
     {
         /**
+         * Check for an existing Data Source of this type
+         *
          * @var $dataSourceRecord DataSourceRecord
          */
         $dataSourceRecord = DataSourceRecord::find()
-            ->where(['id' => $dataSourceModel->id])
+            ->where(['type' => get_class($dataSource)])
             ->one();
 
-        if ($dataSourceRecord !== null) {
-            $dataSourceRecord->id = $dataSourceModel->id;
-        } else {
+        if ($dataSourceRecord === null) {
             $dataSourceRecord = new DataSourceRecord();
-            $dataSourceRecord->type = $dataSourceModel->type;
         }
 
-        $dataSourceRecord->pluginHandle = $dataSourceModel->pluginHandle;
-        $dataSourceRecord->allowNew = $dataSourceModel->allowNew;
+        $dataSourceRecord->type = get_class($dataSource);
+        $dataSourceRecord->allowNew = $dataSource->allowNew ?? $dataSourceRecord->allowNew ?? true;
+        $dataSourceRecord->pluginHandle = $dataSource->pluginHandle ?? $dataSourceRecord->pluginHandle;
 
-        $transaction = Craft::$app->getDb()->beginTransaction();
-
-        if ($dataSourceRecord->validate()) {
-            if ($dataSourceRecord->save(false)) {
-                $dataSourceModel->id = $dataSourceRecord->id;
-
-                if ($transaction) {
-                    $transaction->commit();
-                }
-
-                return true;
-            }
-        } else {
-            $dataSourceModel->addErrors($dataSourceRecord->getErrors());
+        if (!$dataSourceRecord->validate()) {
+            $dataSource->addErrors($dataSourceRecord->getErrors());
+            return false;
         }
 
-        return false;
+        $dataSourceRecord->save(false);
+
+        $dataSource->id = $dataSourceRecord->id;
+
+        return true;
     }
 
     /**
@@ -294,6 +257,69 @@ class DataSources extends Component
             $query->createCommand()
                 ->delete('{{%sproutreports_reports}}', ['[[dataSourceId]]' => $source['id']])
                 ->execute();
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $config
+     *
+     * @return DataSourceInterface
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function createDataSource($config): DataSourceInterface
+    {
+        if (is_string($config)) {
+            $config = ['type' => $config];
+        }
+
+        try {
+            /** @var DataSource $dataSource */
+            $dataSource = ComponentHelper::createComponent($config, DataSourceInterface::class);
+        } catch (MissingComponentException $e) {
+            $config['errorMessage'] = $e->getMessage();
+            $config['expectedType'] = $config['type'];
+            unset($config['type']);
+
+            $dataSource = new MissingDataSource($config);
+        }
+
+        return $dataSource;
+    }
+
+    /**
+     * @param $dataSourceId
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function deleteDataSourceById($dataSourceId): bool
+    {
+        $reports = SproutBaseReports::$app->reports->getReportsBySourceId($dataSourceId);
+
+        $transaction = Craft::$app->db->beginTransaction();
+
+        try {
+            foreach ($reports as $report) {
+                Craft::$app->getDb()->createCommand()
+                    ->delete('{{%sproutreports_reports}}', [
+                        '[[id]]' => $report->id
+                    ])
+                    ->execute();
+            }
+
+            Craft::$app->getDb()->createCommand()
+                ->delete('{{%sproutreports_datasources}}', [
+                    '[[id]]' => $dataSourceId
+                ])
+                ->execute();
+
+            $transaction->commit();
+        } catch (Exception $e) {
+            $transaction->rollBack();
+
+            throw $e;
         }
 
         return true;
