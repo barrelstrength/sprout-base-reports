@@ -67,28 +67,6 @@ class DataSources extends Component
     }
 
     /**
-     * @param $dataSourceClass
-     *
-     * @return DataSource|null
-     */
-    public function getDataSourceByType($dataSourceClass)
-    {
-        /** @var $dataSourceRecord DataSourceRecord */
-        $dataSourceRecord = DataSourceRecord::find()->where([
-            'type' => $dataSourceClass
-        ])->one();
-
-        if ($dataSourceRecord === null) {
-            return null;
-        }
-
-        $dataSource = new $dataSourceRecord->type;
-        $dataSource->dataSourceId = $dataSourceRecord->id;
-
-        return $dataSource;
-    }
-
-    /**
      * Returns all available Data Source classes
      *
      * @return string[]

@@ -19,6 +19,9 @@ use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
+use yii\base\Exception;
+use yii\base\ExitException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -40,9 +43,9 @@ class ReportsController extends Controller
      * @param bool   $hideSidebar
      *
      * @return Response
-     * @throws \yii\base\Exception
-     * @throws \yii\db\Exception
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws Exception
+     * @throws ExitException
+     * @throws ForbiddenHttpException
      */
     public function actionReportsIndexTemplate(string $pluginHandle, $dataSourceId = null, $groupId = null, $hideSidebar = false): Response
     {
@@ -90,9 +93,9 @@ class ReportsController extends Controller
      * @return Response
      * @throws NotFoundHttpException
      * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
+     * @throws Exception
      * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionResultsIndexTemplate(string $pluginHandle, Report $report = null, int $reportId = null): Response
     {
@@ -149,9 +152,8 @@ class ReportsController extends Controller
      *
      * @return Response
      * @throws NotFoundHttpException
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
      */
     public function actionEditReportTemplate(string $pluginHandle, string $dataSourceId, Report $report = null, int $reportId = null): Response
     {
@@ -261,7 +263,7 @@ class ReportsController extends Controller
      * @return null|\yii\web\Response
      * @throws \Throwable
      * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
+     * @throws Exception
      * @throws \yii\web\BadRequestHttpException
      */
     public function actionSaveReport()
@@ -320,7 +322,7 @@ class ReportsController extends Controller
      * @return Response
      * @throws \craft\errors\MissingComponentException
      * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionSaveGroup(): Response
     {
@@ -377,7 +379,7 @@ class ReportsController extends Controller
     /**
      * Export a Report
      *
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function actionExportReport()
     {
@@ -408,7 +410,7 @@ class ReportsController extends Controller
      * Returns a report model populated from saved/POSTed data
      *
      * @return Report
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function prepareFromPost(): Report
     {
