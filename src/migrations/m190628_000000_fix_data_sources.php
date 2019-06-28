@@ -39,23 +39,23 @@ class m190628_000000_fix_data_sources extends Migration
 
         $hashMap = [];
         foreach ($dataSources as $dataSource) {
-            if (isset($hashMap[$dataSource['type']])){
+            if (isset($hashMap[$dataSource['type']])) {
                 // We have a duplicate
                 $this->update($this->reportTable, [
-                    'type' => $hashMap[$dataSource]['type']['id']
+                    'dataSourceId' => $hashMap[$dataSource['type']]['id']
                 ], ['dataSourceId' => $dataSource['id']], [], false);
                 // let's remove the duplicate data source
                 $db->createCommand()->delete($this->dataSourcesTable,
                     ['id' => $dataSource['id']])->execute();
-            }else{
+            } else {
                 // New datasource
                 $hashMap[$dataSource['type']] = $dataSource;
                 if ($dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\EntriesDataSource' ||
-                    $dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\SubmissionLogDataSource'){
+                    $dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\SubmissionLogDataSource') {
                     $this->update($this->dataSourcesTable, [
                         'pluginHandle' => 'sprout-forms'
                     ], ['id' => $dataSource['id']], [], false);
-                }else{
+                } else {
                     // Let's default all to sprout reports
                     $this->update($this->dataSourcesTable, [
                         'pluginHandle' => 'sprout-reports'
