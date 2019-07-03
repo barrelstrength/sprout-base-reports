@@ -4,7 +4,7 @@
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
 {% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
-
+{% set bodyClass = 'sprout-reports-content' %}
 {% set selectedSubnavItem = craft.app.request.getSegment(2) %}
 {% if dataSource is defined %}
     {% set settingsHtml = dataSource.getSettingsHtml() %}
@@ -117,6 +117,7 @@
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\base\\SproutReportsAsset") %}
+{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\datatables\\DataTablesAsset") %}
 
 {% js %}
 
@@ -124,7 +125,6 @@
 
     $('#btn-download-csv').on('click', function(event) {
     event.preventDefault();
-
     $form = $(this).parents('form');
     $form.submit();
     });
