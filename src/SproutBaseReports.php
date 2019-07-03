@@ -90,6 +90,7 @@ class SproutBaseReports extends Module
         self::$app = new App();
 
         Craft::setAlias('@sproutbasereports', $this->getBasePath());
+        Craft::setAlias('@sproutbasereportslib', dirname(__DIR__).'/lib');
 
         // Setup Controllers
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
