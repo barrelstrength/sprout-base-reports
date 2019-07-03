@@ -42,12 +42,105 @@
 /* RESULTS DATA
 -----------------------------------*/
 
-.pane {
-    overflow: auto;
-}
-
 .tableview.sproutreports {
     height: auto;
     max-height: 800px;
-    overflow: auto;
+    overflow: hidden;
 }
+.sprout-reports-content #content {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+.sproutreports .tablecontent {
+    margin: 20px 0 20px 24px;
+}
+.dataTables_scroll th.sorting_asc,
+.dataTables_scroll th.sorting_desc {
+    background-position: 100% -3px;
+    background-image: url(../images/listview_sort_2x.png);
+    background-size: 26px;
+    background-repeat-x: no-repeat;
+    background-repeat-y: no-repeat;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: rgb(242, 242, 242);
+}
+.dataTables_scroll th.sorting_desc {
+    background-position: 100% -34px;
+}
+.dataTables_scroll tr th:focus {
+    outline: none;
+}
+.sproutreports .tablecontent tr th:first-child,
+.sproutreports .tablecontent tr td:first-child {
+    padding-left: 10px;
+}
+
+/* Adjust margin/padding */
+.sprout-results-header #sprout-results_filter input {
+    width: 260px;
+}
+.sprout-results-header,
+.sprout-results-footer {
+    margin-right: 24px;
+    margin-bottom: 24px;
+}
+.dataTables_scroll {
+    margin-bottom: 24px;
+    margin-right: 0;
+}
+
+/* Prepare header stuff */
+.sprout-results-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.sprout-results-header #sprout-results_length {
+    flex-grow: 1;
+}
+.sprout-results-header #sprout-results_filter {
+    text-align: right;
+}
+#sprout-results_filter.texticon.clearable .text {
+    padding-right: 7px !important;
+}
+#sprout-results_filter.texticon.clearable .text {
+    /* Set the search input border to zero to avoid a flash on load */
+    border: 0;
+}
+#sprout-results_filter {
+    /* Apply border styles to search wrapper instead */
+    border: 1px solid rgba(0, 0, 20, 0.1);
+    border-radius: 2px;
+}
+
+/* Fix footer in place */
+.sprout-results-footer {
+    background-color: #fff;
+    bottom: 0;
+    position: fixed;
+    margin-bottom: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+}
+#sprout-results_paginate {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+.paginate_button {
+    margin-left: 7px;
+    margin-right: 7px;
+}
+.paginate_button.previous {
+    margin-left: 0;
+}
+.paginate_button.current {
+    font-weight: bold;
+}
+
+
