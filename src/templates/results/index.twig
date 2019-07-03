@@ -4,7 +4,7 @@
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
 {% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
-
+{% set bodyClass = 'sprout-reports-content' %}
 {% set selectedSubnavItem = craft.app.request.getSegment(2) %}
 {% if dataSource is defined %}
     {% set settingsHtml = dataSource.getSettingsHtml() %}
@@ -24,7 +24,7 @@
     <form method="post" accept-charset="UTF-8">
         {{ csrfInput() }}
         <input type="hidden" name="action"
-               value="sprout-base-reports/reports/export-report">
+            value="sprout-base-reports/reports/export-report">
         <input type="hidden" name="reportId" value="{{ report.id }}">
 
         <a id="btn-download-csv" class="btn">
@@ -47,7 +47,7 @@
                 {{ csrfInput() }}
                 {{ redirectInput(redirectUrl) }}
                 <input type="hidden" name="action"
-                       value="sprout-base-reports/reports/update-report">
+                    value="sprout-base-reports/reports/update-report">
                 <input type="hidden" name="reportId" value="{{ report.id }}">
 
                 {{ settingsHtml | raw }}
@@ -55,7 +55,7 @@
                 <div class="button">
                     <div class="btngroup">
                         <input type="submit" class="btn submit"
-                               value="{{ 'Run Report'|t('sprout-base-reports') }}">
+                            value="{{ 'Run Report'|t('sprout-base-reports') }}">
                     </div>
                 </div>
 
@@ -70,7 +70,7 @@
     <div class="tableview sproutreports">
         {% if values is defined and values is iterable and values|length %}
             <div class="tablecontent">
-                <table class="data fullwidth">
+                <table id="sprout-results" class="data fullwidth nowrap hidden">
                     <thead>
                     <tr>
                         {% for label in labels %}
@@ -83,16 +83,14 @@
                     </thead>
                     <tbody>
                     {% for value in values %}
-                        <tr class="table_row">
+                        <tr>
                             {% for property in value %}
                                 <td>
-                                    <div class="item_content">
-                                        {% if report.allowHtml %}
-                                            {{ property|raw|nl2br }}
-                                        {% else %}
-                                            {{ property }}
-                                        {% endif %}
-                                    </div>
+                                    {%- if report.allowHtml -%}
+                                        {{- property|raw|nl2br -}}
+                                    {%- else -%}
+                                        {{- property -}}
+                                    {%- endif -%}
                                 </td>
                             {% endfor %}
                         </tr>
@@ -100,6 +98,7 @@
                     </tbody>
                 </table>
             </div>
+
         {% else %}
 
             {% set boxBody %}
@@ -119,6 +118,7 @@
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\base\\SproutReportsAsset") %}
+{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\datatables\\DataTablesAsset") %}
 
 {% js %}
 
@@ -126,13 +126,18 @@
 
     $('#btn-download-csv').on('click', function(event) {
     event.preventDefault();
-
     $form = $(this).parents('form');
     $form.submit();
     });
 
     $('#modify-settings-icon').on('click', function() {
     $('#modify-settings-panel').slideToggle('slow');
+    });
+
+    SproutReport.init();
+
+    SproutReportDataTables.init({
+    allowHtml: {{ report.allowHtml ? 'true' : 'false' }}
     });
 
     })();
