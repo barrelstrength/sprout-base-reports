@@ -98,6 +98,7 @@
                     </tbody>
                 </table>
             </div>
+
         {% else %}
 
             {% set boxBody %}
@@ -131,6 +132,12 @@
 
     $('#modify-settings-icon').on('click', function() {
     $('#modify-settings-panel').slideToggle('slow');
+    });
+
+    SproutReport.init();
+
+    SproutReportDataTables.init({
+    allowHtml: {{ report.allowHtml ? 'true' : 'false' }}
     });
 
     })();

@@ -1,14 +1,13 @@
-$(document).ready(function() {
-    SproutReport.init();
-    SproutReportDataTables.init();
-});
 
 var SproutReportDataTables = {
     defaultPageLength: 50,
     $sproutResultsTable: $('#sprout-results'),
     $contentSection: $('#main-content'),
+    allowHtml: false,
 
-    init: function() {
+    init: function(settings) {
+        this.allowHtml = settings.allowHtml;
+        console.log(this.allowHtml);
         this.initializeDataTable();
     },
 
@@ -45,7 +44,8 @@ var SproutReportDataTables = {
                 {
                     targets: "_all",
                     render: function(data, type, row, meta) {
-                        if (type === 'display' && data.length > 65) {
+
+                        if (type === 'display' && data.length > 65 && self.allowHtml === false) {
                             // return data;
                             return data.substr(0, 65) + '… <span class="info" style="margin-right:10px;">' + data + '</span>';
                         }
