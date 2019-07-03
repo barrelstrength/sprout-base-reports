@@ -70,7 +70,7 @@
     <div class="tableview sproutreports">
         {% if values is defined and values is iterable and values|length %}
             <div class="tablecontent">
-                <table class="data fullwidth">
+                <table id="sprout-results" class="data fullwidth nowrap hidden">
                     <thead>
                     <tr>
                         {% for label in labels %}
@@ -83,16 +83,14 @@
                     </thead>
                     <tbody>
                     {% for value in values %}
-                        <tr class="table_row">
+                        <tr>
                             {% for property in value %}
                                 <td>
-                                    <div class="item_content">
-                                        {% if report.allowHtml %}
-                                            {{ property|raw|nl2br }}
-                                        {% else %}
-                                            {{ property }}
-                                        {% endif %}
-                                    </div>
+                                    {%- if report.allowHtml -%}
+                                        {{- property|raw|nl2br -}}
+                                    {%- else -%}
+                                        {{- property -}}
+                                    {%- endif -%}
                                 </td>
                             {% endfor %}
                         </tr>
