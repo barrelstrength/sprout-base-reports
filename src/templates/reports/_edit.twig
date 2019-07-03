@@ -178,3 +178,7 @@
 {% if report is not defined or not report.handle %}
     {% js "new Craft.HandleGenerator('#name', '#handle');" %}
 {% endif %}
+
+{% js %}
+    SproutReport.init();
+{% endjs %}
