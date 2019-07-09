@@ -69,8 +69,7 @@
     background-position: 100% -3px;
     background-image: url(../images/listview_sort_2x.png);
     background-size: 26px;
-    background-repeat-x: no-repeat;
-    background-repeat-y: no-repeat;
+    background-repeat: no-repeat;
     background-attachment: initial;
     background-origin: initial;
     background-clip: initial;
