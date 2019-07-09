@@ -3,7 +3,7 @@
 {% extends "_layouts/cp" %}
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
-{% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
+{% set title  = report.name %}
 {% set bodyClass = 'sprout-reports-content' %}
 {% set selectedSubnavItem = craft.app.request.getSegment(2) %}
 {% if dataSource is defined %}
@@ -70,7 +70,7 @@
     <div class="tableview sproutreports">
         {% if values is defined and values is iterable and values|length %}
             <div class="tablecontent">
-                <table id="sprout-results" class="data fullwidth nowrap hidden">
+                <table id="sprout-results" class="data fullwidth nowrap" style="opacity:0;">
                     <thead>
                     <tr>
                         {% for label in labels %}
