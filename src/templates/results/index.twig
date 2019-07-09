@@ -3,7 +3,7 @@
 {% extends "_layouts/cp" %}
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
 
-{% set title  = 'Sprout Reports'|t('sprout-base-reports') %}
+{% set title  = report.name %}
 {% set bodyClass = 'sprout-reports-content' %}
 {% set selectedSubnavItem = craft.app.request.getSegment(2) %}
 {% if dataSource is defined %}
