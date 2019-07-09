@@ -7,7 +7,6 @@ var SproutReportDataTables = {
 
     init: function(settings) {
         this.allowHtml = settings.allowHtml;
-        console.log(this.allowHtml);
         this.initializeDataTable();
     },
 
@@ -77,7 +76,7 @@ var SproutReportDataTables = {
                     Craft.initUiElements($sproutResultsTable);
                 });
 
-                $('.dataTables_scroll table').removeClass('hidden');
+                $('.dataTables_scroll table').css('opacity', 1);
 
                 $(window).on('resize', function() {
                     self.resizeTable();
