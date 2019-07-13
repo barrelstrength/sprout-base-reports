@@ -131,8 +131,7 @@
     bottom: 0;
     position: fixed;
     margin-bottom: 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px;
     width: 100%;
 }
 #sprout-results_paginate {
@@ -140,9 +139,9 @@
     line-height: 1.5;
     margin-bottom: 5px;
     text-transform: uppercase;
+    float: left;
 }
 .paginate_button {
-    margin-left: 7px;
     margin-right: 7px;
 }
 .paginate_button.previous {

@@ -27,10 +27,10 @@ var SproutReportDataTables = {
                 [50, 100, 250, 500, -1],
                 [50, 100, 250, 500, "All"]
             ],
-            pagingType: "simple_numbers",
+            pagingType: "simple",
             language: {
                 emptyTable: Craft.t('sprout-base-reports', 'No results found.'),
-                info: Craft.t('sprout-base-reports', 'Showing _START_ to _END_ (Total rows: _MAX_)'),
+                info: Craft.t('sprout-base-reports', '_START_-_END_ of _MAX_ results'),
                 infoEmpty: Craft.t('sprout-base-reports', 'No results found.'),
                 infoFiltered: "",
                 lengthMenu: Craft.t('sprout-base-reports', 'Show rows _MENU_'),
@@ -68,11 +68,17 @@ var SproutReportDataTables = {
                 // Style Filter Results message
                 $('#sprout-results_info').addClass('light');
 
+                // Style Pagination
+                self.stylePagination();
+
                 // init info bubbles on page load
                 Craft.initUiElements($sproutResultsTable);
 
                 // init info bubbles after search, sort, filter, etc.
                 $sproutResultsTable.on('draw.dt', function() {
+                    // Style Pagination (again)
+                    self.stylePagination();
+
                     Craft.initUiElements($sproutResultsTable);
                 });
 
@@ -85,6 +91,14 @@ var SproutReportDataTables = {
                 self.resizeTable();
             }
         });
+    },
+
+    stylePagination: function() {
+        $('#sprout-results_paginate').addClass('pagination');
+        $('.paginate_button').addClass('page-link');
+        $('.paginate_button.previous, .paginate_button.next').html('');
+        $('.paginate_button.previous').attr('data-icon', 'leftangle');
+        $('.paginate_button.next').attr('data-icon', 'rightangle');
     },
 
     resizeTable: function() {
