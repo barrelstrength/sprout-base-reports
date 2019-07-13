@@ -398,6 +398,7 @@ class ReportsController extends Controller
                 // Name the report using the $report toString method that will check both nameFormat and name
                 $filename = $report.'-'.$date;
 
+                $dataSource->isExport = true;
                 $labels = $dataSource->getDefaultLabels($report, $settings);
                 $values = $dataSource->getResults($report, $settings);
 
