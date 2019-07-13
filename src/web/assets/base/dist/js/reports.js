@@ -1,12 +1,13 @@
 
 var SproutReportDataTables = {
-    defaultPageLength: 50,
+    defaultPageLength: 10,
     $sproutResultsTable: $('#sprout-results'),
     $contentSection: $('#main-content'),
     allowHtml: false,
 
     init: function(settings) {
         this.allowHtml = settings.allowHtml;
+        this.defaultPageLength = settings.defaultPageLength;
         this.initializeDataTable();
     },
 
@@ -24,8 +25,8 @@ var SproutReportDataTables = {
             scrollY: ($contentSection.height() - headerFooterHeight) + 'px',
             pageLength: self.defaultPageLength,
             lengthMenu: [
-                [50, 100, 250, 500, -1],
-                [50, 100, 250, 500, "All"]
+                [10, 25, 50, 100, 250, -1],
+                [10, 25, 50, 100, 250, "All"]
             ],
             pagingType: "simple",
             language: {

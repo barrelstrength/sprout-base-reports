@@ -137,7 +137,8 @@
     SproutReport.init();
 
     SproutReportDataTables.init({
-    allowHtml: {{ report.allowHtml ? 'true' : 'false' }}
+    allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
+    defaultPageLength: {{ settings.defaultPageLength ?? '10' }}
     });
 
     })();

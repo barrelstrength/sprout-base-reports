@@ -20,6 +20,11 @@ class Settings extends Model implements SproutSettingsInterface, SharedPermissio
     public $pluginNameOverride = '';
 
     /**
+     * @var string
+     */
+    public $defaultPageLength;
+
+    /**
      * @inheritdoc
      */
     public function getSettingsNavItems(): array
