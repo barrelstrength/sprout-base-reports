@@ -61,7 +61,10 @@
                                     <input class="btn small" type="submit"  value="{{ "Remove"|t('sprout-base-reports') }}">
                                 </form>
                             {% else %}
-                                <a href="{{ dataSource.getUrl(dataSource.id ~ '/new') }}"
+                                {# We only display the Data Sources page to Sprout Reports,
+                                   so we know the URL and don't have to use getUrl dynamically
+                                   across Data Source Types #}
+                                <a href="{{ cpUrl('sprout-reports/reports/' ~ dataSource.id ~ '/new') }}"
                                     class="btn small">{{ "New Report"|t('sprout-base-reports') }}</a>
                             {% endif %}
                         </td>

@@ -14,6 +14,7 @@ use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\db\ReportQuery;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
+use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use craft\base\Plugin;
@@ -23,12 +24,17 @@ use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
+use DateTime;
+use Exception;
+use InvalidArgumentException;
+use Throwable;
 use yii\web\NotFoundHttpException;
 
 /**
  * SproutReports - Report element type
  *
  * @property string     $resultsError
+ * @property $this      $startEndDate
  * @property DataSource $dataSource
  */
 class Report extends Element
@@ -64,30 +70,30 @@ class Report extends Element
     public $results;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     public $startDate = null;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     public $endDate = null;
 
     /**
      * @var string Plugin Handle as defined in the Data Sources table
      */
-    public $pluginHandle;
+    public $viewContext;
 
     /**
      * @return string
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function __toString()
     {
         if ($this->hasNameFormat && $this->nameFormat) {
             try {
                 return $this->processNameFormat();
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 return Craft::t('sprout-base-reports', 'Invalid name format for report: '.$this->name);
             }
         }
@@ -128,27 +134,27 @@ class Report extends Element
     /**
      * Returns the element's CP edit URL.
      *
+     * @param null   $baseDataSourceUrl
+     * @param string $permissionContext
+     *
      * @return string|null
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl($baseDataSourceUrl = null, $permissionContext = 'sprout-reports')
     {
-        $pluginHandle = null;
-
+        // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
-            $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle') ?? 'sprout-reports';
-        } else {
-            // Used on Results page
-            $pluginHandle = Craft::$app->getRequest()->getSegment(1) ?? 'sprout-reports';
+            $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
+            $permissionContext = Craft::$app->request->getBodyParam('criteria.permissionContext');
         }
-
-        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
+        
+        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $permissionContext);
 
         if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
             return null;
         }
 
-        return UrlHelper::cpUrl($pluginHandle.'/reports/'.$this->dataSourceId.'/edit/'.$this->id);
+        return UrlHelper::cpUrl($baseDataSourceUrl.$this->dataSourceId.'/edit/'.$this->id);
     }
 
     /**
@@ -182,25 +188,18 @@ class Report extends Element
      * @param string $attribute
      *
      * @return string
-     * @throws \yii\base\Exception
      */
     public function getTableAttributeHtml(string $attribute): string
     {
-        $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle') ?: 'sprout-reports';
+        $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
 
         if ($attribute === 'dataSourceId') {
 
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
 
             if (!$dataSource) {
-                throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
-            }
-
-            $plugin = $dataSource->getPlugin();
-
-            if ($plugin === null) {
-                $message = Craft::t('sprout-base-reports', 'Data Source class not found: {className}', [
-                    'className' => get_class($dataSource)
+                $message = Craft::t('sprout-base-reports', 'Data Source not found: {dataSourceId}', [
+                    'dataSourceId' => $attribute
                 ]);
                 return '<span class="error">'.$message.'</span>';
             }
@@ -210,13 +209,12 @@ class Report extends Element
 
         if ($attribute === 'download') {
             return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
-                    'reportId' => $this->id,
-                    'pluginHandle' => $pluginHandle
+                    'reportId' => $this->id
                 ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
         }
 
         if ($attribute === 'results') {
-            $resultsUrl = UrlHelper::cpUrl($pluginHandle.'/reports/view/'.$this->id);
+            $resultsUrl = UrlHelper::cpUrl($baseDataSourceUrl.'view/'.$this->id);
 
             return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run Report').'</a>';
         }
@@ -249,30 +247,29 @@ class Report extends Element
             ]
         ];
 
-        $dataSources = SproutBaseReports::$app->dataSources->getDataSourcePlugins();
+        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources();
 
-        foreach ($dataSources as $dataSource) {
+        // Grab a representative data source for each of our modules
+        // We just need the module viewContext and name for the Sources
+        $distinctDataSourceModules = [];
+        foreach ($dataSources as $key => &$dataSource) {
+            $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
+        }
 
-            // @todo - temporary fix.
-            // We should remove this and write a migration that ensures that all data source columns have a non-null pluginId setting.
-            $pluginHandle = $dataSource['pluginHandle'] ?? null;
+        // Prevent possible side effects
+        unset($dataSource);
 
-            if (!$pluginHandle) {
-                continue;
-            }
+        foreach ($distinctDataSourceModules as $dataSource) {
 
-            /**
-             * @var $plugin Plugin
-             */
-            $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
+            $viewContext = $dataSource->viewContext;
 
-            if ($plugin) {
-                $key = 'pluginHandle:'.$plugin->getHandle();
+            if ($viewContext) {
+                $key = 'viewContext:'.$viewContext;
 
                 $sources[] = [
                     'key' => $key,
-                    'label' => $plugin->name,
-                    'criteria' => ['pluginHandle' => $plugin->getHandle()],
+                    'label' => $dataSource->getPlugin()->name,
+                    'criteria' => ['viewContext' => $viewContext],
                 ];
             }
         }
@@ -287,7 +284,6 @@ class Report extends Element
 
     /**
      * @return DataSource|null
-     * @throws \yii\base\Exception
      */
     public function getDataSource()
     {
@@ -304,7 +300,7 @@ class Report extends Element
 
     /**
      * @return string
-     * @throws \Throwable
+     * @throws Throwable
      * @throws \yii\base\Exception
      */
     public function processNameFormat(): string
@@ -383,7 +379,7 @@ class Report extends Element
     /**
      * @param bool $isNew
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function afterSave(bool $isNew)
     {
@@ -391,7 +387,7 @@ class Report extends Element
             $reportRecord = ReportRecord::findOne($this->id);
 
             if (!$reportRecord) {
-                throw new \InvalidArgumentException('Invalid Report ID: '.$this->id);
+                throw new InvalidArgumentException('Invalid Report ID: '.$this->id);
             }
         } else {
             $reportRecord = new ReportRecord();
@@ -428,7 +424,7 @@ class Report extends Element
 
     /**
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
     public function getStartEndDate()
     {

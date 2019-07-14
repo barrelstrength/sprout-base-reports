@@ -15,9 +15,10 @@
 ] %}
 
 {% if currentUser.can(editReportsPermission) %}
-    {% set crumbs = crumbs|merge([
-        { label: "Edit "|t('sprout-base-reports') ~ report.name, url: report.getCpEditUrl() }
-    ]) %}
+    {% set crumbs = crumbs|merge([{
+        label: "Edit "|t('sprout-base-reports') ~ report.name,
+        url: report.getCpEditUrl(baseDataSourceUrl, permissionContext)
+    }]) %}
 {% endif %}
 
 {% block actionButton %}

@@ -76,10 +76,10 @@ class Install extends Migration
 
         $dataSourcesTable = $this->getDb()->tableExists($this->dataSourcesTable);
 
-        if ($dataSourcesTable == false) {
+        if ($dataSourcesTable === false) {
             $this->createTable($this->dataSourcesTable, [
                 'id' => $this->primaryKey(),
-                'pluginHandle' => $this->string(),
+                'viewContext' => $this->string(),
                 'type' => $this->string(),
                 'allowNew' => $this->boolean(),
                 'dateCreated' => $this->dateTime()->notNull(),

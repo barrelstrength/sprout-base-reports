@@ -40,15 +40,22 @@
 
 {% block initJs %}
     // Pass segment to the NotificationEmailQuery class to filter notification entries
-    var params = {'pluginHandle': '{{ craft.app.request.getSegment(1) }}'};
+    var params = {
+        'baseDataSourceUrl': '{{ baseDataSourceUrl }}',
+        'permissionContext': '{{ permissionContext }}',
+        'viewContext': '{{ viewContext }}'
+    };
     var criteria = Craft.defaultIndexCriteria;
 
     {# Only apply these values on a plugin integration. We will use the default values above
        in Sprout Email so the Source filtering works as expected. #}
-    if (params.pluginHandle !== 'sprout-reports') {
+    if (params.viewContext !== 'global') {
         criteria = $.extend({}, Craft.defaultIndexCriteria);
-        criteria.pluginHandle = params.pluginHandle;
+        criteria.viewContext = params.viewContext;
     }
+
+    criteria.permissionContext = params.permissionContext;
+    criteria.baseDataSourceUrl = params.baseDataSourceUrl;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
         context:        '{{ context }}',

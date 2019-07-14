@@ -12,17 +12,23 @@ use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
+use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
+use Throwable;
 use yii\base\Exception;
 use yii\base\ExitException;
 use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -31,29 +37,35 @@ class ReportsController extends Controller
 {
     private $permissions = [];
 
+    private $dataSourceBaseUrl;
+
     public function init()
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
+
+        $segmentOne = Craft::$app->getRequest()->getSegment(1);
+        $segmentTwo = Craft::$app->getRequest()->getSegment(2);
+
+        $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
 
         parent::init();
     }
 
     /**
-     * @param string $pluginHandle
-     * @param null   $dataSourceId
+     * @param string $viewContext
+     * @param string $permissionContext
      * @param null   $groupId
      * @param bool   $hideSidebar
      *
      * @return Response
      * @throws Exception
-     * @throws ExitException
      * @throws ForbiddenHttpException
      */
-    public function actionReportsIndexTemplate(string $pluginHandle, $dataSourceId = null, $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
-        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources($pluginHandle);
+        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources($viewContext);
 
         if ($groupId !== null) {
             $reports = SproutBaseReports::$app->reports->getReportsByGroupId($groupId);
@@ -64,11 +76,12 @@ class ReportsController extends Controller
         $newReportOptions = [];
 
         foreach ($dataSources as $dataSource) {
-            /**
-             * @var $dataSource DataSource
-             */
+
+            /** @var $dataSource DataSource */
+            $dataSource->baseUrl = $this->dataSourceBaseUrl;
+
             // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource->allowNew || $pluginHandle !== 'sprout-reports') {
+            if ($dataSource->allowNew || $viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
                 $newReportOptions[] = [
                     'name' => $dataSource::displayName(),
                     'url' => $dataSource->getUrl($dataSource->id.'/new')
@@ -83,22 +96,25 @@ class ReportsController extends Controller
             'newReportOptions' => $newReportOptions,
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
-            'hideSidebar' => $hideSidebar
+            'hideSidebar' => $hideSidebar,
+            'viewContext' => $viewContext,
+            'baseDataSourceUrl' => $this->dataSourceBaseUrl,
+            'permissionContext' => $permissionContext
         ]);
     }
 
     /**
-     * @param string      $pluginHandle
+     * @param string      $viewContext
+     * @param string      $permissionContext
      * @param Report|null $report
      * @param int|null    $reportId
      *
      * @return Response
-     * @throws NotFoundHttpException
-     * @throws Exception
-     * @throws InvalidConfigException
      * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $pluginHandle, Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports',  Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -118,9 +134,12 @@ class ReportsController extends Controller
 
         $labels = $dataSource->getDefaultLabels($report);
 
+        // Set the base URL so we can use the $dataSource->getUrl method
+        $dataSource->baseUrl = $this->dataSourceBaseUrl;
+
         $reportIndexUrl = $dataSource->getUrl($report->groupId);
 
-        if ($pluginHandle !== 'sprout-reports') {
+        if ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -145,12 +164,14 @@ class ReportsController extends Controller
             'redirectUrl' => Craft::$app->getRequest()->getSegment(1).'/reports/view/'.$reportId,
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
-            'settings' => $plugin ? $plugin->getSettings() : null
+            'settings' => $plugin ? $plugin->getSettings() : null,
+            'baseDataSourceUrl' => $this->dataSourceBaseUrl,
+            'permissionContext' => $permissionContext
         ]);
     }
 
     /**
-     * @param string      $pluginHandle
+     * @param string      $viewContext
      * @param string      $dataSourceId
      * @param Report|null $report
      * @param int|null    $reportId
@@ -160,7 +181,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionEditReportTemplate(string $pluginHandle, string $dataSourceId, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
@@ -184,9 +205,12 @@ class ReportsController extends Controller
             throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
         }
 
+        // Set the base URL so we can use the $dataSource->getUrl method
+        $dataSource->baseUrl = $this->dataSourceBaseUrl;
+
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
-        if ($pluginHandle !== 'sprout-reports') {
+        if ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -206,7 +230,7 @@ class ReportsController extends Controller
             'dataSource' => $dataSource,
             'reportIndexUrl' => $reportIndexUrl,
             'groups' => $groups,
-            'continueEditingUrl' => $dataSource->getUrl()."/$dataSourceId/edit/{id}",
+            'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
             'editReportsPermission' => $this->permissions['sproutReports-editReports']
         ]);
     }
@@ -216,10 +240,9 @@ class ReportsController extends Controller
      *
      * @return Response|null
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
     public function actionUpdateReport()
     {
@@ -265,11 +288,11 @@ class ReportsController extends Controller
     /**
      * Saves a report query to the database
      *
-     * @return null|\yii\web\Response
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
+     * @return null|Response
+     * @throws Throwable
+     * @throws ElementNotFoundException
      * @throws Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     public function actionSaveReport()
     {
@@ -278,30 +301,30 @@ class ReportsController extends Controller
 
         $report = $this->prepareFromPost();
 
-        if (Craft::$app->getElements()->saveElement($report)) {
-            Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report saved.'));
+        if (!Craft::$app->getElements()->saveElement($report)) {
+            Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Couldn’t save report.'));
 
-            return $this->redirectToPostedUrl($report);
+            // Send the report back to the template
+            Craft::$app->getUrlManager()->setRouteParams([
+                'report' => $report
+            ]);
+
+            return null;
         }
 
-        Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Couldn’t save report.'));
+        Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report saved.'));
 
-        // Send the report back to the template
-        Craft::$app->getUrlManager()->setRouteParams([
-            'report' => $report
-        ]);
-
-        return null;
+        return $this->redirectToPostedUrl($report);
     }
 
     /**
      * Deletes a Report
      *
-     * @return \yii\web\Response
+     * @return Response
      * @throws \Exception
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
+     * @throws BadRequestHttpException
      */
     public function actionDeleteReport(): Response
     {
@@ -325,8 +348,8 @@ class ReportsController extends Controller
      * Saves a Report Group
      *
      * @return Response
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
      */
     public function actionSaveGroup(): Response
@@ -360,11 +383,11 @@ class ReportsController extends Controller
     /**
      * Deletes a Report Group
      *
-     * @return \yii\web\Response
+     * @return Response
      * @throws \Exception
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
+     * @throws BadRequestHttpException
      */
     public function actionDeleteGroup(): Response
     {
@@ -391,6 +414,7 @@ class ReportsController extends Controller
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         $reportId = Craft::$app->getRequest()->getParam('reportId');
+
         $report = SproutBaseReports::$app->reports->getReport($reportId);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];
 

@@ -13,7 +13,14 @@ trait DataSourceTrait
     // Properties
     // =========================================================================
 
-    public $pluginHandle;
+    public $viewContext;
+
+    /**
+     * Set the base URL dynamically so we can manage different URLs across use cases in different modules
+     *
+     * @var string
+     */
+    public $baseUrl;
 
     /**
      * Allows a user to disable a Data Source from displaying in the New Report dropdown

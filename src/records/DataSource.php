@@ -13,7 +13,7 @@ use craft\db\ActiveRecord;
  * Class DataSource
  *
  * @property int    $id           ID
- * @property int    $pluginHandle Plugin ID
+ * @property int    $viewContext  View Context for displaying reports
  * @property string $type         Data Source Class
  * @property bool   $allowNew     Allow New
  *

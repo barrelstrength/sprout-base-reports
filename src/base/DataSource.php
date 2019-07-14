@@ -45,6 +45,8 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
      */
     public function __construct()
     {
+        parent::__construct();
+
         // Get plugin class
         $pluginHandle = Craft::$app->getPlugins()->getPluginHandleByClass(get_class($this));
 
@@ -129,7 +131,7 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     }
 
     /**
-     * Returns the CP URL for the given data source
+     * Returns the CP Edit URL for the given data source used to create Reports
      *
      * @param null $append
      *
@@ -137,13 +139,9 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
      */
     public function getUrl($append = null): string
     {
-        $pluginHandle = Craft::$app->getRequest()->getSegment(1);
-
-        $baseUrl = $pluginHandle.'/reports/';
-
         $appendedUrl = ltrim($append, '/');
 
-        return UrlHelper::cpUrl($baseUrl.$appendedUrl);
+        return UrlHelper::cpUrl($this->baseUrl.$appendedUrl);
     }
 
     /**

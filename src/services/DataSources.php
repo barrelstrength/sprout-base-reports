@@ -27,6 +27,7 @@ use yii\base\Exception;
  *
  * @property array    $allDataSources
  * @property mixed    $dataSourcePlugins
+ * @property array    $dataSourcesByViewContext
  * @property string[] $allDataSourceTypes
  */
 class DataSources extends Component
@@ -36,13 +37,14 @@ class DataSources extends Component
      */
     const EVENT_REGISTER_DATA_SOURCES = 'registerSproutReportsDataSources';
 
+    const DEFAULT_VIEW_CONTEXT = 'global';
+
     private $dataSources;
 
     /**
      * @param int $id
      *
      * @return DataSource|null
-     * @throws Exception
      */
     public function getDataSourceById($id)
     {
@@ -85,20 +87,19 @@ class DataSources extends Component
     /**
      * Returns all Data Sources
      *
-     * @param string $pluginHandle
+     * @param string $viewContext
      *
-     * @return array
-     * @throws \yii\base\ExitException
+     * @return DataSource[]
      */
-    public function getInstalledDataSources(string $pluginHandle = 'sprout-reports'): array
+    public function getInstalledDataSources(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT): array
     {
         $query = (new Query())
             ->select(['*'])
             ->from(['{{%sproutreports_datasources}}']);
 
-        if ($pluginHandle !== 'sprout-reports') {
+        if ($viewContext !== self::DEFAULT_VIEW_CONTEXT) {
             $query->where([
-                'pluginHandle' => $pluginHandle
+                'viewContext' => $viewContext
             ]);
         }
 
@@ -110,7 +111,7 @@ class DataSources extends Component
             if (class_exists($dataSourceType)) {
                 $dataSources[$dataSourceType] = new $dataSourceType();
                 $dataSources[$dataSourceType]->id = $dataSource['id'];
-                $dataSources[$dataSourceType]->pluginHandle = $dataSource['pluginHandle'];
+                $dataSources[$dataSourceType]->viewContext = $dataSource['viewContext'];
                 $dataSources[$dataSourceType]->allowNew = $dataSource['allowNew'];
             } else {
                 Craft::error(Craft::t('sprout-base-reports', 'Unable to find Data Source: {type}', [
@@ -136,21 +137,6 @@ class DataSources extends Component
     }
 
     /**
-     * @return array
-     */
-    public function getDataSourcePlugins(): array
-    {
-        $query = new Query();
-
-        $dataSourcePlugins = $query->select('pluginHandle')
-            ->from(['{{%sproutreports_datasources}}'])
-            ->distinct()
-            ->all();
-
-        return $dataSourcePlugins;
-    }
-
-    /**
      * @param array $dataSourceTypes
      *
      * @return DataSource|null
@@ -164,8 +150,8 @@ class DataSources extends Component
             /** @var DataSource $dataSource */
             $dataSource = new $dataSourceClass();
 
-            // Set all pre-built class to sprout-reports pluginHandle
-            $dataSource->pluginHandle = $dataSource->getPlugin()->handle ?? 'sprout-reports';
+            // Set all pre-built class to sprout-reports viewContext
+            $dataSource->viewContext = $dataSourceClass->viewContext ?? self::DEFAULT_VIEW_CONTEXT;
 
             $this->saveDataSource($dataSource);
 
@@ -199,7 +185,7 @@ class DataSources extends Component
 
         $dataSourceRecord->type = get_class($dataSource);
         $dataSourceRecord->allowNew = $dataSource->allowNew ?? $dataSourceRecord->allowNew ?? true;
-        $dataSourceRecord->pluginHandle = $dataSource->pluginHandle ?? $dataSourceRecord->pluginHandle;
+        $dataSourceRecord->viewContext = $dataSource->viewContext ?? $dataSourceRecord->viewContext;
 
         if (!$dataSourceRecord->validate()) {
             $dataSource->addErrors($dataSourceRecord->getErrors());

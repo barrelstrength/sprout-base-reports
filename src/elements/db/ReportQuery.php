@@ -14,7 +14,7 @@ use Craft;
 
 class ReportQuery extends ElementQuery
 {
-    public $pluginHandle;
+    public $viewContext;
 
     public $id;
 
@@ -45,6 +45,15 @@ class ReportQuery extends ElementQuery
     public $results;
 
     /**
+     * This is needed to dynamically set the Base URL for the "View Results" buttons. In this case,
+     * the URL is not specific to a data source but to the module displaying the Reports.
+     *
+     * @var string
+     */
+    public $baseDataSourceUrl;
+    public $permissionContext;
+
+    /**
      * @inheritdoc
      */
     protected function beforePrepare(): bool
@@ -61,20 +70,20 @@ class ReportQuery extends ElementQuery
             'sproutreports_reports.settings',
             'sproutreports_reports.groupId',
             'sproutreports_reports.enabled',
-            'sproutreports_datasources.pluginHandle'
+            'sproutreports_datasources.viewContext'
         ]);
 
         $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
 
         // Property is used for Element Sources in sidebar
-        if (!$this->pluginHandle) {
+        if (!$this->viewContext) {
             // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
-            $this->pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
+            $this->viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
         }
 
-        if ($this->pluginHandle) {
+        if ($this->viewContext) {
             $this->query->andWhere(Db::parseParam(
-                'sproutreports_datasources.pluginHandle', $this->pluginHandle)
+                'sproutreports_datasources.viewContext', $this->viewContext)
             );
         }
 

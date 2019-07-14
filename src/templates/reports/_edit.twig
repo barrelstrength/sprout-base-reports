@@ -30,22 +30,22 @@
 {% block actionButton %}
 
     <input type="hidden" name="action" value="sprout-base-reports/reports/save-report">
-
     {{ redirectInput(reportIndexUrl) }}
 
     <div class="button">
         <div class="btngroup">
             <input type="submit" class="btn submit"
-                   value="{{ 'Save Report'|t('sprout-base-reports') }}">
+                value="{{ 'Save Report'|t('sprout-base-reports') }}">
 
             <div class="btn submit menubtn"></div>
             <div class="menu">
                 <ul>
                     <li><a class="formsubmit"
-                           data-redirect="{{ continueEditingUrl|hash }}">{{ "Save and continue editing"|t('sprout-base-reports') }}</a>
+                            data-redirect="{{ continueEditingUrl|hash }}">{{ "Save and continue editing"|t('sprout-base-reports') }}
+                            <span class="shortcut">⌘S</span></a>
                     </li>
                     <li><a class="formsubmit"
-                           data-redirect="{{ dataSource.getUrl(dataSource.id ~ '/new')|hash }}">
+                            data-redirect="{{ dataSource.getUrl(dataSource.id ~ '/new')|hash }}">
                             {{ "Save and add another report"|t('sprout-base-reports') }}</a>
                     </li>
                 </ul>
