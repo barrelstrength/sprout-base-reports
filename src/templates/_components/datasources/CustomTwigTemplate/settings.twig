@@ -1,6 +1,5 @@
 {%- import "_includes/forms" as forms -%}
 {% import 'sprout-base/_includes/sproutcp' as sprout %}
-{% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
 
 {%- set resultsTemplate = settings.resultsTemplate is defined ? settings.resultsTemplate : "" -%}
 {%- set settingsTemplate = settings.settingsTemplate is defined ? settings.settingsTemplate : "" -%}
@@ -49,7 +48,7 @@
     <div id="toggle-templatesettings"
          class="{{ settingsContents ? 'hidden' : 'expanded' }}">
 
-        {{ forms.textField({
+        {{ forms.autosuggestField({
             name: "settings[resultsTemplate]",
             label: "Results Template"|t('sprout-base-reports'),
             instructions: "The template to use to display results. Learn more about <a href='{url}'>Results Templates</a>."|raw|t('sprout-base-reports', {
@@ -59,11 +58,12 @@
             required: true,
             first: true,
             placeholder: "_reports/reportname/results",
+            suggestions: craft.cp.getTemplateSuggestions(),
             value: resultsTemplate,
             errors: errors['resultsTemplate'] is defined ? errors['resultsTemplate'] : null
         }) }}
 
-        {{ forms.textField({
+        {{ forms.autosuggestField({
             name: "settings[settingsTemplate]",
             label: "Settings Template"|t('sprout-base-reports'),
             instructions: "The template to use to display settings. Learn more about <a href='{url}'>Settings Templates</a>."|raw|t('sprout-base-reports', {
@@ -71,6 +71,7 @@
             }),
             class: "nicetext code",
             placeholder: "_reports/reportname/settings",
+            suggestions: craft.cp.getTemplateSuggestions(),
             value: settings.settingsTemplate is defined ? settings.settingsTemplate : "",
             errors: errors['settingsTemplate'] is defined ? errors['settingsTemplate'] : null
         }) }}
