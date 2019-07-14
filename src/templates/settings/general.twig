@@ -14,3 +14,18 @@
     first: true,
     errors: ''
 }) }}
+
+{{ forms.selectField({
+    label: "Default Results to Display"|t('sprout-base-reports'),
+    instructions: "Set the number of results to initially display when a report is run."|t('sprout-base-reports'),
+    name: 'defaultPageLength',
+    placeholder: '10',
+    options: [
+        { label: '10', value: '10' },
+        { label: '25', value: '25' },
+        { label: '50', value: '50' },
+        { label: '100', value: '100' },
+        { label: '250', value: '250' }
+    ],
+    value: settings.defaultPageLength
+}) }}

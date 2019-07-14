@@ -14,6 +14,7 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use barrelstrength\sproutbasereports\models\Settings;
+use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
@@ -21,6 +22,7 @@ use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
 use yii\base\Exception;
 use yii\base\ExitException;
+use yii\base\InvalidConfigException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -92,9 +94,8 @@ class ReportsController extends Controller
      *
      * @return Response
      * @throws NotFoundHttpException
-     * @throws \craft\errors\ElementNotFoundException
      * @throws Exception
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws ForbiddenHttpException
      */
     public function actionResultsIndexTemplate(string $pluginHandle, Report $report = null, int $reportId = null): Response
@@ -132,6 +133,9 @@ class ReportsController extends Controller
 
         $this->getView()->registerAssetBundle(CpAsset::class);
 
+        /** @var SproutReports $plugin */
+        $plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
+
         return $this->renderTemplate('sprout-base-reports/results/index', [
             'report' => $report,
             'dataSource' => $dataSource,
@@ -140,7 +144,8 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'redirectUrl' => Craft::$app->getRequest()->getSegment(1).'/reports/view/'.$reportId,
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
-            'editReportsPermission' => $this->permissions['sproutReports-editReports']
+            'editReportsPermission' => $this->permissions['sproutReports-editReports'],
+            'settings' => $plugin ? $plugin->getSettings() : null
         ]);
     }
 
@@ -398,6 +403,7 @@ class ReportsController extends Controller
                 // Name the report using the $report toString method that will check both nameFormat and name
                 $filename = $report.'-'.$date;
 
+                $dataSource->isExport = true;
                 $labels = $dataSource->getDefaultLabels($report, $settings);
                 $values = $dataSource->getResults($report, $settings);
 

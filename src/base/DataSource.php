@@ -31,6 +31,16 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     use DataSourceTrait;
 
     /**
+     * This value indicates whether a Report is being generated for Export
+     *
+     * This is set to true when exporting data, so a report can do something
+     * like show HTML in the CP report view and exclude that HTML when exporting.
+     *
+     * @var bool
+     */
+    public $isExport = false;
+
+    /**
      * DataSource constructor.
      */
     public function __construct()
