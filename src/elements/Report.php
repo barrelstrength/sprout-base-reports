@@ -308,7 +308,7 @@ class Report extends Element
         $dataSource = $this->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
+            throw new NotFoundHttpException('Data Source not found.');
         }
 
         $settingsArray = Json::decode($this->settings);

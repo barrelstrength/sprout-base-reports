@@ -123,13 +123,13 @@ class ReportsController extends Controller
         }
 
         if (!$report) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
+            throw new NotFoundHttpException('Report not found.');
         }
 
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
+            throw new NotFoundHttpException('Data Source not found.');
         }
 
         $labels = $dataSource->getDefaultLabels($report);
@@ -202,7 +202,7 @@ class ReportsController extends Controller
         $dataSource = $reportElement->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
+            throw new NotFoundHttpException('Data Source not found.');
         }
 
         // Set the base URL so we can use the $dataSource->getUrl method
@@ -260,7 +260,7 @@ class ReportsController extends Controller
             $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$reportElement) {
-                throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'No report exists with the id “{id}”', ['id' => $reportId]));
+                throw new NotFoundHttpException('No report exists with the ID: '.$reportId);
             }
 
             $reportElement->settings = is_array($settings) ? $settings : [];
@@ -341,7 +341,7 @@ class ReportsController extends Controller
             return $this->redirectToPostedUrl($record);
         }
 
-        throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
+        throw new NotFoundHttpException('Report not found.');
     }
 
     /**
@@ -475,7 +475,7 @@ class ReportsController extends Controller
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Date Source not found.'));
+            throw new NotFoundHttpException('Date Source not found.');
         }
 
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
