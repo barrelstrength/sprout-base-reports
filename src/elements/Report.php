@@ -178,7 +178,7 @@ class Report extends Element
     {
         return [
             'name' => Craft::t('sprout-base-reports', 'Name'),
-            'results' => Craft::t('sprout-base-reports', 'View Report'),
+            'results' => Craft::t('sprout-base-reports', 'View'),
             'download' => Craft::t('sprout-base-reports', 'Export'),
             'dataSourceId' => Craft::t('sprout-base-reports', 'Data Source')
         ];
@@ -191,6 +191,7 @@ class Report extends Element
      */
     public function getTableAttributeHtml(string $attribute): string
     {
+        $viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
         $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
 
         if ($attribute === 'dataSourceId') {
@@ -210,13 +211,17 @@ class Report extends Element
         if ($attribute === 'download') {
             return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
                     'reportId' => $this->id
-                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
+                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
         }
 
         if ($attribute === 'results') {
             $resultsUrl = UrlHelper::cpUrl($baseDataSourceUrl.'view/'.$this->id);
 
-            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run Report').'</a>';
+            $runReportText = $viewContext === 'segments'
+                ? Craft::t('sprout-base-reports', 'View Segment')
+                : Craft::t('sprout-base-reports', 'Run Report');
+
+                return '<a href="'.$resultsUrl.'" class="btn small">'.$runReportText.'</a>';
         }
 
         return parent::getTableAttributeHtml($attribute);
@@ -253,7 +258,9 @@ class Report extends Element
         // We just need the module viewContext and name for the Sources
         $distinctDataSourceModules = [];
         foreach ($dataSources as $key => &$dataSource) {
-            $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
+            if ($dataSource->viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && !$dataSource->isUnlisted) {
+                $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
+            }
         }
 
         // Prevent possible side effects

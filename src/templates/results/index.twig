@@ -11,7 +11,7 @@
 {% endif %}
 
 {% set crumbs = [
-    { label: "Reports"|t('sprout-base-reports'), url: reportIndexUrl }
+    { label: labelTextPlural, url: reportIndexUrl }
 ] %}
 
 {% if currentUser.can(editReportsPermission) %}
@@ -29,7 +29,7 @@
         <input type="hidden" name="reportId" value="{{ report.id }}">
 
         <a id="btn-download-csv" class="btn">
-            {{ "Download"|t('sprout-base-reports') }}
+            {{ "Export"|t('sprout-base-reports') }}
         </a>
 
         {% if currentUser.can(editReportsPermission) %}
@@ -37,6 +37,11 @@
         {% endif %}
     </form>
 {% endblock %}
+
+{% set runReportText = viewContext == 'segments'
+    ? "View Segment"|t('sprout-base-reports')
+    : "Run Report"|t('sprout-base-reports')
+%}
 
 {% block content %}
 
@@ -56,7 +61,7 @@
                 <div class="button">
                     <div class="btngroup">
                         <input type="submit" class="btn submit"
-                            value="{{ 'Run Report'|t('sprout-base-reports') }}">
+                            value="{{ runReportText }}">
                     </div>
                 </div>
 
@@ -103,7 +108,9 @@
         {% else %}
 
             {% set boxBody %}
-                <p>{{ "This report currently has no results. Check your report settings and ensure you have content for the report you are trying to run. To quickly edit the Report Settings, click on the gear icon in the upper right."|t('sprout-base-reports')|raw }}</p>
+                <p>{{ "This {labelTextSingular} currently has no results. Check your {labelTextSingular} settings and ensure you have content for the {labelTextSingular} you are trying to run. To quickly edit the {labelTextSingular} settings, click on the gear icon in the upper right."|t('sprout-base-reports', {
+                        labelTextSingular: labelTextSingular|lower
+                    })|raw }}</p>
             {% endset %}
 
             {{ sprout.mediaBox({

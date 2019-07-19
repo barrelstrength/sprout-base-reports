@@ -39,6 +39,9 @@ class ReportsController extends Controller
 
     private $dataSourceBaseUrl;
 
+    private $labelTextSingular;
+    private $labelTextPlural;
+
     public function init()
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
@@ -47,6 +50,14 @@ class ReportsController extends Controller
         $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
         $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+
+        $this->labelTextSingular = $segmentTwo === 'segments'
+            ? Craft::t('sprout-base-reports', 'Segment')
+            : Craft::t('sprout-base-reports', 'Report');
+
+        $this->labelTextPlural = $segmentTwo === 'segments'
+            ? Craft::t('sprout-base-reports', 'Segments')
+            : Craft::t('sprout-base-reports', 'Reports');
 
         parent::init();
     }
@@ -74,6 +85,7 @@ class ReportsController extends Controller
         }
 
         $newReportOptions = [];
+        $unlistedDataSourceViewContexts = [];
 
         foreach ($dataSources as $dataSource) {
 
@@ -81,11 +93,18 @@ class ReportsController extends Controller
             $dataSource->baseUrl = $this->dataSourceBaseUrl;
 
             // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource->allowNew || $viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
+            if ($dataSource->allowNew ||
+                ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && !$dataSource->isUnlisted)
+            ) {
                 $newReportOptions[] = [
                     'name' => $dataSource::displayName(),
                     'url' => $dataSource->getUrl($dataSource->id.'/new')
                 ];
+            }
+
+            if ($dataSource->isUnlisted) {
+                // Prepare value for query in ReportQuery to exclude unlisted DataSources from global listings
+                $unlistedDataSourceViewContexts[] = $dataSource->viewContext;
             }
         }
 
@@ -99,7 +118,10 @@ class ReportsController extends Controller
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext
+            'permissionContext' => $permissionContext,
+            'labelTextSingular' => $this->labelTextSingular,
+            'labelTextPlural' => $this->labelTextPlural,
+            'unlistedDataSourceViewContexts' => implode(',', array_unique($unlistedDataSourceViewContexts))
         ]);
     }
 
@@ -166,7 +188,10 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext
+            'permissionContext' => $permissionContext,
+            'labelTextSingular' => $this->labelTextSingular,
+            'labelTextPlural' => $this->labelTextPlural,
+            'viewContext' => $viewContext
         ]);
     }
 
@@ -231,7 +256,9 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
-            'editReportsPermission' => $this->permissions['sproutReports-editReports']
+            'editReportsPermission' => $this->permissions['sproutReports-editReports'],
+            'labelTextSingular' => $this->labelTextSingular,
+            'labelTextPlural' => $this->labelTextPlural
         ]);
     }
 

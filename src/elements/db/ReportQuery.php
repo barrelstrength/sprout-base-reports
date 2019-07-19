@@ -52,6 +52,7 @@ class ReportQuery extends ElementQuery
      */
     public $baseDataSourceUrl;
     public $permissionContext;
+    public $unlistedDataSourceViewContexts;
 
     /**
      * @inheritdoc
@@ -85,6 +86,18 @@ class ReportQuery extends ElementQuery
             $this->query->andWhere(Db::parseParam(
                 'sproutreports_datasources.viewContext', $this->viewContext)
             );
+        } else {
+            $unlistedDataSourceViewContexts = Craft::$app->request->getBodyParam('criteria.unlistedDataSourceViewContexts');
+
+            if ($unlistedDataSourceViewContexts) {
+            // Exclude segments from global context
+            // @todo - update hardcoded segments to exclude all DataSource::isUnlisted types
+            $this->query->andWhere([
+                'not in',
+                'sproutreports_datasources.viewContext',
+                [$unlistedDataSourceViewContexts]
+            ]);
+            }
         }
 
         if ($this->dataSourceId) {

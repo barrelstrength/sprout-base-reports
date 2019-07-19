@@ -41,6 +41,13 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     public $isExport = false;
 
     /**
+     * Set to true to exclude the Data Source from the global context
+     *
+     * @var bool
+     */
+    public $isUnlisted = false;
+
+    /**
      * DataSource constructor.
      */
     public function __construct()

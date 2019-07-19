@@ -2,7 +2,11 @@
 
 {% extends "sprout-base-reports/_layouts/elementindex" %}
 
-{% set title  = "Reports"|t('sprout-base-reports') %}
+{% set title = labelTextPlural %}
+{% set newReportText = "New {labelTextSingular}"|t('sprout-base-reports', {
+    labelTextSingular: labelTextSingular,
+}) %}
+
 {% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
 {% block actionButton %}
@@ -12,7 +16,7 @@
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
                 <a class="btn submit add icon"
-                   href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
+                   href="{{ newReportOptions[0].url }}">{{ newReportText }}</a>
                 {% if dataSources %}
                     <div class="btn submit menubtn"></div>
                     <div class="menu">
@@ -29,7 +33,7 @@
         {% else %}
             <div class="btngroup submit first">
                 {% if newReportOptions[0] is defined %}
-                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
+                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ newReportText }}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -43,7 +47,8 @@
     var params = {
         'baseDataSourceUrl': '{{ baseDataSourceUrl }}',
         'permissionContext': '{{ permissionContext }}',
-        'viewContext': '{{ viewContext }}'
+        'viewContext': '{{ viewContext }}',
+        'unlistedDataSourceViewContexts': '{{ unlistedDataSourceViewContexts }}'
     };
     var criteria = Craft.defaultIndexCriteria;
 
@@ -56,6 +61,7 @@
 
     criteria.permissionContext = params.permissionContext;
     criteria.baseDataSourceUrl = params.baseDataSourceUrl;
+    criteria.unlistedDataSourceViewContexts = params.unlistedDataSourceViewContexts;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
         context:        '{{ context }}',
