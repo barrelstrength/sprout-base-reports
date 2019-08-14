@@ -147,7 +147,7 @@ class Report extends Element
             $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
             $permissionContext = Craft::$app->request->getBodyParam('criteria.permissionContext');
         }
-        
+
         $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $permissionContext);
 
         if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
@@ -221,7 +221,7 @@ class Report extends Element
                 ? Craft::t('sprout-base-reports', 'View Segment')
                 : Craft::t('sprout-base-reports', 'Run Report');
 
-                return '<a href="'.$resultsUrl.'" class="btn small">'.$runReportText.'</a>';
+            return '<a href="'.$resultsUrl.'" class="btn small">'.$runReportText.'</a>';
         }
 
         return parent::getTableAttributeHtml($attribute);
@@ -258,9 +258,13 @@ class Report extends Element
         // We just need the module viewContext and name for the Sources
         $distinctDataSourceModules = [];
         foreach ($dataSources as $key => &$dataSource) {
-            if ($dataSource->viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && !$dataSource->isUnlisted) {
+
+            // @TODO
+            // This works fine but doesn't allow us to trigger the Segment Element Select Modal with any results. Setting this to true displays the proper results on the Segment Element Select Modal but then also displays "Sprout Lists" as a sidebar Source in Sprout Reports, which we don't want.
+            if ($dataSource->viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && $dataSource->isUnlisted !== true) {
                 $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
             }
+
         }
 
         // Prevent possible side effects
@@ -439,7 +443,7 @@ class Report extends Element
 
         if ($dateRange !== null && $dateRange == 'customRange') {
             $startDateSetting = $this->getSetting('startDate');
-            $endDateSetting   = $this->getSetting('endDate');
+            $endDateSetting = $this->getSetting('endDate');
         } else {
             $startEndDate = SproutBaseReports::$app->reports->getStartEndDateRange($dateRange);
 
@@ -448,7 +452,7 @@ class Report extends Element
         }
 
         $this->startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
-        $this->endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
+        $this->endDate = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
 
         return $this;
     }
