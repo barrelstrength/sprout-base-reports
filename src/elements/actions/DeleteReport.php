@@ -16,12 +16,12 @@ class DeleteReport extends Delete
     /**
      * @var string|null The confirmation message that should be shown before the elements get deleted
      */
-    public $confirmationMessage = 'Are you sure you want to delete this report(s)?';
+    public $confirmationMessage = 'Are you sure you want to delete the selected reports?';
 
     /**
      * @var string|null The message that should be shown after the elements get deleted
      */
-    public $successMessage = 'report(s) deleted.';
+    public $successMessage = 'Reports deleted.';
 
     /**
      *  Performs the action on any elements that match the given criteria.
@@ -35,7 +35,7 @@ class DeleteReport extends Delete
     {
         parent::performAction($query);
 
-        $this->setMessage(Craft::t('app', 'report(s) deleted.'));
+        $this->setMessage(Craft::t('sprout-base-reports', 'Reports deleted.'));
 
         return true;
     }
