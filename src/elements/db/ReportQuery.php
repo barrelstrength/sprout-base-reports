@@ -91,7 +91,6 @@ class ReportQuery extends ElementQuery
 
             if ($unlistedDataSourceViewContexts) {
             // Exclude segments from global context
-            // @todo - update hardcoded segments to exclude all DataSource::isUnlisted types
             $this->query->andWhere([
                 'not in',
                 'sproutreports_datasources.viewContext',
