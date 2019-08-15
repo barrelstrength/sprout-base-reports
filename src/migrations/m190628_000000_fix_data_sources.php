@@ -52,7 +52,7 @@ class m190628_000000_fix_data_sources extends Migration
                 $hashMap[$dataSource['type']] = $dataSource;
                 if ($dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\EntriesDataSource' ||
                     $dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\SubmissionLogDataSource') {
-                    if ($this->db->columnExists($table, 'pluginHandle')) {
+                    if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
                         $this->update($this->dataSourcesTable, [
                             'pluginHandle' => 'sprout-forms'
                         ], ['id' => $dataSource['id']], [], false);
@@ -63,7 +63,7 @@ class m190628_000000_fix_data_sources extends Migration
                     }
                 } else {
                     // Let's default all to sprout reports
-                    if ($this->db->columnExists($table, 'pluginHandle')) {
+                    if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
                         $this->update($this->dataSourcesTable, [
                             'pluginHandle' => 'sprout-reports'
                         ], ['id' => $dataSource['id']], [], false);
