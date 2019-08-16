@@ -135,20 +135,20 @@ class Report extends Element
      * Returns the element's CP edit URL.
      *
      * @param null   $baseDataSourceUrl
-     * @param string $permissionContext
+     * @param string $pluginHandle
      *
      * @return string|null
      */
-    public function getCpEditUrl($baseDataSourceUrl = null, $permissionContext = 'sprout-reports')
+    public function getCpEditUrl($baseDataSourceUrl = null, $pluginHandle = 'sprout-reports')
     {
         // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
             $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
-            $permissionContext = Craft::$app->request->getBodyParam('criteria.permissionContext');
+            $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
         }
         
-        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $permissionContext);
+        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
 
         if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
             return null;
@@ -192,6 +192,7 @@ class Report extends Element
     public function getTableAttributeHtml(string $attribute): string
     {
         $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
+        $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
 
         if ($attribute === 'dataSourceId') {
 
@@ -209,7 +210,8 @@ class Report extends Element
 
         if ($attribute === 'download') {
             return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
-                    'reportId' => $this->id
+                    'reportId' => $this->id,
+                    'pluginHandle' => $pluginHandle
                 ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Download CSV').'</a>';
         }
 
