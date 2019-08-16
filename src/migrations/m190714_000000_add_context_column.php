@@ -48,8 +48,8 @@ class m190714_000000_add_context_column extends Migration
                         break;
                 }
             }
-
-            $this->dropColumn($table, 'pluginHandle');
+            // @todo - remove the comment after we add minimun version required.
+            #$this->dropColumn($table, 'pluginHandle');
         }
 
         return true;

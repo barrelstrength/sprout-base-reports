@@ -46,10 +46,13 @@ class ReportsController extends Controller
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
 
-        $segmentOne = Craft::$app->getRequest()->getSegment(1);
-        $segmentTwo = Craft::$app->getRequest()->getSegment(2);
+        // Only use dataSourceBaseUrl variable in template routes, segments won't be accurate in action requests
+        if (!Craft::$app->getRequest()->getIsActionRequest()) {
+            $segmentOne = Craft::$app->getRequest()->getSegment(1);
+            $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
-        $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+            $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+        }
 
         $this->labelTextSingular = $segmentTwo === 'segments'
             ? Craft::t('sprout-base-reports', 'Segment')
@@ -64,7 +67,7 @@ class ReportsController extends Controller
 
     /**
      * @param string $viewContext
-     * @param string $permissionContext
+     * @param string $pluginHandle
      * @param null   $groupId
      * @param bool   $hideSidebar
      *
@@ -72,7 +75,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -118,7 +121,7 @@ class ReportsController extends Controller
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext,
+            'pluginHandle' => $pluginHandle,
             'labelTextSingular' => $this->labelTextSingular,
             'labelTextPlural' => $this->labelTextPlural,
             'unlistedDataSourceViewContexts' => implode(',', array_unique($unlistedDataSourceViewContexts))
@@ -127,7 +130,7 @@ class ReportsController extends Controller
 
     /**
      * @param string      $viewContext
-     * @param string      $permissionContext
+     * @param string      $pluginHandle
      * @param Report|null $report
      * @param int|null    $reportId
      *
@@ -136,7 +139,7 @@ class ReportsController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports',  Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -188,7 +191,7 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext,
+            'pluginHandle' => $pluginHandle,
             'labelTextSingular' => $this->labelTextSingular,
             'labelTextPlural' => $this->labelTextPlural,
             'viewContext' => $viewContext
@@ -206,7 +209,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, string $dataSourceId = null, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
@@ -258,7 +261,8 @@ class ReportsController extends Controller
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'labelTextSingular' => $this->labelTextSingular,
-            'labelTextPlural' => $this->labelTextPlural
+            'labelTextPlural' => $this->labelTextPlural,
+            'pluginHandle' => $pluginHandle
         ]);
     }
 

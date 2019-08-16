@@ -52,14 +52,26 @@ class m190628_000000_fix_data_sources extends Migration
                 $hashMap[$dataSource['type']] = $dataSource;
                 if ($dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\EntriesDataSource' ||
                     $dataSource['type'] == 'barrelstrength\sproutforms\integrations\sproutreports\datasources\SubmissionLogDataSource') {
-                    $this->update($this->dataSourcesTable, [
-                        'pluginHandle' => 'sprout-forms'
-                    ], ['id' => $dataSource['id']], [], false);
+                    if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
+                        $this->update($this->dataSourcesTable, [
+                            'pluginHandle' => 'sprout-forms'
+                        ], ['id' => $dataSource['id']], [], false);
+                    } else {
+                        $this->update($this->dataSourcesTable, [
+                            'viewContext' => 'sprout-forms'
+                        ], ['id' => $dataSource['id']], [], false);
+                    }
                 } else {
                     // Let's default all to sprout reports
-                    $this->update($this->dataSourcesTable, [
-                        'pluginHandle' => 'sprout-reports'
-                    ], ['id' => $dataSource['id']], [], false);
+                    if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
+                        $this->update($this->dataSourcesTable, [
+                            'pluginHandle' => 'sprout-reports'
+                        ], ['id' => $dataSource['id']], [], false);
+                    } else {
+                        $this->update($this->dataSourcesTable, [
+                            'viewContext' => 'sprout-reports'
+                        ], ['id' => $dataSource['id']], [], false);
+                    }
                 }
             }
         }

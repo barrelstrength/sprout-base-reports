@@ -46,7 +46,7 @@
     // Pass segment to the NotificationEmailQuery class to filter notification entries
     var params = {
         'baseDataSourceUrl': '{{ baseDataSourceUrl }}',
-        'permissionContext': '{{ permissionContext }}',
+        'pluginHandle': '{{ pluginHandle }}',
         'viewContext': '{{ viewContext }}',
         'unlistedDataSourceViewContexts': '{{ unlistedDataSourceViewContexts }}'
     };
@@ -59,7 +59,7 @@
         criteria.viewContext = params.viewContext;
     }
 
-    criteria.permissionContext = params.permissionContext;
+    criteria.pluginHandle = params.pluginHandle;
     criteria.baseDataSourceUrl = params.baseDataSourceUrl;
     criteria.unlistedDataSourceViewContexts = params.unlistedDataSourceViewContexts;
 
