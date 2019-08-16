@@ -42,7 +42,7 @@
     // Pass segment to the NotificationEmailQuery class to filter notification entries
     var params = {
         'baseDataSourceUrl': '{{ baseDataSourceUrl }}',
-        'permissionContext': '{{ permissionContext }}',
+        'pluginHandle': '{{ pluginHandle }}',
         'viewContext': '{{ viewContext }}'
     };
     var criteria = Craft.defaultIndexCriteria;
@@ -54,7 +54,7 @@
         criteria.viewContext = params.viewContext;
     }
 
-    criteria.permissionContext = params.permissionContext;
+    criteria.pluginHandle = params.pluginHandle;
     criteria.baseDataSourceUrl = params.baseDataSourceUrl;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {

@@ -17,7 +17,7 @@
 {% if currentUser.can(editReportsPermission) %}
     {% set crumbs = crumbs|merge([{
         label: "Edit "|t('sprout-base-reports') ~ report.name,
-        url: report.getCpEditUrl(baseDataSourceUrl, permissionContext)
+        url: report.getCpEditUrl(baseDataSourceUrl, pluginHandle)
     }]) %}
 {% endif %}
 
@@ -27,6 +27,7 @@
         <input type="hidden" name="action"
             value="sprout-base-reports/reports/export-report">
         <input type="hidden" name="reportId" value="{{ report.id }}">
+        <input type="hidden" name="pluginHandle" value="{{ pluginHandle }}">
 
         <a id="btn-download-csv" class="btn">
             {{ "Download"|t('sprout-base-reports') }}
@@ -50,6 +51,7 @@
                 <input type="hidden" name="action"
                     value="sprout-base-reports/reports/update-report">
                 <input type="hidden" name="reportId" value="{{ report.id }}">
+                <input type="hidden" name="pluginHandle" value="{{ pluginHandle }}">
 
                 {{ settingsHtml | raw }}
 

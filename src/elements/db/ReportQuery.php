@@ -51,7 +51,7 @@ class ReportQuery extends ElementQuery
      * @var string
      */
     public $baseDataSourceUrl;
-    public $permissionContext;
+    public $pluginHandle;
 
     /**
      * @inheritdoc

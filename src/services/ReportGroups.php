@@ -2,6 +2,7 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use InvalidArgumentException;
 use yii\base\Component;
 use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
@@ -27,7 +28,7 @@ class ReportGroups extends Component
         $groupRecord = $this->getGroupRecord($group);
 
         if (!$groupRecord) {
-            throw new \InvalidArgumentException(Craft::t('sprout-import', 'No report group found.'));
+            throw new InvalidArgumentException('No report group found.');
         }
 
         $groupRecord->name = $group->name;
@@ -87,7 +88,7 @@ class ReportGroups extends Component
         $reportGroupRecord = ReportGroupRecord::findOne($id);
 
         if (!$reportGroupRecord) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report Group not found.'));
+            throw new NotFoundHttpException('Report Group not found.');
         }
 
         return (bool)$reportGroupRecord->delete();
@@ -104,7 +105,7 @@ class ReportGroups extends Component
             $groupRecord = ReportGroupRecord::findOne($group->id);
 
             if (!$groupRecord) {
-                throw new \InvalidArgumentException(Craft::t('sprout-import', 'No field group exists with the ID “{id}”', ['id' => $group->id]));
+                throw new InvalidArgumentException('No field group exists with the ID: '.$group->id);
             }
         } else {
             $groupRecord = new ReportGroupRecord();

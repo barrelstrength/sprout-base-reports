@@ -43,17 +43,20 @@ class ReportsController extends Controller
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
 
-        $segmentOne = Craft::$app->getRequest()->getSegment(1);
-        $segmentTwo = Craft::$app->getRequest()->getSegment(2);
+        // Only use dataSourceBaseUrl variable in template routes, segments won't be accurate in action requests
+        if (!Craft::$app->getRequest()->getIsActionRequest()) {
+            $segmentOne = Craft::$app->getRequest()->getSegment(1);
+            $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
-        $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+            $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+        }
 
         parent::init();
     }
 
     /**
      * @param string $viewContext
-     * @param string $permissionContext
+     * @param string $pluginHandle
      * @param null   $groupId
      * @param bool   $hideSidebar
      *
@@ -61,7 +64,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -99,13 +102,13 @@ class ReportsController extends Controller
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext
+            'pluginHandle' => $pluginHandle
         ]);
     }
 
     /**
      * @param string      $viewContext
-     * @param string      $permissionContext
+     * @param string      $pluginHandle
      * @param Report|null $report
      * @param int|null    $reportId
      *
@@ -114,7 +117,7 @@ class ReportsController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $permissionContext = 'sprout-reports',  Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -123,13 +126,13 @@ class ReportsController extends Controller
         }
 
         if (!$report) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
+            throw new NotFoundHttpException('Report not found.');
         }
 
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
+            throw new NotFoundHttpException('Data Source not found.');
         }
 
         $labels = $dataSource->getDefaultLabels($report);
@@ -166,7 +169,7 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
             'baseDataSourceUrl' => $this->dataSourceBaseUrl,
-            'permissionContext' => $permissionContext
+            'pluginHandle' => $pluginHandle
         ]);
     }
 
@@ -181,7 +184,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, string $dataSourceId = null, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
@@ -202,7 +205,7 @@ class ReportsController extends Controller
         $dataSource = $reportElement->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Data Source not found.'));
+            throw new NotFoundHttpException('Data Source not found.');
         }
 
         // Set the base URL so we can use the $dataSource->getUrl method
@@ -231,7 +234,8 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
-            'editReportsPermission' => $this->permissions['sproutReports-editReports']
+            'editReportsPermission' => $this->permissions['sproutReports-editReports'],
+            'pluginHandle' => $pluginHandle
         ]);
     }
 
@@ -260,7 +264,7 @@ class ReportsController extends Controller
             $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$reportElement) {
-                throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'No report exists with the id “{id}”', ['id' => $reportId]));
+                throw new NotFoundHttpException('No report exists with the ID: '.$reportId);
             }
 
             $reportElement->settings = is_array($settings) ? $settings : [];
@@ -341,7 +345,7 @@ class ReportsController extends Controller
             return $this->redirectToPostedUrl($record);
         }
 
-        throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Report not found.'));
+        throw new NotFoundHttpException('Report not found.');
     }
 
     /**
@@ -475,7 +479,7 @@ class ReportsController extends Controller
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
-            throw new NotFoundHttpException(Craft::t('sprout-base-reports', 'Date Source not found.'));
+            throw new NotFoundHttpException('Date Source not found.');
         }
 
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
