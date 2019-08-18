@@ -42,25 +42,54 @@
 
 {% endblock %}
 
+{% block sidebar %}
+
+    {% set customizableSources = false %}
+
+    {{ parent() }}
+
+    <div class="buttons">
+        <div id="newgroupbtn"
+            class="btn add icon">{{ "New Group"|t('sprout-base-reports') }}</div>
+
+        {% if groupId is defined %}
+            <div id="groupsettingsbtn" class="btn settings icon menubtn"
+                title="{{ 'Settings' }}"></div>
+            <div class="menu">
+                <ul>
+                    <li><a data-action="rename"
+                            role="button">{{ "Rename selected group"|t('sprout-base-reports') }}</a>
+                    </li>
+                    <li><a data-action="delete"
+                            role="button">{{ "Delete selected group"|t('sprout-base-reports') }}</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\groups\\GroupsAsset") %}
+
 {% block initJs %}
     // Pass segment to the NotificationEmailQuery class to filter notification entries
     var params = {
-        'baseDataSourceUrl': '{{ baseDataSourceUrl }}',
+        'dataSourceBaseUrl': '{{ dataSourceBaseUrl }}',
         'pluginHandle': '{{ pluginHandle }}',
-        'viewContext': '{{ viewContext }}',
-        'unlistedDataSourceViewContexts': '{{ unlistedDataSourceViewContexts }}'
+        'viewContext': '{{ viewContext }}'
     };
     var criteria = Craft.defaultIndexCriteria;
 
     {# Only apply these values on a plugin integration. We will use the default values above
        in Sprout Email so the Source filtering works as expected. #}
-    if (params.viewContext !== 'global') {
+    if (params.viewContext !== 'reports') {
         criteria = $.extend({}, Craft.defaultIndexCriteria);
         criteria.viewContext = params.viewContext;
     }
 
     criteria.pluginHandle = params.pluginHandle;
-    criteria.baseDataSourceUrl = params.baseDataSourceUrl;
+    criteria.dataSourceBaseUrl = params.dataSourceBaseUrl;
     criteria.unlistedDataSourceViewContexts = params.unlistedDataSourceViewContexts;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
@@ -69,6 +98,30 @@
         criteria:       criteria,
         hideSidebar:    '{{ hideSidebar ?? false }}'
     });
-
-    $('#main-content').removeClass('has-sidebar');
 {% endblock %}
+
+{% js %}
+    {# Fix display issue when sidebar is hidden #}
+    $('#main-content').removeClass('has-sidebar');
+
+    new Craft.SproutBase.GroupsAdmin({
+    groupsSelector: '#sidebar nav ul',
+    newGroupButtonSelector: '#newgroupbtn',
+    groupSettingsSelector: '#groupsettingsbtn',
+
+    newGroupAction: 'sprout-base-reports/reports/save-group',
+    newGroupOnSuccessUrlBase: '{{ dataSourceBaseUrl }}',
+    newGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not create the group:'),
+
+    renameGroupAction: 'sprout-base-reports/reports/save-group',
+    renameGroupOnSuccessMessage: Craft.t('sprout-base-reports', 'Group renamed.'),
+    renameGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not rename the group:'),
+
+    promptForGroupNameMessage: Craft.t('sprout-base-reports', 'What do you want to name your group?'),
+
+    deleteGroupAction: 'sprout-base-reports/reports/delete-group',
+    deleteGroupOnSuccessUrl: '{{ dataSourceBaseUrl }}',
+    deleteGroupConfirmMessage: Craft.t('sprout-base-reports', 'Are you sure you want to delete this group and all its reports?'),
+    deleteGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not delete the group.'),
+    });
+{% endjs %}

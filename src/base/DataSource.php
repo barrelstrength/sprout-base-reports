@@ -9,6 +9,7 @@ namespace barrelstrength\sproutbasereports\base;
 
 use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
@@ -30,6 +31,8 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     use BaseSproutTrait;
     use DataSourceTrait;
 
+    const DEFAULT_VIEW_CONTEXT = 'reports';
+
     /**
      * This value indicates whether a Report is being generated for Export
      *
@@ -39,13 +42,6 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
      * @var bool
      */
     public $isExport = false;
-
-    /**
-     * Set to true to exclude the Data Source from the global context
-     *
-     * @var bool
-     */
-    public $isUnlisted = false;
 
     /**
      * DataSource constructor.
@@ -62,6 +58,26 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
         } else {
             $this->plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
         }
+    }
+
+    /**
+     * Returns the viewContext for a given Data Source
+     *
+     * @return string
+     */
+    public function getViewContext(): string
+    {
+        return self::DEFAULT_VIEW_CONTEXT;
+    }
+
+    /**
+     * Returns the viewContext Label used when grouping common report types in the sidebar Sources
+     *
+     * @return string
+     */
+    public function getViewContextLabel(): string
+    {
+        return 'Custom';
     }
 
     /**

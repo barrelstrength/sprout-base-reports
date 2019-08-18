@@ -61,6 +61,7 @@ class Install extends Migration
         if ($reportGroupTable == false) {
             $this->createTable($this->reportGroupTable, [
                 'id' => $this->primaryKey(),
+                'viewContext' => $this->string(),
                 'name' => $this->string()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),

@@ -17,7 +17,7 @@
 {% if currentUser.can(editReportsPermission) %}
     {% set crumbs = crumbs|merge([{
         label: "Edit "|t('sprout-base-reports') ~ report.name,
-        url: report.getCpEditUrl(baseDataSourceUrl, pluginHandle)
+        url: report.getCpEditUrl(dataSourceBaseUrl, pluginHandle)
     }]) %}
 {% endif %}
 
@@ -57,6 +57,7 @@
                     value="sprout-base-reports/reports/update-report">
                 <input type="hidden" name="reportId" value="{{ report.id }}">
                 <input type="hidden" name="pluginHandle" value="{{ pluginHandle }}">
+                <input type="hidden" name="viewContext" value="{{ viewContext }}">
 
                 {{ settingsHtml | raw }}
 

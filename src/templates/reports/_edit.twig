@@ -35,6 +35,7 @@
 {% block actionButton %}
 
     <input type="hidden" name="action" value="sprout-base-reports/reports/save-report">
+    <input type="hidden" name="viewContext" value="{{ viewContext }}">
     {{ redirectInput(reportIndexUrl) }}
 
     <div class="button">

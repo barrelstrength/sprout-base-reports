@@ -13,5 +13,5 @@ class ReportGroup extends Model
 {
     public $id;
     public $name;
-    public $handle;
+    public $viewContext;
 }

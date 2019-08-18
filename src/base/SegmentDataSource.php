@@ -11,11 +11,28 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
+ * @property string $viewContextLabel
  * @property string $emailColumn
  */
 abstract class SegmentDataSource extends DataSource implements SegmentDataSourceInterface
 {
-    public $isUnlisted = true;
+    const DEFAULT_VIEW_CONTEXT = 'segments';
+
+    /**
+     * @inheritDoc
+     */
+    public function getViewContext(): string
+    {
+        return self::DEFAULT_VIEW_CONTEXT;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getViewContextLabel(): string
+    {
+        return 'Segments';
+    }
 
     /**
      * @inheritDoc

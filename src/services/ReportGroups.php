@@ -2,6 +2,9 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use barrelstrength\sproutbasereports\base\DataSource;
+use barrelstrength\sproutbasereports\models\ReportGroup;
+use craft\db\Query;
 use InvalidArgumentException;
 use yii\base\Component;
 use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
@@ -68,11 +71,32 @@ class ReportGroups extends Component
 
 
     /**
-     * @return array|\yii\db\ActiveRecord[]
+     * @param string $viewContext
+     *
+     * @return array
      */
-    public function getAllReportGroups(): array
+    public function getReportGroups($viewContext = DataSource::DEFAULT_VIEW_CONTEXT): array
     {
-        return ReportGroupRecord::find()->indexBy('id')->all();
+        $query = (new Query())
+            ->select('*')
+            ->from('{{%sproutreports_reportgroups}}')
+            ->where([
+                'viewContext' => $viewContext
+            ])
+            ->indexBy('id');
+
+        $results = $query->all();
+
+        $reportGroups = [];
+        foreach($results as $reportGroup) {
+            $reportGroupModel = new ReportGroup();
+            $reportGroupModel->id = $reportGroup['id'];
+            $reportGroupModel->name = $reportGroup['name'];
+            $reportGroupModel->viewContext = $reportGroup['viewContext'];
+            $reportGroups[] = $reportGroupModel;
+        }
+
+        return $reportGroups;
     }
 
     /**

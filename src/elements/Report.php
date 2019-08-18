@@ -8,6 +8,7 @@
 namespace barrelstrength\sproutbasereports\elements;
 
 use barrelstrength\sproutbase\SproutBase;
+use barrelstrength\sproutbasereports\base\SegmentDataSource;
 use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\base\DataSource;
@@ -16,6 +17,7 @@ use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
+use barrelstrength\sproutforms\SproutForms;
 use Craft;
 use craft\base\Plugin;
 use craft\helpers\Json;
@@ -134,27 +136,27 @@ class Report extends Element
     /**
      * Returns the element's CP edit URL.
      *
-     * @param null   $baseDataSourceUrl
+     * @param null   $dataSourceBaseUrl
      * @param string $pluginHandle
      *
      * @return string|null
      */
-    public function getCpEditUrl($baseDataSourceUrl = null, $pluginHandle = 'sprout-reports')
+    public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
     {
         // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
-            $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
             $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
+            $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
         }
-        
+
         $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
 
         if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
             return null;
         }
 
-        return UrlHelper::cpUrl($baseDataSourceUrl.$this->dataSourceId.'/edit/'.$this->id);
+        return UrlHelper::cpUrl($dataSourceBaseUrl.$this->dataSourceId.'/edit/'.$this->id);
     }
 
     /**
@@ -176,12 +178,19 @@ class Report extends Element
      */
     public static function defineTableAttributes($source = null): array
     {
-        return [
-            'name' => Craft::t('sprout-base-reports', 'Name'),
-            'results' => Craft::t('sprout-base-reports', 'View'),
-            'download' => Craft::t('sprout-base-reports', 'Export'),
-            'dataSourceId' => Craft::t('sprout-base-reports', 'Data Source')
-        ];
+        // index or modal
+        $context = Craft::$app->request->getParam('context');
+
+        $tableAttributes['name'] = Craft::t('sprout-base-reports', 'Name');
+
+        if ($context !== 'modal') {
+            $tableAttributes['results'] = Craft::t('sprout-base-reports', 'View');
+            $tableAttributes['download'] = Craft::t('sprout-base-reports', 'Export');
+        }
+
+        $tableAttributes['dataSourceId'] = Craft::t('sprout-base-reports', 'Data Source');
+
+        return $tableAttributes;
     }
 
     /**
@@ -192,7 +201,7 @@ class Report extends Element
     public function getTableAttributeHtml(string $attribute): string
     {
         $viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
-        $baseDataSourceUrl = Craft::$app->request->getBodyParam('criteria.baseDataSourceUrl');
+        $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
         $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
 
         if ($attribute === 'dataSourceId') {
@@ -212,16 +221,17 @@ class Report extends Element
         if ($attribute === 'download') {
             return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
                     'reportId' => $this->id,
-                    'pluginHandle' => $pluginHandle
+                    'pluginHandle' => $pluginHandle,
+                    'viewContext' => $viewContext
                 ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
         }
 
         if ($attribute === 'results') {
-            $resultsUrl = UrlHelper::cpUrl($baseDataSourceUrl.'view/'.$this->id);
+            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
 
-            $runReportText = $viewContext === 'segments'
+            $runReportText = $viewContext === SegmentDataSource::DEFAULT_VIEW_CONTEXT
                 ? Craft::t('sprout-base-reports', 'View Segment')
-                : Craft::t('sprout-base-reports', 'Run Report');
+                : Craft::t('sprout-base-reports', 'View Report');
 
             return '<a href="'.$resultsUrl.'" class="btn small">'.$runReportText.'</a>';
         }
@@ -247,12 +257,49 @@ class Report extends Element
      */
     protected static function defineSources(string $context = null): array
     {
+        $viewContext = DataSource::DEFAULT_VIEW_CONTEXT;
+
+        // Just in case this gets run from the console for some reason, make sure we don't try to access the request
+        if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
+            // Check the URL, Element Index, and Element Selector Modal requests
+            if (Craft::$app->getRequest()->getSegment(2) === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
+                Craft::$app->getRequest()->getParam('criteria.viewContext') === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
+                Craft::$app->getRequest()->getParam('sources') === 'viewContext:'.SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+                $viewContext = SegmentDataSource::DEFAULT_VIEW_CONTEXT;
+            }
+        }
+
         $sources = [
             [
                 'key' => '*',
                 'label' => Craft::t('sprout-base-reports', 'All reports')
             ]
         ];
+
+        $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
+
+        if ($groups) {
+
+            $sources[] = [
+                'heading' => Craft::t('sprout-base-reports', 'Group')
+            ];
+
+            foreach ($groups as $group) {
+                $key = 'group:'.$group->id;
+
+                $sources[] = [
+                    'key' => $key,
+                    'label' => Craft::t('sprout-base-reports', $group->name),
+                    'data' => ['id' => $group->id],
+                    'criteria' => ['groupId' => $group->id]
+                ];
+            }
+        }
+
+        // For the Segment Element Listing page, don't display a sidebar
+        if ($viewContext === SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+            return $sources;
+        }
 
         $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources();
 
@@ -263,14 +310,24 @@ class Report extends Element
 
             // @TODO
             // This works fine but doesn't allow us to trigger the Segment Element Select Modal with any results. Setting this to true displays the proper results on the Segment Element Select Modal but then also displays "Sprout Lists" as a sidebar Source in Sprout Reports, which we don't want.
-            if ($dataSource->viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && $dataSource->isUnlisted !== true) {
+            if ($dataSource->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT &&
+                $dataSource->viewContext !== SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
                 $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
             }
-
         }
 
         // Prevent possible side effects
         unset($dataSource);
+
+        $sources[] = [
+            'heading' => Craft::t('sprout-base-reports', 'Type')
+        ];
+
+        $sources[] = [
+            'key' => 'viewContext:reports',
+            'label' => Craft::t('sprout-base-reports', 'Custom'),
+            'criteria' => ['viewContext' => DataSource::DEFAULT_VIEW_CONTEXT],
+        ];
 
         foreach ($distinctDataSourceModules as $dataSource) {
 
@@ -281,7 +338,7 @@ class Report extends Element
 
                 $sources[] = [
                     'key' => $key,
-                    'label' => $dataSource->getPlugin()->name,
+                    'label' => $dataSource->getViewContextLabel(),
                     'criteria' => ['viewContext' => $viewContext],
                 ];
             }

@@ -8,6 +8,8 @@
 namespace barrelstrength\sproutbasereports\elements\db;
 
 
+use barrelstrength\sproutbasereports\base\SegmentDataSource;
+use function Couchbase\defaultDecoder;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use Craft;
@@ -50,9 +52,15 @@ class ReportQuery extends ElementQuery
      *
      * @var string
      */
-    public $baseDataSourceUrl;
+    public $dataSourceBaseUrl;
     public $pluginHandle;
-    public $unlistedDataSourceViewContexts;
+
+    public function viewContext($value)
+    {
+        $this->viewContext = $value;
+
+        return $this;
+    }
 
     /**
      * @inheritdoc
@@ -79,24 +87,23 @@ class ReportQuery extends ElementQuery
         // Property is used for Element Sources in sidebar
         if (!$this->viewContext) {
             // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
-            $this->viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
+            $this->viewContext = Craft::$app->getRequest()->getBodyParam('criteria.viewContext') ?? Craft::$app->getRequest()->getParam('viewContext');
         }
 
         if ($this->viewContext) {
             $this->query->andWhere(Db::parseParam(
                 'sproutreports_datasources.viewContext', $this->viewContext)
             );
-        } else {
-            $unlistedDataSourceViewContexts = Craft::$app->request->getBodyParam('criteria.unlistedDataSourceViewContexts');
+        }
 
-            if ($unlistedDataSourceViewContexts) {
-            // Exclude segments from global context
+        // Exclude Segments from all other listing views
+        if ($this->viewContext !== SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+            // Exclude 'segments' from 'reports' context
             $this->query->andWhere([
                 'not in',
                 'sproutreports_datasources.viewContext',
-                [$unlistedDataSourceViewContexts]
+                [SegmentDataSource::DEFAULT_VIEW_CONTEXT]
             ]);
-            }
         }
 
         if ($this->dataSourceId) {

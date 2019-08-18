@@ -9,6 +9,7 @@ namespace barrelstrength\sproutbasereports\controllers;
 
 use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
+use barrelstrength\sproutbasereports\base\SegmentDataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
@@ -51,16 +52,16 @@ class ReportsController extends Controller
             $segmentOne = Craft::$app->getRequest()->getSegment(1);
             $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
-            $this->dataSourceBaseUrl = $segmentOne.'/'.$segmentTwo.'/';
+            $this->dataSourceBaseUrl = UrlHelper::cpUrl($segmentOne.'/'.$segmentTwo).'/';
+
+            $this->labelTextSingular = $segmentTwo === SegmentDataSource::DEFAULT_VIEW_CONTEXT
+                ? Craft::t('sprout-base-reports', 'Segment')
+                : Craft::t('sprout-base-reports', 'Report');
+
+            $this->labelTextPlural = $segmentTwo === SegmentDataSource::DEFAULT_VIEW_CONTEXT
+                ? Craft::t('sprout-base-reports', 'Segments')
+                : Craft::t('sprout-base-reports', 'Reports');
         }
-
-        $this->labelTextSingular = $segmentTwo === 'segments'
-            ? Craft::t('sprout-base-reports', 'Segment')
-            : Craft::t('sprout-base-reports', 'Report');
-
-        $this->labelTextPlural = $segmentTwo === 'segments'
-            ? Craft::t('sprout-base-reports', 'Segments')
-            : Craft::t('sprout-base-reports', 'Reports');
 
         parent::init();
     }
@@ -75,7 +76,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionReportsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -88,7 +89,6 @@ class ReportsController extends Controller
         }
 
         $newReportOptions = [];
-        $unlistedDataSourceViewContexts = [];
 
         foreach ($dataSources as $dataSource) {
 
@@ -96,18 +96,11 @@ class ReportsController extends Controller
             $dataSource->baseUrl = $this->dataSourceBaseUrl;
 
             // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource->allowNew ||
-                ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT && !$dataSource->isUnlisted)
-            ) {
+            if ($dataSource->allowNew || $viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
                 $newReportOptions[] = [
                     'name' => $dataSource::displayName(),
                     'url' => $dataSource->getUrl($dataSource->id.'/new')
                 ];
-            }
-
-            if ($dataSource->isUnlisted) {
-                // Prepare value for query in ReportQuery to exclude unlisted DataSources from global listings
-                $unlistedDataSourceViewContexts[] = $dataSource->viewContext;
             }
         }
 
@@ -120,11 +113,10 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
-            'baseDataSourceUrl' => $this->dataSourceBaseUrl,
+            'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
             'pluginHandle' => $pluginHandle,
             'labelTextSingular' => $this->labelTextSingular,
             'labelTextPlural' => $this->labelTextPlural,
-            'unlistedDataSourceViewContexts' => implode(',', array_unique($unlistedDataSourceViewContexts))
         ]);
     }
 
@@ -139,12 +131,12 @@ class ReportsController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         if ($report === null) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId);
+            $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
         }
 
         if (!$report) {
@@ -164,7 +156,7 @@ class ReportsController extends Controller
 
         $reportIndexUrl = $dataSource->getUrl($report->groupId);
 
-        if ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
+        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -186,11 +178,11 @@ class ReportsController extends Controller
             'labels' => $labels,
             'values' => $values,
             'reportIndexUrl' => $reportIndexUrl,
-            'redirectUrl' => Craft::$app->getRequest()->getSegment(1).'/reports/view/'.$reportId,
+            'redirectUrl' => $dataSource->baseUrl.'/view/'.$reportId,
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
-            'baseDataSourceUrl' => $this->dataSourceBaseUrl,
+            'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
             'pluginHandle' => $pluginHandle,
             'labelTextSingular' => $this->labelTextSingular,
             'labelTextPlural' => $this->labelTextPlural,
@@ -209,7 +201,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionEditReportTemplate(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  string $dataSourceId = null, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
@@ -219,7 +211,7 @@ class ReportsController extends Controller
         if ($report !== null) {
             $reportElement = $report;
         } elseif ($reportId !== null) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
+            $reportElement = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
         }
 
         // This is for creating new report
@@ -238,7 +230,7 @@ class ReportsController extends Controller
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
-        if ($viewContext !== DataSources::DEFAULT_VIEW_CONTEXT) {
+        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -250,7 +242,7 @@ class ReportsController extends Controller
         $groups = [];
 
         if (Craft::$app->getPlugins()->getPlugin('sprout-reports')) {
-            $groups = SproutBaseReports::$app->reportGroups->getAllReportGroups();
+            $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
         }
 
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
@@ -262,7 +254,8 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'labelTextSingular' => $this->labelTextSingular,
             'labelTextPlural' => $this->labelTextPlural,
-            'pluginHandle' => $pluginHandle
+            'pluginHandle' => $pluginHandle,
+            'viewContext' => $viewContext
         ]);
     }
 
@@ -285,10 +278,11 @@ class ReportsController extends Controller
         $reportElement = new Report();
 
         $reportId = $request->getBodyParam('reportId');
+        $viewContext = $request->getBodyParam('viewContext');
         $settings = $request->getBodyParam('settings');
 
         if ($reportId && $settings) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
+            $reportElement = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
 
             if (!$reportElement) {
                 throw new NotFoundHttpException('No report exists with the ID: '.$reportId);
@@ -428,7 +422,7 @@ class ReportsController extends Controller
         $groupId = Craft::$app->getRequest()->getBodyParam('id');
         $success = SproutBaseReports::$app->reportGroups->deleteGroup($groupId);
 
-        Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Group deleted..'));
+        Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Group deleted.'));
 
         return $this->asJson([
             'success' => $success,
@@ -445,8 +439,9 @@ class ReportsController extends Controller
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         $reportId = Craft::$app->getRequest()->getParam('reportId');
+        $viewContext = Craft::$app->getRequest()->getParam('viewContext');
 
-        $report = SproutBaseReports::$app->reports->getReport($reportId);
+        $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];
 
         if ($report) {
@@ -478,9 +473,10 @@ class ReportsController extends Controller
         $request = Craft::$app->getRequest();
 
         $reportId = $request->getBodyParam('id');
+        $viewContext = $request->getBodyParam('viewContext');
 
         if ($reportId) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId);
+            $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
 
             if (!$report) {
                 $report->addError('id', Craft::t('sprout-base-reports', 'Could not find a report with id {reportId}', [

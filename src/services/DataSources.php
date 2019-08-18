@@ -37,8 +37,6 @@ class DataSources extends Component
      */
     const EVENT_REGISTER_DATA_SOURCES = 'registerSproutReportsDataSources';
 
-    const DEFAULT_VIEW_CONTEXT = 'global';
-
     private $dataSources;
 
     /**
@@ -113,13 +111,13 @@ class DataSources extends Component
      *
      * @return DataSource[]
      */
-    public function getInstalledDataSources(string $viewContext = DataSources::DEFAULT_VIEW_CONTEXT): array
+    public function getInstalledDataSources(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT): array
     {
         $query = (new Query())
             ->select(['*'])
             ->from(['{{%sproutreports_datasources}}']);
 
-        if ($viewContext !== self::DEFAULT_VIEW_CONTEXT) {
+        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $query->where([
                 'viewContext' => $viewContext
             ]);
@@ -173,7 +171,7 @@ class DataSources extends Component
             $dataSource = new $dataSourceClass();
 
             // Set all pre-built class to sprout-reports viewContext
-            $dataSource->viewContext = $dataSourceClass->viewContext ?? self::DEFAULT_VIEW_CONTEXT;
+            $dataSource->viewContext = $dataSourceClass->viewContext ?? DataSource::DEFAULT_VIEW_CONTEXT;
 
             $this->saveDataSource($dataSource);
 

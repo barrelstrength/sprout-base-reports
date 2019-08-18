@@ -7,6 +7,7 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutforms\elements\Form as FormElement;
 use barrelstrength\sproutreports\SproutReports;
@@ -29,15 +30,17 @@ use craft\helpers\DateTimeHelper;
 class Reports extends Component
 {
     /**
-     * @param $reportId
+     * @param        $reportId
+     * @param string $viewContext
      *
-     * @return Report|ElementInterface|null
+     * @return Report|ElementInterface
      */
-    public function getReport($reportId): Report
+    public function getReport($reportId, $viewContext = DataSource::DEFAULT_VIEW_CONTEXT): Report
     {
         $query = Report::find();
         $query->id($reportId);
         $query->siteId(null);
+        $query->viewContext($viewContext);
 
         return $query->one();
     }
