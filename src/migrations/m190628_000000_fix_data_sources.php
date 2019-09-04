@@ -56,20 +56,12 @@ class m190628_000000_fix_data_sources extends Migration
                         $this->update($this->dataSourcesTable, [
                             'pluginHandle' => 'sprout-forms'
                         ], ['id' => $dataSource['id']], [], false);
-                    } else {
-                        $this->update($this->dataSourcesTable, [
-                            'viewContext' => 'sprout-forms'
-                        ], ['id' => $dataSource['id']], [], false);
                     }
                 } else {
                     // Let's default all to sprout reports
                     if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
                         $this->update($this->dataSourcesTable, [
                             'pluginHandle' => 'sprout-reports'
-                        ], ['id' => $dataSource['id']], [], false);
-                    } else {
-                        $this->update($this->dataSourcesTable, [
-                            'viewContext' => 'sprout-reports'
                         ], ['id' => $dataSource['id']], [], false);
                     }
                 }
