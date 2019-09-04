@@ -93,7 +93,7 @@ class ReportGroups extends Component
             $reportGroupModel->id = $reportGroup['id'];
             $reportGroupModel->name = $reportGroup['name'];
             $reportGroupModel->viewContext = $reportGroup['viewContext'];
-            $reportGroups[] = $reportGroupModel;
+            $reportGroups[$reportGroup['id']] = $reportGroupModel;
         }
 
         return $reportGroups;

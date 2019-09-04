@@ -8,18 +8,14 @@
 namespace barrelstrength\sproutbasereports\elements;
 
 use barrelstrength\sproutbase\SproutBase;
-use barrelstrength\sproutbasereports\base\SegmentDataSource;
 use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\db\ReportQuery;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
-use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutforms\SproutForms;
 use Craft;
-use craft\base\Plugin;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\base\Element;
@@ -56,6 +52,8 @@ class Report extends Element
     public $description;
 
     public $allowHtml;
+
+    public $emailColumn;
 
     public $settings;
 
@@ -124,11 +122,27 @@ class Report extends Element
     }
 
     /**
-     * Returns whether the current user can edit the element.
+     * Returns whether the Report can be .
      *
      * @return bool
      */
     public function getIsEditable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Returns whether a Report can be deleted
+     *
+     * This is used when integrations like Sprout Forms or Sprout Lists want to
+     * dynamically create a Report when something else happens, like when a Form
+     * is created or when a list is created. This allows Sprout Forms to be sure
+     * to have a report for each specific Form, or Sprout Lists to have a Mailing List
+     * for each specific List.
+     *
+     * @return bool
+     */
+    public function canBeDeleted(): bool
     {
         return true;
     }
@@ -188,7 +202,23 @@ class Report extends Element
             $tableAttributes['download'] = Craft::t('sprout-base-reports', 'Export');
         }
 
+        $tableAttributes['emailColumn'] = Craft::t('sprout-base-reports', 'Mailing List');
         $tableAttributes['dataSourceId'] = Craft::t('sprout-base-reports', 'Data Source');
+
+        return $tableAttributes;
+    }
+
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        // index or modal
+        $context = Craft::$app->request->getParam('context');
+
+        $tableAttributes[] = 'name';
+
+        if ($context !== 'modal') {
+            $tableAttributes[] = 'results';
+            $tableAttributes[] = 'download';
+        }
 
         return $tableAttributes;
     }
@@ -204,6 +234,30 @@ class Report extends Element
         $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
         $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
 
+        if ($attribute === 'results') {
+            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
+
+            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run report').'</a>';
+        }
+
+        if ($attribute === 'download') {
+            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
+                    'reportId' => $this->id,
+                    'pluginHandle' => $pluginHandle,
+                    'viewContext' => $viewContext
+                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
+        }
+
+        if ($attribute === 'emailColumn') {
+            if ($this->emailColumn !== null) {
+                return '<svg style="width:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98.65 98.65">
+  <path d="M50,.67A49.33,49.33,0,1,0,99.33,50,49.35,49.35,0,0,0,50,.67ZM77,66.85C77,68.5,76.17,70,74.51,70h-48C24.86,70,23,68.5,23,66.85v-27L46.39,58.72a6.44,6.44,0,0,0,4,1.31,5.55,5.55,0,0,0,3.67-1.31L77,39.8Zm0-33L50.65,55.64a.92.92,0,0,1-.91,0L23,33.89v-.58A3.75,3.75,0,0,1,26.51,30h48C76.17,30,77,31.65,77,33.31Z" transform="translate(-0.67 -0.67)" style="fill:#47b649"></path>
+</svg>';
+            }
+
+            return '';
+        }
+
         if ($attribute === 'dataSourceId') {
 
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
@@ -216,24 +270,6 @@ class Report extends Element
             }
 
             return $dataSource::displayName();
-        }
-
-        if ($attribute === 'download') {
-            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
-                    'reportId' => $this->id,
-                    'pluginHandle' => $pluginHandle,
-                    'viewContext' => $viewContext
-                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
-        }
-
-        if ($attribute === 'results') {
-            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
-
-            $runReportText = $viewContext === SegmentDataSource::DEFAULT_VIEW_CONTEXT
-                ? Craft::t('sprout-base-reports', 'View Segment')
-                : Craft::t('sprout-base-reports', 'View Report');
-
-            return '<a href="'.$resultsUrl.'" class="btn small">'.$runReportText.'</a>';
         }
 
         return parent::getTableAttributeHtml($attribute);
@@ -262,17 +298,22 @@ class Report extends Element
         // Just in case this gets run from the console for some reason, make sure we don't try to access the request
         if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
             // Check the URL, Element Index, and Element Selector Modal requests
-            if (Craft::$app->getRequest()->getSegment(2) === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
-                Craft::$app->getRequest()->getParam('criteria.viewContext') === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
-                Craft::$app->getRequest()->getParam('sources') === 'viewContext:'.SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
-                $viewContext = SegmentDataSource::DEFAULT_VIEW_CONTEXT;
+//            if (Craft::$app->getRequest()->getSegment(2) === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
+//                Craft::$app->getRequest()->getParam('criteria.viewContext') === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
+//                Craft::$app->getRequest()->getParam('sources') === 'viewContext:'.SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+//                $viewContext = SegmentDataSource::DEFAULT_VIEW_CONTEXT;
+//            }
+            if (Craft::$app->getRequest()->getSegment(2) === 'mailingList' ||
+                Craft::$app->getRequest()->getParam('criteria.viewContext') === 'mailingList' ||
+                Craft::$app->getRequest()->getParam('sources') === 'viewContext:mailingList') {
+                $viewContext = 'mailingList';
             }
         }
 
         $sources = [
             [
                 'key' => '*',
-                'label' => Craft::t('sprout-base-reports', 'All reports')
+                'label' => Craft::t('sprout-base-reports', 'All segments')
             ]
         ];
 
@@ -297,7 +338,7 @@ class Report extends Element
         }
 
         // For the Segment Element Listing page, don't display a sidebar
-        if ($viewContext === SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+        if ($viewContext === 'mailingList') {
             return $sources;
         }
 
@@ -306,12 +347,12 @@ class Report extends Element
         // Grab a representative data source for each of our modules
         // We just need the module viewContext and name for the Sources
         $distinctDataSourceModules = [];
+//        \Craft::dd($dataSources);
         foreach ($dataSources as $key => &$dataSource) {
 
             // @TODO
             // This works fine but doesn't allow us to trigger the Segment Element Select Modal with any results. Setting this to true displays the proper results on the Segment Element Select Modal but then also displays "Sprout Lists" as a sidebar Source in Sprout Reports, which we don't want.
-            if ($dataSource->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT &&
-                $dataSource->viewContext !== SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
+            if ($dataSource->viewContext !== 'mailingList') {
                 $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
             }
         }
@@ -323,11 +364,13 @@ class Report extends Element
             'heading' => Craft::t('sprout-base-reports', 'Type')
         ];
 
-        $sources[] = [
-            'key' => 'viewContext:reports',
-            'label' => Craft::t('sprout-base-reports', 'Custom'),
-            'criteria' => ['viewContext' => DataSource::DEFAULT_VIEW_CONTEXT],
-        ];
+//        $sources[] = [
+//            'key' => 'viewContext:mailingList',
+//            'label' => Craft::t('sprout-base-reports', 'Mailing List'),
+//            'criteria' => [
+//                'viewContext' => 'mailingList'
+//            ],
+//        ];
 
         foreach ($distinctDataSourceModules as $dataSource) {
 
@@ -339,7 +382,9 @@ class Report extends Element
                 $sources[] = [
                     'key' => $key,
                     'label' => $dataSource->getViewContextLabel(),
-                    'criteria' => ['viewContext' => $viewContext],
+                    'criteria' => [
+                        'viewContext' => $viewContext
+                    ],
                 ];
             }
         }
@@ -474,6 +519,7 @@ class Report extends Element
         $reportRecord->allowHtml = $this->allowHtml;
         $reportRecord->settings = $this->settings;
         $reportRecord->enabled = $this->enabled;
+        $reportRecord->emailColumn = $this->emailColumn;
         $reportRecord->save(false);
 
         parent::afterSave($isNew);

@@ -117,7 +117,8 @@ class DataSources extends Component
             ->select(['*'])
             ->from(['{{%sproutreports_datasources}}']);
 
-        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+        // Allow any DataSource ot be used as a MailingList. We'll just require the emailColumn setting
+        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT && $viewContext !== 'mailingList') {
             $query->where([
                 'viewContext' => $viewContext
             ]);

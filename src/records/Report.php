@@ -25,6 +25,7 @@ use yii\db\ActiveQueryInterface;
  * @property string               $settings
  * @property int                  $dataSourceId
  * @property bool                 $enabled
+ * @property string               $emailColumn
  * @property ActiveQueryInterface $element
  * @property int                  $groupId
  */

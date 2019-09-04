@@ -8,8 +8,10 @@
 namespace barrelstrength\sproutbasereports\elements\db;
 
 
+use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\base\SegmentDataSource;
 use function Couchbase\defaultDecoder;
+use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use Craft;
@@ -34,6 +36,8 @@ class ReportQuery extends ElementQuery
 
     public $settings;
 
+    public $emailColumn;
+
     public $dataSourceId;
 
     public $enabled;
@@ -57,7 +61,11 @@ class ReportQuery extends ElementQuery
 
     public function viewContext($value)
     {
-        $this->viewContext = $value;
+        if ($value === 'mailingList') {
+            $this->viewContext = DataSource::DEFAULT_VIEW_CONTEXT;
+        } else {
+            $this->viewContext = $value;
+        }
 
         return $this;
     }
@@ -68,6 +76,7 @@ class ReportQuery extends ElementQuery
     protected function beforePrepare(): bool
     {
         $this->joinElementTable('sproutreports_reports');
+
         $this->query->select([
             'sproutreports_reports.dataSourceId',
             'sproutreports_reports.name',
@@ -79,10 +88,13 @@ class ReportQuery extends ElementQuery
             'sproutreports_reports.settings',
             'sproutreports_reports.groupId',
             'sproutreports_reports.enabled',
-            'sproutreports_datasources.viewContext'
+            'sproutreports_reports.emailColumn',
+            'sproutreports_datasources.viewContext',
         ]);
 
         $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
+
+
 
         // Property is used for Element Sources in sidebar
         if (!$this->viewContext) {
@@ -91,30 +103,46 @@ class ReportQuery extends ElementQuery
         }
 
         if ($this->viewContext) {
-            $this->query->andWhere(Db::parseParam(
-                'sproutreports_datasources.viewContext', $this->viewContext)
-            );
+            if ($this->viewContext === 'mailingList') {
+                $this->query->andWhere(Db::parseParam(
+                    'sproutreports_datasources.viewContext', DataSource::DEFAULT_VIEW_CONTEXT)
+                );
+                // If emailColumn === true, only return results where emailColumn is not null
+                // We set emailColumn to true in the defineSources method.
+                // @todo - is there a better way to add support for this and search for not null?
+                $this->query->andWhere(['not', ['sproutreports_reports.emailColumn' => null]]);
+            } else {
+                $this->query->andWhere(Db::parseParam(
+                    'sproutreports_datasources.viewContext', $this->viewContext)
+                );
+
+                // Exclude Mailing Lists from non Mailing List views
+                $this->query->andWhere(['sproutreports_reports.emailColumn' => null]);
+            }
+        }
+
+        if ($this->emailColumn) {
+            $this->query->andWhere(['[[sproutreports_reports.emailColumn]]' => $this->emailColumn]);
         }
 
         // Exclude Segments from all other listing views
-        if ($this->viewContext !== SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
-            // Exclude 'segments' from 'reports' context
-            $this->query->andWhere([
-                'not in',
-                'sproutreports_datasources.viewContext',
-                [SegmentDataSource::DEFAULT_VIEW_CONTEXT]
-            ]);
+        // Exclude 'mailingList' from all other viewContexts
+        if ($this->viewContext !== 'mailingList') {
+            $this->query->andWhere('[[sproutreports_reports.emailColumn]] IS NULL');
         }
+
+
+
 
         if ($this->dataSourceId) {
             $this->query->andWhere(Db::parseParam(
-                'sproutreports_reports.dataSourceId', $this->dataSourceId)
+                '[[sproutreports_reports.dataSourceId]]', $this->dataSourceId)
             );
         }
 
         if ($this->groupId) {
             $this->query->andWhere(Db::parseParam(
-                'sproutreports_reports.groupId', $this->groupId)
+                '[[sproutreports_reports.groupId]]', $this->groupId)
             );
         }
 
