@@ -9,11 +9,9 @@ namespace barrelstrength\sproutbasereports\controllers;
 
 use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
-use barrelstrength\sproutbasereports\base\SegmentDataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
-use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutreports\SproutReports;
@@ -26,7 +24,6 @@ use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
 use Throwable;
 use yii\base\Exception;
-use yii\base\ExitException;
 use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
@@ -40,9 +37,6 @@ class ReportsController extends Controller
 
     private $dataSourceBaseUrl;
 
-    private $labelTextSingular;
-    private $labelTextPlural;
-
     public function init()
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
@@ -53,14 +47,6 @@ class ReportsController extends Controller
             $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
             $this->dataSourceBaseUrl = UrlHelper::cpUrl($segmentOne.'/'.$segmentTwo).'/';
-
-            $this->labelTextSingular = $segmentTwo === SegmentDataSource::DEFAULT_VIEW_CONTEXT
-                ? Craft::t('sprout-base-reports', 'Segment')
-                : Craft::t('sprout-base-reports', 'Report');
-
-            $this->labelTextPlural = $segmentTwo === SegmentDataSource::DEFAULT_VIEW_CONTEXT
-                ? Craft::t('sprout-base-reports', 'Segments')
-                : Craft::t('sprout-base-reports', 'Reports');
         }
 
         parent::init();
@@ -114,9 +100,7 @@ class ReportsController extends Controller
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
             'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
-            'pluginHandle' => $pluginHandle,
-            'labelTextSingular' => $this->labelTextSingular,
-            'labelTextPlural' => $this->labelTextPlural,
+            'pluginHandle' => $pluginHandle
         ]);
     }
 
@@ -131,7 +115,7 @@ class ReportsController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -184,8 +168,6 @@ class ReportsController extends Controller
             'settings' => $plugin ? $plugin->getSettings() : null,
             'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
             'pluginHandle' => $pluginHandle,
-            'labelTextSingular' => $this->labelTextSingular,
-            'labelTextPlural' => $this->labelTextPlural,
             'viewContext' => $viewContext
         ]);
     }
@@ -201,7 +183,7 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports',  string $dataSourceId = null, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
@@ -241,9 +223,35 @@ class ReportsController extends Controller
 
         $groups = [];
 
-        if (Craft::$app->getPlugins()->getPlugin('sprout-reports')) {
-            $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
+//        if (Craft::$app->getPlugins()->getPlugin('sprout-reports')) {
+        $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
+//        }
+
+        $emailColumnOptions = [
+            [
+                'label' => 'None',
+                'value' => ''
+            ],
+            [
+                'label' => 'Email (email)',
+                'value' => 'email'
+            ],
+            [
+                'optgroup' => 'Custom'
+            ]
+        ];
+
+        if ($reportElement->emailColumn) {
+            $emailColumnOptions[] = [
+                'label' => $reportElement->emailColumn,
+                'value' => $reportElement->emailColumn
+            ];
         }
+
+        $emailColumnOptions[] = [
+            'label' => 'Add custom',
+            'value' => 'custom'
+        ];
 
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
             'report' => $reportElement,
@@ -252,10 +260,9 @@ class ReportsController extends Controller
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
-            'labelTextSingular' => $this->labelTextSingular,
-            'labelTextPlural' => $this->labelTextPlural,
             'pluginHandle' => $pluginHandle,
-            'viewContext' => $viewContext
+            'viewContext' => $viewContext,
+            'emailColumnOptions' => $emailColumnOptions
         ]);
     }
 
@@ -498,6 +505,7 @@ class ReportsController extends Controller
         $report->dataSourceId = $request->getBodyParam('dataSourceId');
         $report->enabled = $request->getBodyParam('enabled', false);
         $report->groupId = $request->getBodyParam('groupId');
+        $report->emailColumn = $request->getBodyParam('emailColumn');
 
         $dataSource = $report->getDataSource();
 

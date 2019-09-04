@@ -2,10 +2,7 @@
 
 {% extends "sprout-base-reports/_layouts/elementindex" %}
 
-{% set title = labelTextPlural %}
-{% set newReportText = "New {labelTextSingular}"|t('sprout-base-reports', {
-    labelTextSingular: labelTextSingular,
-}) %}
+{% set title = "Segments"|t('sprout-base-reports') %}
 
 {% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
@@ -16,7 +13,7 @@
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
                 <a class="btn submit add icon"
-                   href="{{ newReportOptions[0].url }}">{{ newReportText }}</a>
+                   href="{{ newReportOptions[0].url }}">{{ "New Segment"|t('sprout-base-reports') }}</a>
                 {% if dataSources %}
                     <div class="btn submit menubtn"></div>
                     <div class="menu">
@@ -33,7 +30,7 @@
         {% else %}
             <div class="btngroup submit first">
                 {% if newReportOptions[0] is defined %}
-                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ newReportText }}</a>
+                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Segment"|t('sprout-base-reports') }}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -44,7 +41,7 @@
 
 {% block sidebar %}
 
-    {% set customizableSources = false %}
+{#    {% set customizableSources = false %}#}
 
     {{ parent() }}
 
@@ -67,6 +64,10 @@
             </div>
         {% endif %}
     </div>
+
+{#    <br>#}
+
+{#    <div style="border:1px solid #ccc;">This is for...</div>#}
 
 {% endblock %}
 

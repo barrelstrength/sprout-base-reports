@@ -11,7 +11,7 @@
 {% endif %}
 
 {% set crumbs = [
-    { label: labelTextPlural, url: reportIndexUrl }
+    { label: 'Segments'|t('sprout-base-reports'), url: reportIndexUrl }
 ] %}
 
 {% if currentUser.can(editReportsPermission) %}
@@ -39,11 +39,6 @@
     </form>
 {% endblock %}
 
-{% set runReportText = viewContext == 'segments'
-    ? "View Segment"|t('sprout-base-reports')
-    : "Run Report"|t('sprout-base-reports')
-%}
-
 {% block content %}
 
     {% if settingsHtml %}
@@ -64,7 +59,7 @@
                 <div class="button">
                     <div class="btngroup">
                         <input type="submit" class="btn submit"
-                            value="{{ runReportText }}">
+                            value="{{ 'Run report'|t('sprout-base-reports') }}">
                     </div>
                 </div>
 
@@ -111,9 +106,7 @@
         {% else %}
 
             {% set boxBody %}
-                <p>{{ "This {labelTextSingular} currently has no results. Check your {labelTextSingular} settings and ensure you have content for the {labelTextSingular} you are trying to run. To quickly edit the {labelTextSingular} settings, click on the gear icon in the upper right."|t('sprout-base-reports', {
-                        labelTextSingular: labelTextSingular|lower
-                    })|raw }}</p>
+                <p>{{ "This segment currently has no results. Check your segment settings and ensure you have content for the segment you are trying to run. To quickly edit the segment settings, click on the gear icon in the upper right."|t('sprout-base-reports')|raw }}</p>
             {% endset %}
 
             {{ sprout.mediaBox({
