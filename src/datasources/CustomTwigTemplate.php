@@ -1,12 +1,13 @@
 <?php
 
-namespace barrelstrength\sproutbasereports\datasources;
+namespace barrelstrength\sproutreports\datasources;
 
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\helpers\DateTimeHelper;
+use craft\web\View;
 use Exception;
 use Twig_Error_Loader;
 
@@ -127,7 +128,7 @@ class CustomTwigTemplate extends DataSource
                 $customSettingsHtml = Craft::$app->getView()->renderString($customSettingsHtmlWithExtras, [
                     'settings' => count($settings) ? $settings : $this->report->getSettings(),
                     'errors' => $settingsErrors
-                ]);
+                ], View::TEMPLATE_MODE_CP);
             }
         }
 
