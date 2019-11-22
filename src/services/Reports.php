@@ -33,7 +33,7 @@ class Reports extends Component
      *
      * @return Report|ElementInterface|null
      */
-    public function getReport($reportId): Report
+    public function getReport($reportId)
     {
         $query = Report::find();
         $query->id($reportId);
