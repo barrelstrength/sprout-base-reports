@@ -62,7 +62,7 @@
 }
 .dataTables_scrollBody {
     margin-top: -1px;
-    /*margin-bottom: -1px;*/
+    overflow: scroll;
 }
 .dataTables_scroll th.sorting_asc,
 .dataTables_scroll th.sorting_desc {
