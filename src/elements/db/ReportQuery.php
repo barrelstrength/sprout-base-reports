@@ -97,7 +97,7 @@ class ReportQuery extends ElementQuery
 
 
         // Property is used for Element Sources in sidebar
-        if (!$this->viewContext) {
+        if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest()) {
             // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
             $this->viewContext = Craft::$app->getRequest()->getBodyParam('criteria.viewContext') ?? Craft::$app->getRequest()->getParam('viewContext');
         }

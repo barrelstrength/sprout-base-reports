@@ -34,8 +34,8 @@ class Reports extends Component
      * @param string $viewContext
      *
      * @return Report|ElementInterface
-     */
-    public function getReport($reportId, $viewContext = DataSource::DEFAULT_VIEW_CONTEXT): Report
+     */ 
+    public function getReport($reportId, $viewContext = DataSource::DEFAULT_VIEW_CONTEXT)
     {
         $query = Report::find();
         $query->id($reportId);
