@@ -41,8 +41,6 @@
 
 {% block sidebar %}
 
-{#    {% set customizableSources = false %}#}
-
     {{ parent() }}
 
     {% if viewContext == 'reports' %}
@@ -67,10 +65,6 @@
         </div>
     {% endif %}
 
-{#    <br>#}
-
-{#    <div style="border:1px solid #ccc;">This is for...</div>#}
-
 {% endblock %}
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\groups\\GroupsAsset") %}
@@ -84,16 +78,10 @@
     };
     var criteria = Craft.defaultIndexCriteria;
 
-    {# Only apply these values on a plugin integration. We will use the default values above
-       in Sprout Email so the Source filtering works as expected. #}
-    if (params.viewContext !== 'reports') {
-        criteria = $.extend({}, Craft.defaultIndexCriteria);
-        criteria.viewContext = params.viewContext;
-    }
-
     criteria.pluginHandle = params.pluginHandle;
     criteria.dataSourceBaseUrl = params.dataSourceBaseUrl;
     criteria.unlistedDataSourceViewContexts = params.unlistedDataSourceViewContexts;
+    criteria.viewContext = params.viewContext;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
         context:        '{{ context }}',

@@ -202,7 +202,6 @@ class Report extends Element
             $tableAttributes['download'] = Craft::t('sprout-base-reports', 'Export');
         }
 
-        $tableAttributes['emailColumn'] = Craft::t('sprout-base-reports', 'Mailing List');
         $tableAttributes['dataSourceId'] = Craft::t('sprout-base-reports', 'Data Source');
 
         return $tableAttributes;
@@ -248,16 +247,6 @@ class Report extends Element
                 ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
         }
 
-        if ($attribute === 'emailColumn') {
-            if ($this->emailColumn !== null) {
-                return '<svg style="width:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98.65 98.65">
-  <path d="M50,.67A49.33,49.33,0,1,0,99.33,50,49.35,49.35,0,0,0,50,.67ZM77,66.85C77,68.5,76.17,70,74.51,70h-48C24.86,70,23,68.5,23,66.85v-27L46.39,58.72a6.44,6.44,0,0,0,4,1.31,5.55,5.55,0,0,0,3.67-1.31L77,39.8Zm0-33L50.65,55.64a.92.92,0,0,1-.91,0L23,33.89v-.58A3.75,3.75,0,0,1,26.51,30h48C76.17,30,77,31.65,77,33.31Z" transform="translate(-0.67 -0.67)" style="fill:#47b649"></path>
-</svg>';
-            }
-
-            return '';
-        }
-
         if ($attribute === 'dataSourceId') {
 
             $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
@@ -293,99 +282,67 @@ class Report extends Element
      */
     protected static function defineSources(string $context = null): array
     {
-        $viewContext = DataSource::DEFAULT_VIEW_CONTEXT;
+        $viewContext = null;
 
-        // Just in case this gets run from the console for some reason, make sure we don't try to access the request
+        // Just in case this gets run from the console for some reason,
+        // make sure we don't try to access the request
         if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
-            // Check the URL, Element Index, and Element Selector Modal requests
-//            if (Craft::$app->getRequest()->getSegment(2) === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
-//                Craft::$app->getRequest()->getParam('criteria.viewContext') === SegmentDataSource::DEFAULT_VIEW_CONTEXT ||
-//                Craft::$app->getRequest()->getParam('sources') === 'viewContext:'.SegmentDataSource::DEFAULT_VIEW_CONTEXT) {
-//                $viewContext = SegmentDataSource::DEFAULT_VIEW_CONTEXT;
-//            }
-            if (Craft::$app->getRequest()->getSegment(2) === 'mailingList' ||
-                Craft::$app->getRequest()->getParam('criteria.viewContext') === 'mailingList' ||
-                Craft::$app->getRequest()->getParam('sources') === 'viewContext:mailingList') {
-                $viewContext = 'mailingList';
+            // Allow the Element Selector Modal requests
+            // to override the viewContext param set in the route
+            // 'sources' is set as a config setting on the forms.elementSelect macro
+            $viewContext = Craft::$app->getRequest()->getParam('sources');
+
+            // Get the context from the URL, skip action requests
+            $segment = Craft::$app->getRequest()->getSegment(1);
+            if (!$viewContext && strpos($segment, 'sprout') === 0) {
+                $viewContext = $segment;
+            }
+
+            // Default to sprout-reports context, necessary when filtering sources
+            if (!$viewContext) {
+                $viewContext = DataSource::DEFAULT_VIEW_CONTEXT;
             }
         }
 
-        $sources = [
-            [
-                'key' => '*',
-                'label' => Craft::t('sprout-base-reports', 'All segments')
-            ]
-        ];
-
-        $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
-
-        if ($groups) {
-
-            $sources[] = [
-                'heading' => Craft::t('sprout-base-reports', 'Group')
+        if ($viewContext !== 'mailingListModal') {
+            $sources = [
+                [
+                    'key' => '*',
+                    'label' => Craft::t('sprout-base-reports', 'All reports'),
+                    'criteria' => [
+                        'emailColumn' => ':empty:'
+                    ]
+                ]
             ];
-
-            foreach ($groups as $group) {
-                $key = 'group:'.$group->id;
-
-                $sources[] = [
-                    'key' => $key,
-                    'label' => Craft::t('sprout-base-reports', $group->name),
-                    'data' => ['id' => $group->id],
-                    'criteria' => ['groupId' => $group->id]
-                ];
-            }
         }
-
-        // For the Segment Element Listing page, don't display a sidebar
-        if ($viewContext === 'mailingList') {
-            return $sources;
-        }
-
-        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources();
-
-        // Grab a representative data source for each of our modules
-        // We just need the module viewContext and name for the Sources
-        $distinctDataSourceModules = [];
-//        \Craft::dd($dataSources);
-        foreach ($dataSources as $key => &$dataSource) {
-
-            // @TODO
-            // This works fine but doesn't allow us to trigger the Segment Element Select Modal with any results. Setting this to true displays the proper results on the Segment Element Select Modal but then also displays "Sprout Lists" as a sidebar Source in Sprout Reports, which we don't want.
-            if ($dataSource->viewContext !== 'mailingList') {
-                $distinctDataSourceModules[$dataSource['viewContext']] = $dataSource;
-            }
-        }
-
-        // Prevent possible side effects
-        unset($dataSource);
 
         $sources[] = [
-            'heading' => Craft::t('sprout-base-reports', 'Type')
+                'key' => 'mailingList',
+                'label' => Craft::t('sprout-base-reports', 'All mailing lists'),
+                'criteria' => [
+                    'emailColumn' => ':notempty:'
+                ]
         ];
 
-//        $sources[] = [
-//            'key' => 'viewContext:mailingList',
-//            'label' => Craft::t('sprout-base-reports', 'Mailing List'),
-//            'criteria' => [
-//                'viewContext' => 'mailingList'
-//            ],
-//        ];
+        if ($viewContext === DataSource::DEFAULT_VIEW_CONTEXT) {
+            $groups = SproutBaseReports::$app->reportGroups->getReportGroups();
 
-        foreach ($distinctDataSourceModules as $dataSource) {
-
-            $viewContext = $dataSource->viewContext;
-
-            if ($viewContext) {
-                $key = 'viewContext:'.$viewContext;
+            if ($groups) {
 
                 $sources[] = [
-                    'key' => $key,
-                    'label' => $dataSource->getViewContextLabel(),
-                    'criteria' => [
-                        'viewContext' => $viewContext
-                    ],
+                    'heading' => Craft::t('sprout-base-reports', 'Group')
                 ];
+
+                foreach ($groups as $group) {
+                    $key = 'group:'.$group->id;
+
+                    $sources[] = [
+                        'key' => $key,
+                        'label' => Craft::t('sprout-base-reports', $group->name),
+                        'data' => ['id' => $group->id],
+                        'criteria' => ['groupId' => $group->id]
+                    ];
+                }
             }
         }
 

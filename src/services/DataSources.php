@@ -67,28 +67,6 @@ class DataSources extends Component
     }
 
     /**
-     * @param $dataSourceClass
-     *
-     * @return DataSource|null
-     */
-//    public function getDataSourceByType($dataSourceClass)
-//    {
-//        /** @var $dataSourceRecord DataSourceRecord */
-//        $dataSourceRecord = DataSourceRecord::find()->where([
-//            'type' => $dataSourceClass
-//        ])->one();
-//
-//        if ($dataSourceRecord === null) {
-//            return null;
-//        }
-//
-//        $dataSource = new $dataSourceRecord->type;
-//        $dataSource->id = $dataSourceRecord->id;
-//
-//        return $dataSource;
-//    }
-
-    /**
      * Returns all available Data Source classes
      *
      * @return string[]
@@ -117,17 +95,22 @@ class DataSources extends Component
             ->select(['*'])
             ->from(['{{%sproutreports_datasources}}']);
 
-        // Allow any DataSource ot be used as a MailingList. We'll just require the emailColumn setting
-        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT && $viewContext !== 'mailingList') {
-            $query->where([
-                'viewContext' => $viewContext
-            ]);
-        }
-
         $dataSources = [];
 
+        $allowedViewContexts[] = DataSource::DEFAULT_VIEW_CONTEXT;
+
+        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+            $allowedViewContexts[] = $viewContext;
+        }
+
         foreach ($query->all() as $dataSource) {
+
             $dataSourceType = $dataSource['type'];
+
+            // If the datasource isn't installed in Sprout Base Reports or our integration, don't include it
+            if (!in_array($dataSource['viewContext'], $allowedViewContexts, true)) {
+                continue;
+            }
 
             if (class_exists($dataSourceType)) {
                 $dataSources[$dataSourceType] = new $dataSourceType();

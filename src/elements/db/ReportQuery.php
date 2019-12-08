@@ -18,8 +18,6 @@ use Craft;
 
 class ReportQuery extends ElementQuery
 {
-    public $viewContext;
-
     public $id;
 
     public $name;
@@ -35,6 +33,8 @@ class ReportQuery extends ElementQuery
     public $allowHtml;
 
     public $settings;
+
+    public $viewContext;
 
     public $emailColumn;
 
@@ -58,17 +58,6 @@ class ReportQuery extends ElementQuery
      */
     public $dataSourceBaseUrl;
     public $pluginHandle;
-
-    public function viewContext($value)
-    {
-        if ($value === 'mailingList') {
-            $this->viewContext = DataSource::DEFAULT_VIEW_CONTEXT;
-        } else {
-            $this->viewContext = $value;
-        }
-
-        return $this;
-    }
 
     /**
      * @inheritdoc
@@ -94,45 +83,31 @@ class ReportQuery extends ElementQuery
 
         $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
 
-
-
         // Property is used for Element Sources in sidebar
         if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest()) {
-            // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
-            $this->viewContext = Craft::$app->getRequest()->getBodyParam('criteria.viewContext') ?? Craft::$app->getRequest()->getParam('viewContext');
+//          The request is available on the Element Index page and used for plugin integrations using Sprout Reports
+            $this->viewContext = Craft::$app->getRequest()->getBodyParam('criteria.viewContext');
         }
 
-        if ($this->viewContext) {
-            if ($this->viewContext === 'mailingList') {
-                $this->query->andWhere(Db::parseParam(
-                    'sproutreports_datasources.viewContext', DataSource::DEFAULT_VIEW_CONTEXT)
-                );
-                // If emailColumn === true, only return results where emailColumn is not null
-                // We set emailColumn to true in the defineSources method.
-                // @todo - is there a better way to add support for this and search for not null?
-                $this->query->andWhere(['not', ['sproutreports_reports.emailColumn' => null]]);
-            } else {
-                $this->query->andWhere(Db::parseParam(
-                    'sproutreports_datasources.viewContext', $this->viewContext)
-                );
+        // sprout-reports = all, don't limit by viewContext
+        // sprout-forms = all sprout-reports + sprout-forms viewContext
+        // sprout-email = all sprout-reports + sprout-email viewContext
+        if ($this->viewContext && $this->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+            $viewContextList = array_unique([
+                DataSource::DEFAULT_VIEW_CONTEXT,
+                $this->viewContext
+            ]);
 
-                // Exclude Mailing Lists from non Mailing List views
-                $this->query->andWhere(['sproutreports_reports.emailColumn' => null]);
-            }
+            $this->query->andWhere(
+                ['in', 'sproutreports_datasources.viewContext', $viewContextList]
+            );
         }
 
         if ($this->emailColumn) {
-            $this->query->andWhere(['[[sproutreports_reports.emailColumn]]' => $this->emailColumn]);
+            $this->query->andWhere(Db::parseParam(
+                '[[sproutreports_reports.emailColumn]]', $this->emailColumn
+            ));
         }
-
-        // Exclude Segments from all other listing views
-        // Exclude 'mailingList' from all other viewContexts
-        if ($this->viewContext !== 'mailingList') {
-            $this->query->andWhere('[[sproutreports_reports.emailColumn]] IS NULL');
-        }
-
-
-
 
         if ($this->dataSourceId) {
             $this->query->andWhere(Db::parseParam(
