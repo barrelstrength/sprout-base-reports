@@ -179,10 +179,11 @@
         {{ forms.field({
             label: "Email Column <span class='info'>The column name that represents a valid email address. Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report.</span>"|t('sprout-base-reports'),
             placeholder: 'Email',
+            warning: not report.getDataSource().isEmailColumnEditable() ? 'Email Column is set by Data Source'|t('sprout-base-reports') : null,
         }, sproutFields.selectOther({
             name: 'emailColumn',
             options: emailColumnOptions,
-            value: report.emailColumn ?? '',
+            value: report.getDataSource().isEmailColumnEditable() ? (report.emailColumn ?? '') : report.getDataSource().getDefaultEmailColumn(),
             otherPlaceholderText: 'email'|t('sprout-forms')
         })) }}
 

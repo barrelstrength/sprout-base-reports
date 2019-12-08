@@ -80,6 +80,24 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     }
 
     /**
+     * @return bool
+     */
+    public function isEmailColumnEditable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * getDefaultEmailColumn is only used when isEmailColumnEditable is set to false.
+     *
+     * @return string
+     */
+    public function getDefaultEmailColumn(): string
+    {
+        return '';
+    }
+
+    /**
      * Returns an instance of the plugin that created this Data Source
      *
      * @return Plugin|null

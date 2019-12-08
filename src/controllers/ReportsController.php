@@ -237,7 +237,7 @@ class ReportsController extends Controller
             ]
         ];
 
-        if ($reportElement->emailColumn) {
+        if (!in_array($reportElement->emailColumn, ['', 'email'], true)) {
             $emailColumnOptions[] = [
                 'label' => $reportElement->emailColumn,
                 'value' => $reportElement->emailColumn
@@ -498,13 +498,14 @@ class ReportsController extends Controller
         $report->dataSourceId = $request->getBodyParam('dataSourceId');
         $report->enabled = $request->getBodyParam('enabled', false);
         $report->groupId = $request->getBodyParam('groupId');
-        $report->emailColumn = $request->getBodyParam('emailColumn');
 
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
             throw new NotFoundHttpException('Date Source not found.');
         }
+
+        $report->emailColumn = !$dataSource->isEmailColumnEditable() ? $dataSource->getDefaultEmailColumn() : $request->getBodyParam('emailColumn');
 
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
 
