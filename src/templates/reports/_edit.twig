@@ -117,6 +117,7 @@
         {% if groups | length %}
 
             {% set groupOptions = [] %}
+            {% set groupOptions = groupOptions|merge([{ label: 'None'|t('sprout-base-reports'), value: '' }]) %}
             {% for group in groups %}
                 {% set groupOptions = groupOptions|merge([{ label: group.name, value: group.id }]) %}
             {% endfor %}
