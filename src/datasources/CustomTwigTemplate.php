@@ -1,6 +1,6 @@
 <?php
 
-namespace barrelstrength\sproutreports\datasources;
+namespace barrelstrength\sproutbasereports\datasources;
 
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
