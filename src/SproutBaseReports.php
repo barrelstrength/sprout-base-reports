@@ -9,7 +9,12 @@ namespace barrelstrength\sproutbasereports;
 
 use barrelstrength\sproutbasereports\controllers\ReportsController;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
+use barrelstrength\sproutbasereports\datasources\CustomQuery;
+use barrelstrength\sproutbasereports\datasources\CustomTwigTemplate;
+use barrelstrength\sproutbasereports\datasources\Users;
 use barrelstrength\sproutbasereports\services\App;
+use barrelstrength\sproutbasereports\services\DataSources;
+use craft\events\RegisterComponentTypesEvent;
 use yii\base\Event;
 use \yii\base\Module;
 use craft\web\View;
@@ -106,6 +111,12 @@ class SproutBaseReports extends Module
         // Setup Template Roots
         Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
             $e->roots['sprout-base-reports'] = $this->getBasePath().DIRECTORY_SEPARATOR.'templates';
+        });
+
+        Event::on(DataSources::class, DataSources::EVENT_REGISTER_DATA_SOURCES, function(RegisterComponentTypesEvent $event) {
+            $event->types[] = CustomQuery::class;
+            $event->types[] = CustomTwigTemplate::class;
+            $event->types[] = Users::class;
         });
 
         parent::init();
