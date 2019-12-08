@@ -2,7 +2,7 @@
 
 {% extends "sprout-base-reports/_layouts/elementindex" %}
 
-{% set title = "Segments"|t('sprout-base-reports') %}
+{% set title = "Reports"|t('sprout-base-reports') %}
 
 {% set elementType = 'barrelstrength\\sproutbasereports\\elements\\Report' %}
 
@@ -13,7 +13,7 @@
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
                 <a class="btn submit add icon"
-                   href="{{ newReportOptions[0].url }}">{{ "New Segment"|t('sprout-base-reports') }}</a>
+                   href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
                 {% if dataSources %}
                     <div class="btn submit menubtn"></div>
                     <div class="menu">
@@ -30,7 +30,7 @@
         {% else %}
             <div class="btngroup submit first">
                 {% if newReportOptions[0] is defined %}
-                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Segment"|t('sprout-base-reports') }}</a>
+                    <a class="btn submit add icon" href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -45,25 +45,27 @@
 
     {{ parent() }}
 
-    <div class="buttons">
-        <div id="newgroupbtn"
-            class="btn add icon">{{ "New Group"|t('sprout-base-reports') }}</div>
+    {% if viewContext == 'reports' %}
+        <div class="buttons">
+            <div id="newgroupbtn"
+                class="btn add icon">{{ "New Group"|t('sprout-base-reports') }}</div>
 
-        {% if groupId is defined %}
-            <div id="groupsettingsbtn" class="btn settings icon menubtn"
-                title="{{ 'Settings' }}"></div>
-            <div class="menu">
-                <ul>
-                    <li><a data-action="rename"
-                            role="button">{{ "Rename selected group"|t('sprout-base-reports') }}</a>
-                    </li>
-                    <li><a data-action="delete"
-                            role="button">{{ "Delete selected group"|t('sprout-base-reports') }}</a>
-                    </li>
-                </ul>
-            </div>
-        {% endif %}
-    </div>
+            {% if groupId is defined %}
+                <div id="groupsettingsbtn" class="btn settings icon menubtn"
+                    title="{{ 'Settings' }}"></div>
+                <div class="menu">
+                    <ul>
+                        <li><a data-action="rename"
+                                role="button">{{ "Rename selected group"|t('sprout-base-reports') }}</a>
+                        </li>
+                        <li><a data-action="delete"
+                                role="button">{{ "Delete selected group"|t('sprout-base-reports') }}</a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 
 {#    <br>#}
 

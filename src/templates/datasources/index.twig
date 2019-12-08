@@ -19,7 +19,7 @@
                 <th scope="col"
                     data-attribute="plugin">{{ "Plugin"|t('sprout-base-reports') }}</th>
                 <th scope="col"
-                    data-attribute="totalReports">{{ "Segments"|t('sprout-base-reports') }}</th>
+                    data-attribute="totalReports">{{ "Reports"|t('sprout-base-reports') }}</th>
                 <th scope="col"
                     data-attribute="allowNew">{{ "Allow New?"|t('sprout-base-reports') }}
                     <span class="info">{{ "Allow users to create a new Report from this Data Source from the New Report dropdown. If disabled, any existing Reports using this Data Source will still be visible to all users in the list of Reports. Users with the 'Edit Data Sources' permission can always create a new Report from this page. "|t('sprout-base-reports') }}</span>
@@ -65,7 +65,7 @@
                                    so we know the URL and don't have to use getUrl dynamically
                                    across Data Source Types #}
                                 <a href="{{ cpUrl('sprout-reports/reports/' ~ dataSource.id ~ '/new') }}"
-                                    class="btn small">{{ "New Segment"|t('sprout-base-reports') }}</a>
+                                    class="btn small">{{ "New Report"|t('sprout-base-reports') }}</a>
                             {% endif %}
                         </td>
                     {% endif %}
