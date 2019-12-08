@@ -224,7 +224,7 @@ class ReportsController extends Controller
         $groups = [];
 
 //        if (Craft::$app->getPlugins()->getPlugin('sprout-reports')) {
-        $groups = SproutBaseReports::$app->reportGroups->getReportGroups($viewContext);
+        $groups = SproutBaseReports::$app->reportGroups->getReportGroups();
 //        }
 
         $emailColumnOptions = [

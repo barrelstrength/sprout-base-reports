@@ -75,14 +75,11 @@ class ReportGroups extends Component
      *
      * @return array
      */
-    public function getReportGroups($viewContext = DataSource::DEFAULT_VIEW_CONTEXT): array
+    public function getReportGroups(): array
     {
         $query = (new Query())
             ->select('*')
             ->from('{{%sproutreports_reportgroups}}')
-            ->where([
-                'viewContext' => $viewContext
-            ])
             ->indexBy('id');
 
         $results = $query->all();
@@ -92,7 +89,6 @@ class ReportGroups extends Component
             $reportGroupModel = new ReportGroup();
             $reportGroupModel->id = $reportGroup['id'];
             $reportGroupModel->name = $reportGroup['name'];
-            $reportGroupModel->viewContext = $reportGroup['viewContext'];
             $reportGroups[$reportGroup['id']] = $reportGroupModel;
         }
 
