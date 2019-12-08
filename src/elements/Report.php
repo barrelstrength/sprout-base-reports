@@ -319,6 +319,9 @@ class Report extends Element
         $sources[] = [
             'key' => 'mailingList',
             'label' => Craft::t('sprout-base-reports', 'All mailing lists'),
+            'data' => [
+                'readonly' => true
+            ],
             'criteria' => [
                 'emailColumn' => ':notempty:'
             ]

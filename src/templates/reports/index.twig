@@ -43,7 +43,7 @@
 
     {{ parent() }}
 
-    {% if viewContext == 'reports' %}
+    {% if viewContext == 'sprout-reports' %}
         <div class="buttons">
             <div id="newgroupbtn"
                 class="btn add icon">{{ "New Group"|t('sprout-base-reports') }}</div>
@@ -89,9 +89,7 @@
     criteria:       criteria,
     hideSidebar:    '{{ hideSidebar ?? false }}'
     });
-{% endblock %}
 
-{% js %}
     {# Fix display issue when sidebar is hidden #}
     $('#main-content').removeClass('has-sidebar');
 
@@ -115,4 +113,4 @@
     deleteGroupConfirmMessage: Craft.t('sprout-base-reports', 'Are you sure you want to delete this group and all its reports?'),
     deleteGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not delete the group.'),
     });
-{% endjs %}
+{% endblock %}
