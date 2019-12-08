@@ -39,6 +39,7 @@ class Install extends Migration
                     'handle' => $this->string()->notNull(),
                     'description' => $this->text(),
                     'allowHtml' => $this->boolean(),
+                    'emailColumn' => $this->string(),
                     'settings' => $this->text(),
                     'enabled' => $this->boolean(),
                     'dateCreated' => $this->dateTime()->notNull(),
