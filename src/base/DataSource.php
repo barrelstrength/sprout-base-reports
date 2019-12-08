@@ -31,7 +31,7 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     use BaseSproutTrait;
     use DataSourceTrait;
 
-    const DEFAULT_VIEW_CONTEXT = 'reports';
+    const DEFAULT_VIEW_CONTEXT = 'sprout-reports';
 
     /**
      * This value indicates whether a Report is being generated for Export
