@@ -2,14 +2,16 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
-use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use craft\db\Query;
+use Exception;
 use InvalidArgumentException;
+use Throwable;
 use yii\base\Component;
 use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
-use Craft;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -17,7 +19,8 @@ use yii\web\NotFoundHttpException;
  *
  * @package barrelstrength\sproutreports\services
  *
- * @property array|\yii\db\ActiveRecord[] $allReportGroups
+ * @property array                $reportGroups
+ * @property array|ActiveRecord[] $allReportGroups
  */
 class ReportGroups extends Component
 {
@@ -55,7 +58,7 @@ class ReportGroups extends Component
      * @param $name
      *
      * @return ReportGroupModel|bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function createGroupByName($name)
     {
@@ -71,8 +74,6 @@ class ReportGroups extends Component
 
 
     /**
-     * @param string $viewContext
-     *
      * @return array
      */
     public function getReportGroups(): array
@@ -85,7 +86,7 @@ class ReportGroups extends Component
         $results = $query->all();
 
         $reportGroups = [];
-        foreach($results as $reportGroup) {
+        foreach ($results as $reportGroup) {
             $reportGroupModel = new ReportGroup();
             $reportGroupModel->id = $reportGroup['id'];
             $reportGroupModel->name = $reportGroup['name'];
@@ -99,9 +100,9 @@ class ReportGroups extends Component
      * @param $id
      *
      * @return bool
-     * @throws \Exception
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Exception
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function deleteGroup($id): bool
     {

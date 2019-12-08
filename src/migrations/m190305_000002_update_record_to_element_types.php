@@ -6,6 +6,10 @@ use craft\db\Migration;
 use Craft;
 use craft\db\Query;
 use barrelstrength\sproutbasereports\elements\Report;
+use craft\errors\ElementNotFoundException;
+use Throwable;
+use yii\base\Exception as BaseException;
+use yii\db\Exception;
 
 /**
  * m190305_000002_update_record_to_element_types migration.
@@ -14,10 +18,10 @@ class m190305_000002_update_record_to_element_types extends Migration
 {
     /**
      * @return bool
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws \yii\db\Exception
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws Throwable
+     * @throws BaseException
      */
     public function safeUp(): bool
     {

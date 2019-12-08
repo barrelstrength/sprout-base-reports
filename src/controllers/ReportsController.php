@@ -120,7 +120,7 @@ class ReportsController extends Controller
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         if ($report === null) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
+            $report = SproutBaseReports::$app->reports->getReport($reportId);
         }
 
         if (!$report) {
@@ -174,14 +174,14 @@ class ReportsController extends Controller
 
     /**
      * @param string      $viewContext
+     * @param string      $pluginHandle
      * @param string      $dataSourceId
      * @param Report|null $report
      * @param int|null    $reportId
      *
      * @return Response
-     * @throws NotFoundHttpException
-     * @throws Exception
      * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
@@ -193,7 +193,7 @@ class ReportsController extends Controller
         if ($report !== null) {
             $reportElement = $report;
         } elseif ($reportId !== null) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
+            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
         }
 
         // This is for creating new report
@@ -221,11 +221,7 @@ class ReportsController extends Controller
             $reportIndexUrl = UrlHelper::cpUrl('sprout-reports/reports');
         }
 
-        $groups = [];
-
-//        if (Craft::$app->getPlugins()->getPlugin('sprout-reports')) {
         $groups = SproutBaseReports::$app->reportGroups->getReportGroups();
-//        }
 
         $emailColumnOptions = [
             [
@@ -285,11 +281,10 @@ class ReportsController extends Controller
         $reportElement = new Report();
 
         $reportId = $request->getBodyParam('reportId');
-        $viewContext = $request->getBodyParam('viewContext');
         $settings = $request->getBodyParam('settings');
 
         if ($reportId && $settings) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
+            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$reportElement) {
                 throw new NotFoundHttpException('No report exists with the ID: '.$reportId);
@@ -446,9 +441,8 @@ class ReportsController extends Controller
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         $reportId = Craft::$app->getRequest()->getParam('reportId');
-        $viewContext = Craft::$app->getRequest()->getParam('viewContext');
 
-        $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
+        $report = SproutBaseReports::$app->reports->getReport($reportId);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];
 
         if ($report) {
@@ -480,10 +474,9 @@ class ReportsController extends Controller
         $request = Craft::$app->getRequest();
 
         $reportId = $request->getBodyParam('id');
-        $viewContext = $request->getBodyParam('viewContext');
 
         if ($reportId) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId, $viewContext);
+            $report = SproutBaseReports::$app->reports->getReport($reportId);
 
             if (!$report) {
                 $report->addError('id', Craft::t('sprout-base-reports', 'Could not find a report with id {reportId}', [

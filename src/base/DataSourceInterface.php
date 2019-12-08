@@ -3,7 +3,6 @@
 namespace barrelstrength\sproutbasereports\base;
 
 use barrelstrength\sproutbasereports\elements\Report;
-use craft\base\Plugin;
 use craft\base\SavableComponentInterface;
 
 /**
@@ -32,11 +31,11 @@ interface DataSourceInterface extends SavableComponentInterface
      * Should return an array of records to use in the report
      *
      * @param Report $report
-     * @param array  $settings  Not in use. Use $report->getSettings() instead.
-     *
-     * @todo - Deprecated $settings param in 1.0. Will be removed in 2.0.
+     * @param array  $settings Not in use. Use $report->getSettings() instead.
      *
      * @return array
+     * @todo - Deprecated $settings param in 1.0. Will be removed in 2.0.
+     *
      */
     public function getResults(Report $report, array $settings = []): array;
 }

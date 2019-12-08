@@ -9,7 +9,6 @@ use Craft;
 use craft\helpers\DateTimeHelper;
 use craft\web\View;
 use Exception;
-use Twig_Error_Loader;
 
 /**
  * Class SproutReportsTwigDataSource

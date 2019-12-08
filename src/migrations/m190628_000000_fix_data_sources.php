@@ -5,7 +5,9 @@ namespace barrelstrength\sproutbasereports\migrations;
 use craft\db\Migration;
 use Craft;
 use craft\db\Query;
-use barrelstrength\sproutbasereports\elements\Report;
+use Throwable;
+use yii\base\Exception as BaseException;
+use yii\db\Exception;
 
 /**
  * m190628_000000_fix_data_sources migration.
@@ -13,15 +15,13 @@ use barrelstrength\sproutbasereports\elements\Report;
 class m190628_000000_fix_data_sources extends Migration
 {
     private $reportTable = '{{%sproutreports_reports}}';
-    private $reportGroupTable = '{{%sproutreports_reportgroups}}';
     private $dataSourcesTable = '{{%sproutreports_datasources}}';
 
     /**
      * @return bool
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws \yii\db\Exception
+     * @throws Throwable
+     * @throws BaseException
+     * @throws Exception
      */
     public function safeUp(): bool
     {
@@ -57,13 +57,10 @@ class m190628_000000_fix_data_sources extends Migration
                             'pluginHandle' => 'sprout-forms'
                         ], ['id' => $dataSource['id']], [], false);
                     }
-                } else {
-                    // Let's default all to sprout reports
-                    if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
-                        $this->update($this->dataSourcesTable, [
-                            'pluginHandle' => 'sprout-reports'
-                        ], ['id' => $dataSource['id']], [], false);
-                    }
+                } else if ($this->db->columnExists($this->dataSourcesTable, 'pluginHandle')) {
+                    $this->update($this->dataSourcesTable, [
+                        'pluginHandle' => 'sprout-reports'
+                    ], ['id' => $dataSource['id']], [], false);
                 }
             }
         }

@@ -44,7 +44,7 @@ class m190818_000001_update_dataSource_viewContext_column_values extends Migrati
                         break;
                 }
             }
-            // @todo - remove the comment after we add minimun version required.
+            // @todo - remove the comment after we add minimum version required.
             #$this->dropColumn($table, 'pluginHandle');
         }
 

@@ -7,8 +7,14 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use Craft;
 use craft\helpers\Json;
+use Exception;
 use League\Csv\Writer;
+use SplTempFileObject;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Component;
 
 class Exports extends Component
@@ -19,8 +25,9 @@ class Exports extends Component
      * @param array $variables
      *
      * @return string
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function toHtml(array &$values, array $labels = [], array $variables = []): string
     {
@@ -35,14 +42,14 @@ class Exports extends Component
         $variables['labels'] = $labels;
         $variables['values'] = $values;
 
-        return \Craft::$app->getView()->renderTemplate('sprout-base/results/index', $variables);
+        return Craft::$app->getView()->renderTemplate('sprout-base/results/index', $variables);
     }
 
     /**
      * @param array $values
      *
-     * @throws \Exception
      * @return string
+     * @throws Exception
      */
     public function toJson(array &$values): string
     {
@@ -67,7 +74,7 @@ class Exports extends Component
             $labels = array_keys($firstRowOfArray);
         }
 
-        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+        $csv = Writer::createFromFileObject(new SplTempFileObject());
 
         $csv->insertOne($labels);
         $csv->insertAll($values);

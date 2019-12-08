@@ -6,9 +6,9 @@ use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use Craft;
 use craft\db\Query;
-use craft\db\Table;
-use Twig_Error_Loader;
-use yii\base\Exception;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  *
@@ -135,8 +135,9 @@ class Users extends DataSource
      * @param array $settings
      *
      * @return null|string
-     * @throws Twig_Error_Loader
-     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function getSettingsHtml(array $settings = [])
     {

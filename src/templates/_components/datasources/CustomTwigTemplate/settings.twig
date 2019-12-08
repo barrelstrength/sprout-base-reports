@@ -39,14 +39,14 @@
 
     <p>
         <a href='#'
-           class='fieldtoggle settings {{ settingsContents ? 'collapsed' : 'expanded' }}'
-           data-target='toggle-templatesettings'>
+            class='fieldtoggle settings {{ settingsContents ? 'collapsed' : 'expanded' }}'
+            data-target='toggle-templatesettings'>
             {{ "Template Settings"|t('sprout-base-reports') }}
         </a>
     </p>
 
     <div id="toggle-templatesettings"
-         class="{{ settingsContents ? 'hidden' : 'expanded' }}">
+        class="{{ settingsContents ? 'hidden' : 'expanded' }}">
 
         {{ forms.autosuggestField({
             name: "settings[resultsTemplate]",

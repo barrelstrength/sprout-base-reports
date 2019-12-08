@@ -113,7 +113,7 @@ class SproutBaseReports extends Module
             $e->roots['sprout-base-reports'] = $this->getBasePath().DIRECTORY_SEPARATOR.'templates';
         });
 
-        Event::on(DataSources::class, DataSources::EVENT_REGISTER_DATA_SOURCES, function(RegisterComponentTypesEvent $event) {
+        Event::on(DataSources::class, DataSources::EVENT_REGISTER_DATA_SOURCES, static function(RegisterComponentTypesEvent $event) {
             $event->types[] = CustomQuery::class;
             $event->types[] = CustomTwigTemplate::class;
             $event->types[] = Users::class;

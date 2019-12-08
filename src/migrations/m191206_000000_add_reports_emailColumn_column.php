@@ -3,7 +3,6 @@
 namespace barrelstrength\sproutbasereports\migrations;
 
 use craft\db\Migration;
-use craft\db\Query;
 use yii\base\NotSupportedException;
 
 /**

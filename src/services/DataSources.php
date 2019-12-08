@@ -19,6 +19,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\db\Query;
 use Craft;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 
 /**
  * Class DataSources
@@ -234,7 +235,7 @@ class DataSources extends Component
      * @param $config
      *
      * @return DataSourceInterface
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function createDataSource($config): DataSourceInterface
     {

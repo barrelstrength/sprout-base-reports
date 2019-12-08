@@ -9,9 +9,6 @@ namespace barrelstrength\sproutbasereports\elements\db;
 
 
 use barrelstrength\sproutbasereports\base\DataSource;
-use barrelstrength\sproutbasereports\base\SegmentDataSource;
-use function Couchbase\defaultDecoder;
-use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use Craft;

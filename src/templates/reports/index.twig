@@ -13,14 +13,14 @@
         {% if newReportOptions|length > 1 %}
             <div class="btngroup submit first">
                 <a class="btn submit add icon"
-                   href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
+                    href="{{ newReportOptions[0].url }}">{{ "New Report"|t('sprout-base-reports') }}</a>
                 {% if dataSources %}
                     <div class="btn submit menubtn"></div>
                     <div class="menu">
                         <ul>
                             {% for option in newReportOptions %}
                                 <li><a class="formsubmit"
-                                       href="{{ option.url }}">{{ option.name }}</a>
+                                        href="{{ option.url }}">{{ option.name }}</a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -72,9 +72,9 @@
 {% block initJs %}
     // Pass segment to the NotificationEmailQuery class to filter notification entries
     var params = {
-        'dataSourceBaseUrl': '{{ dataSourceBaseUrl }}',
-        'pluginHandle': '{{ pluginHandle }}',
-        'viewContext': '{{ viewContext }}'
+    'dataSourceBaseUrl': '{{ dataSourceBaseUrl }}',
+    'pluginHandle': '{{ pluginHandle }}',
+    'viewContext': '{{ viewContext }}'
     };
     var criteria = Craft.defaultIndexCriteria;
 
@@ -84,10 +84,10 @@
     criteria.viewContext = params.viewContext;
 
     Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-        context:        '{{ context }}',
-        storageKey:     'elementindex.{{ elementType|e("js") }}',
-        criteria:       criteria,
-        hideSidebar:    '{{ hideSidebar ?? false }}'
+    context:        '{{ context }}',
+    storageKey:     'elementindex.{{ elementType|e("js") }}',
+    criteria:       criteria,
+    hideSidebar:    '{{ hideSidebar ?? false }}'
     });
 {% endblock %}
 

@@ -72,12 +72,12 @@ class Report extends Element
     /**
      * @var DateTime
      */
-    public $startDate = null;
+    public $startDate;
 
     /**
      * @var DateTime
      */
-    public $endDate = null;
+    public $endDate;
 
     /**
      * @var string Plugin Handle as defined in the Data Sources table
@@ -317,11 +317,11 @@ class Report extends Element
         }
 
         $sources[] = [
-                'key' => 'mailingList',
-                'label' => Craft::t('sprout-base-reports', 'All mailing lists'),
-                'criteria' => [
-                    'emailColumn' => ':notempty:'
-                ]
+            'key' => 'mailingList',
+            'label' => Craft::t('sprout-base-reports', 'All mailing lists'),
+            'criteria' => [
+                'emailColumn' => ':notempty:'
+            ]
         ];
 
         if ($viewContext === DataSource::DEFAULT_VIEW_CONTEXT) {
@@ -499,7 +499,7 @@ class Report extends Element
      * @return $this
      * @throws Exception
      */
-    public function getStartEndDate()
+    public function getStartEndDate(): self
     {
         $dateRange = $this->getSetting('dateRange');
 
@@ -519,12 +519,12 @@ class Report extends Element
         return $this;
     }
 
-    public function getStartDate()
+    public function getStartDate(): DateTime
     {
         return $this->startDate;
     }
 
-    public function getEndDate()
+    public function getEndDate(): DateTime
     {
         return $this->endDate;
     }

@@ -47,23 +47,29 @@
     max-height: 800px;
     overflow: hidden;
 }
+
 .sprout-reports-content #content {
     overflow: hidden !important;
     padding: 0 !important;
 }
+
 #modify-settings-panel {
     padding: 24px 24px 0;
 }
+
 .sproutreports .tablecontent {
     margin: 20px 0 20px 24px;
 }
+
 .dataTables_scrollHead {
     border-bottom: 1px solid rgba(0, 0, 20, 0.1) !important;
 }
+
 .dataTables_scrollBody {
     margin-top: -1px;
     overflow: scroll;
 }
+
 .dataTables_scroll th.sorting_asc,
 .dataTables_scroll th.sorting_desc {
     background-position: 100% -3px;
@@ -75,12 +81,15 @@
     background-clip: initial;
     background-color: rgb(242, 242, 242);
 }
+
 .dataTables_scroll th.sorting_desc {
     background-position: 100% -34px;
 }
+
 .dataTables_scroll tr th:focus {
     outline: none;
 }
+
 .sproutreports .tablecontent tr th:first-child,
 .sproutreports .tablecontent tr td:first-child {
     padding-left: 10px;
@@ -90,11 +99,13 @@
 .sprout-results-header #sprout-results_filter input {
     width: 260px;
 }
+
 .sprout-results-header,
 .sprout-results-footer {
     margin-right: 24px;
     margin-bottom: 24px;
 }
+
 .dataTables_scroll {
     margin-bottom: 24px;
     margin-right: 0;
@@ -106,19 +117,24 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
 .sprout-results-header #sprout-results_length {
     flex-grow: 1;
 }
+
 .sprout-results-header #sprout-results_filter {
     text-align: right;
 }
+
 #sprout-results_filter.texticon.clearable .text {
     padding-right: 7px !important;
 }
+
 #sprout-results_filter.texticon.clearable .text {
     /* Set the search input border to zero to avoid a flash on load */
     border: 0;
 }
+
 #sprout-results_filter {
     /* Apply border styles to search wrapper instead */
     border: 1px solid rgba(0, 0, 20, 0.1);
@@ -127,13 +143,14 @@
 
 /* Fix footer in place */
 .sprout-results-footer {
-    background-color: #fff;
+    background-color: #ffffff;
     bottom: 0;
     position: fixed;
     margin-bottom: 0;
     padding: 10px;
     width: 100%;
 }
+
 #sprout-results_paginate {
     font-size: 14px;
     line-height: 1.5;
@@ -141,12 +158,15 @@
     text-transform: uppercase;
     float: left;
 }
+
 .paginate_button {
     margin-right: 7px;
 }
+
 .paginate_button.previous {
     margin-left: 0;
 }
+
 .paginate_button.current {
     font-weight: bold;
 }

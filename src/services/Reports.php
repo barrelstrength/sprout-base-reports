@@ -7,14 +7,14 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
-use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
-use barrelstrength\sproutforms\elements\Form as FormElement;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\base\ElementInterface;
 use craft\db\Query;
-use craft\errors\ElementNotFoundException;
+use DateTime;
+use DateTimeZone;
+use Throwable;
 use yii\base\Component;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
@@ -23,24 +23,22 @@ use craft\helpers\DateTimeHelper;
 
 /**
  *
- * @property null|\barrelstrength\sproutbasereports\elements\Report[] $allReports
- * @property array                                                    $reportsAsSelectFieldOptions
- * @property \craft\db\Query                                          $reportsQuery
+ * @property null|Report[] $allReports
+ * @property array         $reportsAsSelectFieldOptions
+ * @property Query         $reportsQuery
  */
 class Reports extends Component
 {
     /**
      * @param        $reportId
-     * @param string $viewContext
      *
      * @return Report|ElementInterface
-     */ 
-    public function getReport($reportId, $viewContext = DataSource::DEFAULT_VIEW_CONTEXT)
+     */
+    public function getReport($reportId)
     {
         $query = Report::find();
         $query->id($reportId);
         $query->siteId(null);
-        $query->viewContext($viewContext);
 
         return $query->one();
     }
@@ -49,14 +47,12 @@ class Reports extends Component
      * @param Report $report
      *
      * @return bool
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function saveReport(Report $report): bool
     {
         if (!$report) {
-
             Craft::info('Report not saved due to validation error.', __METHOD__);
-
             return false;
         }
 
@@ -90,7 +86,6 @@ class Reports extends Component
      * @param Report $report
      *
      * @return bool
-     * @throws Exception
      */
     protected function validateSettings(Report $report): bool
     {
@@ -237,139 +232,126 @@ class Reports extends Component
 
     /**
      * Convert DateTime to UTC to get correct result when querying SQL. SQL data is always on UTC.
+     *
      * @param $dateSetting
      *
-     * @return \DateTime|false
+     * @return DateTime|false
      * @throws \Exception
      */
     public function getUtcDateTime($dateSetting)
     {
-        $timeZone =  new \DateTimeZone('UTC');
+        $timeZone = new DateTimeZone('UTC');
 
         return DateTimeHelper::toDateTime($dateSetting, true)->setTimezone($timeZone);
     }
 
-    public function getStartEndDateRange($value)
+    public function getStartEndDateRange($value): array
     {
         // The date function still return date based on the cpPanel timezone settings
         $dateTime = [
             'startDate' => date('Y-m-d H:i:s'),
-            'endDate'   => date('Y-m-d H:i:s')
+            'endDate' => date('Y-m-d H:i:s')
         ];
 
         switch ($value) {
 
             case 'thisWeek':
                 $dateTime['startDate'] = date('Y-m-d H:i:s', strtotime('-7 days'));
-            break;
+                break;
 
             case 'thisMonth':
 
                 $dateTime['startDate'] = date('Y-m-1 00:00:00');
                 $dateTime['endDate'] = date('Y-m-t 00:00:00');
 
-            break;
+                break;
 
             case 'lastMonth':
 
                 $dateTime['startDate'] = date('Y-m-1 00:00:00', strtotime('-1 month'));
                 $dateTime['endDate'] = date('Y-m-t 00:00:00', strtotime('-1 month'));
 
-            break;
+                break;
 
             case 'thisQuarter':
                 $dateTime = $this->thisQuarter();
-            break;
+                break;
 
             case 'lastQuarter':
                 $dateTime = $this->lastQuarter();
-            break;
+                break;
 
             case 'thisYear':
                 $dateTime['startDate'] = date('Y-1-1 00:00:00');
                 $dateTime['endDate'] = date('Y-12-t 00:00:00');
-            break;
+                break;
 
             case 'lastYear':
                 $dateTime['startDate'] = date('Y-1-1 00:00:00', strtotime('-1 year'));
                 $dateTime['endDate'] = date('Y-12-t 00:00:00', strtotime('-1 year'));
-            break;
+                break;
         }
 
         return $dateTime;
     }
 
-    private function thisQuarter()
+    private function thisQuarter(): array
     {
         $startDate = '';
-        $endDate   = '';
+        $endDate = '';
         $current_month = date('m');
         $current_year = date('Y');
-        if($current_month>=1 && $current_month<=3)
-        {
-            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-Januray 12:00:00 AM
+        if ($current_month >= 1 && $current_month <= 3) {
+            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-January 12:00:00 AM
             $endDate = strtotime('31-March-'.$current_year);  // timestamp or 1-April 12:00:00 AM means end of 31 March
-        }
-        else  if($current_month>=4 && $current_month<=6)
-        {
+        } else if ($current_month >= 4 && $current_month <= 6) {
             $startDate = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM
             $endDate = strtotime('30-June-'.$current_year);  // timestamp or 1-July 12:00:00 AM means end of 30 June
-        }
-        else  if($current_month>=7 && $current_month<=9)
-        {
+        } else if ($current_month >= 7 && $current_month <= 9) {
             $startDate = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM
             $endDate = strtotime('30-September-'.$current_year);  // timestamp or 1-October 12:00:00 AM means end of 30 September
-        }
-        else  if($current_month>=10 && $current_month<=12)
-        {
+        } else if ($current_month >= 10 && $current_month <= 12) {
             $startDate = strtotime('1-October-'.$current_year);  // timestamp or 1-October 12:00:00 AM
             $endDate = strtotime('31-December-'.$current_year);  // timestamp or 1-January Next year 12:00:00 AM means end of 31 December this year
         }
 
         return [
             'startDate' => date('Y-m-d H:i:s', $startDate),
-            'endDate'   => date('Y-m-d H:i:s', $endDate)
+            'endDate' => date('Y-m-d H:i:s', $endDate)
         ];
     }
 
-    private function lastQuarter()
+    private function lastQuarter(): array
     {
         $startDate = '';
-        $endDate   = '';
+        $endDate = '';
         $current_month = date('m');
         $current_year = date('Y');
 
-        if($current_month>=1 && $current_month<=3)
-        {
-            $startDate = strtotime('1-October-'.($current_year-1));  // timestamp or 1-October Last Year 12:00:00 AM
-            $endDate = strtotime('31-December-'.($current_year-1));  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
-        }
-        else if($current_month>=4 && $current_month<=6)
-        {
-            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-Januray 12:00:00 AM
+        if ($current_month >= 1 && $current_month <= 3) {
+            $startDate = strtotime('1-October-'.($current_year - 1));  // timestamp or 1-October Last Year 12:00:00 AM
+            $endDate = strtotime('31-December-'.($current_year - 1));  // // timestamp or 1-January  12:00:00 AM means end of 31 December Last year
+        } else if ($current_month >= 4 && $current_month <= 6) {
+            $startDate = strtotime('1-January-'.$current_year);  // timestamp or 1-January 12:00:00 AM
             $endDate = strtotime('31-March-'.$current_year);  // timestamp or 1-April 12:00:00 AM means end of 31 March
-        }
-        else  if($current_month>=7 && $current_month<=9)
-        {
+        } else if ($current_month >= 7 && $current_month <= 9) {
             $startDate = strtotime('1-April-'.$current_year);  // timestamp or 1-April 12:00:00 AM
             $endDate = strtotime('30-June-'.$current_year);  // timestamp or 1-July 12:00:00 AM means end of 30 June
-        }
-        else  if($current_month>=10 && $current_month<=12)
-        {
+        } else if ($current_month >= 10 && $current_month <= 12) {
             $startDate = strtotime('1-July-'.$current_year);  // timestamp or 1-July 12:00:00 AM
             $endDate = strtotime('30-September-'.$current_year);  // timestamp or 1-October 12:00:00 AM means end of 30 September
         }
 
         return [
             'startDate' => date('Y-m-d H:i:s', $startDate),
-            'endDate'   => date('Y-m-d H:i:s', $endDate)
+            'endDate' => date('Y-m-d H:i:s', $endDate)
         ];
     }
 
     public function getDateRanges($withQuarter = true)
     {
         $currentMonth = date('F');
-        $lastMonth = date('F', strtotime(date('Y-m')." -1 month"));
+        $lastMonth = date('F', strtotime(date('Y-m').' -1 month'));
         $thisQuarter = $this->thisQuarter();
         $thisQuarterInitialMonth = date('F', strtotime($thisQuarter['startDate']));
         $thisQuarterFinalMonth = date('F', strtotime($thisQuarter['endDate']));
@@ -380,8 +362,8 @@ class Reports extends Component
         $lastQuarterFinalMonth = date('F', strtotime($lastQuarter['endDate']));
         $lastQuarterYear = date('Y', strtotime($lastQuarter['endDate']));
 
-        $currentYear = date("Y");
-        $previousYear = date("Y", strtotime("-1 year"));
+        $currentYear = date('Y');
+        $previousYear = date('Y', strtotime('-1 year'));
 
         $ranges = [
             'thisWeek' => Craft::t('sprout-base-reports', 'Last 7 Days'),
@@ -389,8 +371,8 @@ class Reports extends Component
             'lastMonth' => Craft::t('sprout-base-reports', 'Last Month ({month})', ['month' => $lastMonth])
         ];
 
-        if ($withQuarter){
-            $ranges = array_merge($ranges,[
+        if ($withQuarter) {
+            $ranges = array_merge($ranges, [
                 'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter ({iMonth} - {fMonth} {year})', [
                     'iMonth' => $thisQuarterInitialMonth,
                     'fMonth' => $thisQuarterFinalMonth,

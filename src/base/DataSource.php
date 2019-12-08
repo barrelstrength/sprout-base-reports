@@ -9,10 +9,8 @@ namespace barrelstrength\sproutbasereports\base;
 
 use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\elements\Report;
-use barrelstrength\sproutbasereports\services\DataSources;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
-use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use craft\base\Plugin;
 use craft\base\SavableComponent;
 use craft\helpers\UrlHelper;
@@ -24,6 +22,7 @@ use craft\helpers\UrlHelper;
  *
  * @property string $description
  * @property int    $reportCount
+ * @property string $viewContextLabel
  * @property bool   $defaultAllowHtml
  */
 abstract class DataSource extends SavableComponent implements DataSourceInterface
@@ -87,6 +86,7 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
      */
     final public function getPlugin()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->plugin;
     }
 
