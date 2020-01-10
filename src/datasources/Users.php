@@ -21,7 +21,7 @@ class Users extends DataSource
      */
     public function getName(): string
     {
-        return Craft::t('sprout-base-lists', 'Users');
+        return Craft::t('sprout-base-reports', 'Users');
     }
 
     /**
@@ -29,7 +29,7 @@ class Users extends DataSource
      */
     public function getDescription(): string
     {
-        return Craft::t('sprout-base-lists', 'Create reports about your users and user groups.');
+        return Craft::t('sprout-base-reports', 'Create reports about your users and user groups.');
     }
 
     /**
@@ -176,7 +176,7 @@ class Users extends DataSource
     public function validateSettings(array $settings = [], array &$errors = []): bool
     {
         if (empty($settings['userGroups'])) {
-            $errors['userGroups'][] = Craft::t('sprout-base-lists', 'Select at least one User Group.');
+            $errors['userGroups'][] = Craft::t('sprout-base-reports', 'Select at least one User Group.');
 
             return false;
         }
