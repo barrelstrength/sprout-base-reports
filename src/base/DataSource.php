@@ -23,6 +23,7 @@ use craft\helpers\UrlHelper;
  * @property string $description
  * @property int    $reportCount
  * @property string $viewContextLabel
+ * @property string $defaultEmailColumn
  * @property bool   $defaultAllowHtml
  */
 abstract class DataSource extends SavableComponent implements DataSourceInterface
@@ -45,9 +46,9 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
     /**
      * DataSource constructor.
      */
-    public function __construct()
+    public function init()
     {
-        parent::__construct();
+        parent::init();
 
         // Get plugin class
         $pluginHandle = Craft::$app->getPlugins()->getPluginHandleByClass(get_class($this));
@@ -58,6 +59,7 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
             $this->plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
         }
     }
+
 
     /**
      * Returns the viewContext for a given Data Source
