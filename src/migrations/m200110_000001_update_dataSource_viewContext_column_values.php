@@ -7,9 +7,9 @@ use craft\db\Query;
 use yii\base\NotSupportedException;
 
 /**
- * m190818_000001_update_dataSource_viewContext_column_values migration.
+ * m200110_000001_update_dataSource_viewContext_column_values migration.
  */
-class m190818_000001_update_dataSource_viewContext_column_values extends Migration
+class m200110_000001_update_dataSource_viewContext_column_values extends Migration
 {
     /**
      * @inheritdoc
@@ -32,12 +32,9 @@ class m190818_000001_update_dataSource_viewContext_column_values extends Migrati
                 switch ($dataSource['viewContext']) {
                     case 'global':
                     case '':
-                        // Update our default to be labeled 'reports'
-                        $this->update($table, ['viewContext' => 'reports'], ['id' => $dataSource['id']], [], false);
-                        break;
                     case 'sprout-lists':
-                        // Update Sprout Lists to use the 'segments' context
-                        $this->update($table, ['viewContext' => 'segments'], ['id' => $dataSource['id']], [], false);
+                        // Update our default to be labeled 'reports'
+                        $this->update($table, ['viewContext' => 'sprout-reports'], ['id' => $dataSource['id']], [], false);
                         break;
                     default:
                         // No need to update
@@ -56,7 +53,7 @@ class m190818_000001_update_dataSource_viewContext_column_values extends Migrati
      */
     public function safeDown(): bool
     {
-        echo "m190818_000001_update_dataSource_viewContext_column_values cannot be reverted.\n";
+        echo "m200110_000001_update_dataSource_viewContext_column_values cannot be reverted.\n";
         return false;
     }
 }

@@ -6,9 +6,9 @@ use craft\db\Migration;
 use yii\base\NotSupportedException;
 
 /**
- * m191206_000000_add_reports_emailColumn_column migration.
+ * m200110_000000_add_reports_emailColumn_column migration.
  */
-class m191206_000000_add_reports_emailColumn_column extends Migration
+class m200110_000000_add_reports_emailColumn_column extends Migration
 {
     /**
      * @inheritdoc
@@ -17,11 +17,11 @@ class m191206_000000_add_reports_emailColumn_column extends Migration
      */
     public function safeUp(): bool
     {
-        $table = '{{%sproutreports_reports}}';
+        $reportsTable = '{{%sproutreports_reports}}';
 
         // Add a `viewContext` column
-        if (!$this->db->columnExists($table, 'emailColumn')) {
-            $this->addColumn($table, 'emailColumn', $this->string()->after('allowHtml'));
+        if (!$this->db->columnExists($reportsTable, 'emailColumn')) {
+            $this->addColumn($reportsTable, 'emailColumn', $this->string()->after('allowHtml'));
         }
 
         return true;
@@ -32,7 +32,7 @@ class m191206_000000_add_reports_emailColumn_column extends Migration
      */
     public function safeDown(): bool
     {
-        echo "m191206_000000_add_reports_emailColumn_column cannot be reverted.\n";
+        echo "m200110_000000_add_reports_emailColumn_column cannot be reverted.\n";
         return false;
     }
 }
