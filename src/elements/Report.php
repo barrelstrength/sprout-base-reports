@@ -28,6 +28,7 @@ use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
+use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -358,15 +359,28 @@ class Report extends Element
     }
 
     /**
-     * @inheritdoc
+     * @return array
+     * @throws InvalidConfigException
      */
-    public function rules(): array
+    protected function defineRules(): array
     {
-        return [
-            [['name', 'handle'], 'required'],
-            [['handle'], HandleValidator::class, 'reservedWords' => ['id', 'dateCreated', 'dateUpdated', 'uid', 'title']],
-            [['name', 'handle'], UniqueValidator::class, 'targetClass' => ReportRecord::class]
+        $rules = parent::defineRules();
+
+        $rules[] = [['name', 'handle'], 'required'];
+        $rules[] = [
+            ['handle'],
+            HandleValidator::class,
+            'reservedWords' => [
+                'id', 'dateCreated', 'dateUpdated', 'uid', 'title'
+            ]
         ];
+        $rules[] = [
+            ['name', 'handle'],
+            UniqueValidator::class,
+            'targetClass' => ReportRecord::class
+        ];
+
+        return $rules;
     }
 
 
