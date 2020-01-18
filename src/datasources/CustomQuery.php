@@ -22,7 +22,7 @@ class CustomQuery extends DataSource
      */
     public static function displayName(): string
     {
-        return Craft::t('sprout-reports', 'Custom Query');
+        return Craft::t('sprout-base-reports', 'Custom Query');
     }
 
     /**
@@ -30,7 +30,7 @@ class CustomQuery extends DataSource
      */
     public function getDescription(): string
     {
-        return Craft::t('sprout-reports', 'Create reports using a custom database query');
+        return Craft::t('sprout-base-reports', 'Create reports using a custom database query');
     }
 
     /**
@@ -84,7 +84,7 @@ class CustomQuery extends DataSource
     public function validateSettings(array $settings = [], array &$errors = []): bool
     {
         if (empty($settings['query'])) {
-            $errors['query'][] = Craft::t('sprout-reports', 'Query cannot be blank.');
+            $errors['query'][] = Craft::t('sprout-base-reports', 'Query cannot be blank.');
 
             return false;
         }

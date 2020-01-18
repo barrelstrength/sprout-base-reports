@@ -22,7 +22,7 @@ class CustomTwigTemplate extends DataSource
      */
     public static function displayName(): string
     {
-        return Craft::t('sprout-reports', 'Twig Template');
+        return Craft::t('sprout-base-reports', 'Twig Template');
     }
 
     /**
@@ -30,7 +30,7 @@ class CustomTwigTemplate extends DataSource
      */
     public function getDescription(): string
     {
-        return Craft::t('sprout-reports', 'Create a report using Twig in your templates folder.');
+        return Craft::t('sprout-base-reports', 'Create a report using Twig in your templates folder.');
     }
 
     /**
@@ -164,7 +164,7 @@ class CustomTwigTemplate extends DataSource
     public function validateSettings(array $settings = [], array &$errors = []): bool
     {
         if (empty($settings['resultsTemplate'])) {
-            $errors['resultsTemplate'][] = Craft::t('sprout-reports', 'Results template cannot be blank.');
+            $errors['resultsTemplate'][] = Craft::t('sprout-base-reports', 'Results template cannot be blank.');
         }
 
         if (count($errors)) {
