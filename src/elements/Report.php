@@ -108,7 +108,15 @@ class Report extends Element
      */
     public static function displayName(): string
     {
-        return Craft::t('sprout-base-reports', 'Reports (Sprout)');
+        return Craft::t('sprout-base-reports', 'Report');
+    }
+
+    /**
+     * @return string
+     */
+    public static function pluralDisplayName(): string
+    {
+        return Craft::t('sprout-base-reports', 'Reports');
     }
 
     /**
