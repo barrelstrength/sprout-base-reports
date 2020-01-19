@@ -112,7 +112,7 @@
             {{ sprout.mediaBox({
                 heading: "No results found"|t('sprout-base-reports'),
                 body: boxBody,
-                resourcePath: '@sproutbasereports/web/assets/base/dist/images/icon.svg'
+                resourcePath: '@sproutbasereports/web/assets/reports/dist/images/icon.svg'
             }) }}
 
         {% endif %}
@@ -121,12 +121,10 @@
 {% endblock %}
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
-{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\base\\SproutReportsAsset") %}
+{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\reports\\SproutReportsAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\datatables\\DataTablesAsset") %}
 
-{% js %}
-
-    (function(){
+{% js on ready %}
 
     $('#btn-download-csv').on('click', function(event) {
     event.preventDefault();
@@ -138,13 +136,9 @@
     $('#modify-settings-panel').slideToggle('slow');
     });
 
-    SproutReport.init();
-
-    SproutReportDataTables.init({
+    new SproutReportDataTables({
     allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
     defaultPageLength: {{ settings.defaultPageLength ?? '10' }}
     });
-
-    })();
 
 {% endjs %}

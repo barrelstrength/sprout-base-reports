@@ -5,7 +5,7 @@
 {% import "sprout-base-fields/_includes/forms" as sproutFields %}
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
-{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\base\\SproutReportsAsset") %}
+{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\reports\\SproutReportsAsset") %}
 
 {% set title = report['id'] is defined and report['id'] is not empty
     ? "Edit Report"|t('sprout-base-reports')
@@ -203,13 +203,12 @@
     {% js "new Craft.HandleGenerator('#name', '#handle');" %}
 {% endif %}
 
-{% js %}
-    SproutReport.init();
+{% js on ready %}
 
-    $(document).ready(function() {
+    new SproutReportDateRangeFields();
+
     if (Craft.SproutFields !== null) {
     Craft.SproutFields.initFields($(".field"));
     }
-    });
 
 {% endjs %}
