@@ -83,15 +83,20 @@
     criteria.unlistedDataSourceViewContexts = params.unlistedDataSourceViewContexts;
     criteria.viewContext = params.viewContext;
 
-    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-    context:        '{{ context }}',
-    storageKey:     'elementindex.{{ elementType|e("js") }}',
-    criteria:       criteria,
-    hideSidebar:    '{{ hideSidebar ?? false }}'
+    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#page-container'), {
+    elementTypeName: '{{ elementInstance.displayName()|e("js") }}',
+    elementTypePluralName: '{{ elementInstance.pluralDisplayName()|e("js") }}',
+    context: '{{ context }}',
+    storageKey: 'elementindex.{{ elementType|e("js") }}',
+    criteria: criteria,
+    toolbarSelector: '#toolbar',
+    hideSidebar: '{{ hideSidebar ?? false }}'
     });
 
-    {# Fix display issue when sidebar is hidden #}
-    $('#main-content').removeClass('has-sidebar');
+    {% if hideSidebar %}
+        $('#sidebar-toggle-container').remove();
+        $('#sidebar-container').remove();
+    {% endif %}
 
     new Craft.SproutBase.GroupsAdmin({
     groupsSelector: '#sidebar nav ul',
@@ -113,4 +118,5 @@
     deleteGroupConfirmMessage: Craft.t('sprout-base-reports', 'Are you sure you want to delete this group and all its reports?'),
     deleteGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not delete the group.'),
     });
+
 {% endblock %}
