@@ -16,6 +16,7 @@ use barrelstrength\sproutbasereports\services\App;
 use barrelstrength\sproutbasereports\services\DataSources;
 use craft\events\RegisterComponentTypesEvent;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 use \yii\base\Module;
 use craft\web\View;
 use craft\events\RegisterTemplateRootsEvent;
@@ -90,9 +91,18 @@ class SproutBaseReports extends Module
         parent::__construct($id, $parent, $config);
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function init()
     {
-        self::$app = new App();
+        parent::init();
+
+        $this->setComponents([
+            'app' => App::class
+        ]);
+
+        self::$app = $this->get('app');
 
         Craft::setAlias('@sproutbasereports', $this->getBasePath());
         Craft::setAlias('@sproutbasereportslib', dirname(__DIR__).'/lib');
@@ -118,7 +128,5 @@ class SproutBaseReports extends Module
             $event->types[] = CustomTwigTemplate::class;
             $event->types[] = Users::class;
         });
-
-        parent::init();
     }
 }
