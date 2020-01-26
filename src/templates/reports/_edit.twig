@@ -168,13 +168,11 @@
         }) }}
     </div>
 
-    <hr>
-
-    <div class="meta read-only sprout-meta-heading">
-        <h6>{{ "Mailing List"|t('sprout-base-reports') }}</h6>
-    </div>
-    <hr>
     <div class="meta">
+
+        <div class="field sprout-meta-heading">
+            <div class="heading"><h6>{{ "Mailing List"|t('sprout-base-reports') }}</h6></div>
+        </div>
 
         {{ forms.field({
             label: "Email Column <span class='info'>The column name that represents a valid email address. Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report.</span>"|t('sprout-base-reports'),
