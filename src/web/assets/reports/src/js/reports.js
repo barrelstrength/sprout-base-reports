@@ -58,6 +58,7 @@ class SproutReportsDataTables {
         // Style Search Box
         searchInput.setAttribute('placeholder', Craft.t('sprout-base-reports', 'Search'));
         searchInput.classList.add('text', 'fullwidth');
+        searchInput.focus();
 
         sproutResultsFilter.classList.add('texticon', 'search', 'icon', 'clearable');
 
