@@ -22,21 +22,22 @@
 {% endif %}
 
 {% block actionButton %}
+
     <form method="post" accept-charset="UTF-8">
         {{ csrfInput() }}
-        <input type="hidden" name="action"
-            value="sprout-base-reports/reports/export-report">
+        <input type="hidden" name="action" value="sprout-base-reports/reports/export-report">
         <input type="hidden" name="reportId" value="{{ report.id }}">
         <input type="hidden" name="pluginHandle" value="{{ pluginHandle }}">
 
-        <a id="btn-download-csv" class="btn">
+        <button id="btn-download-csv" class="btn" type="submit">
             {{ "Export"|t('sprout-base-reports') }}
-        </a>
-
-        {% if currentUser.can(editReportsPermission) %}
-            <a id="modify-settings-icon" class="btn" data-icon="settings"></a>
-        {% endif %}
+        </button>
     </form>
+
+    {% if currentUser.can(editReportsPermission) %}
+        <a id="modify-settings-icon" class="btn" data-icon="settings"></a>
+    {% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -126,19 +127,11 @@
 
 {% js on ready %}
 
-    $('#btn-download-csv').on('click', function(event) {
-    event.preventDefault();
-    $form = $(this).parents('form');
-    $form.submit();
-    });
-
-    $('#modify-settings-icon').on('click', function() {
-    $('#modify-settings-panel').slideToggle('slow');
-    });
-
-    new SproutReportDataTables({
+    new SproutReportsDataTables({
     allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
     defaultPageLength: {{ settings.defaultPageLength ?? '10' }}
     });
+
+    new ReportSettingsToggleButton();
 
 {% endjs %}

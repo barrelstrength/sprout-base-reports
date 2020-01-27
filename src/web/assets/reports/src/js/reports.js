@@ -3,14 +3,12 @@
 /**
  * Initialize and style DataTables on the Sprout Reports results page
  */
-class SproutReportDataTables {
+class SproutReportsDataTables {
 
   constructor(settings) {
     this.allowHtml = settings.allowHtml ?? false;
     this.defaultPageLength = settings.defaultPageLength ?? 10;
     this.sproutResultsTable = $('#sprout-results');
-    this.contentSection = document.getElementById('main-content');
-    this.headerFooterHeight = 122;
 
     this.initializeDataTable();
   }
@@ -19,10 +17,9 @@ class SproutReportDataTables {
     let self = this;
 
     this.sproutResultsTable.DataTable({
-      dom: '<"sprout-results-header"lf>t<"sprout-results-footer"pi>',
+      dom: '<"sprout-results-header"pilf>t',
       responsive: true,
       scrollX: "100vw",
-      scrollY: (self.contentSection.offsetHeight - self.headerFooterHeight) + 'px',
       pageLength: self.defaultPageLength,
       lengthMenu: [
         [10, 25, 50, 100, 250, -1],
@@ -38,7 +35,7 @@ class SproutReportDataTables {
         loadingRecords: Craft.t('sprout-base-reports', 'Loading...'),
         processing: Craft.t('sprout-base-reports', 'Processing...'),
         search: '',
-        zeroRecords: Craft.t('sprout-base-reports', 'No matching records found'),
+        zeroRecords: Craft.t('sprout-base-reports', 'No results found'),
       },
       columnDefs: [
         {
@@ -57,7 +54,6 @@ class SproutReportDataTables {
 
         let searchInput = document.querySelector('#sprout-results_filter input');
         let sproutResultsFilter = document.getElementById('sprout-results_filter');
-        let sproutResultsInfo = document.getElementById('sprout-results_info');
 
         // Style Search Box
         searchInput.setAttribute('placeholder', Craft.t('sprout-base-reports', 'Search'));
@@ -74,22 +70,15 @@ class SproutReportDataTables {
         // Move resultsLengthDropdown into wrapper
         selectWrapper.appendChild(resultsLengthDropdown);
 
-        // Style Filter Results message
-        sproutResultsInfo.classList.add('light');
-
-        // Style Pagination
-        self.stylePagination();
-
-        // init info bubbles on page load
-        Craft.initUiElements(self.sproutResultsTable);
-
         // init info bubbles after search, sort, filter, etc.
         self.sproutResultsTable.on('draw.dt', function() {
-          // Style Pagination (again)
           self.stylePagination();
-
           Craft.initUiElements(self.sproutResultsTable);
         });
+
+        self.stylePagination();
+
+        Craft.initUiElements(self.sproutResultsTable);
 
         let dataTablesScrollTable = document.querySelector('.dataTables_scroll table');
         dataTablesScrollTable.style.opacity = '1';
@@ -97,37 +86,76 @@ class SproutReportDataTables {
 
         resultsTable.style.opacity = '1';
 
-        window.addEventListener('resize', self.resizeTable);
+        window.addEventListener('resize', function() {
+          self.resizeTable()
+        });
 
         self.resizeTable();
       }
     });
   }
 
+  resizeTable() {
+    let leftAndRightPadding = 48;
+    $('.dataTables_scroll').width($('#header').width()-leftAndRightPadding);
+  }
+
   stylePagination() {
     document.querySelector('#sprout-results_paginate').classList.add('pagination');
-    document.querySelector('.paginate_button').classList.add('page-link');
+    let paginateButtons = document.querySelectorAll('.paginate_button');
     document.querySelector('.paginate_button.previous').innerHTML = '';
     document.querySelector('.paginate_button.next').innerHTML = '';
     document.querySelector('.paginate_button.previous').setAttribute('data-icon', 'leftangle');
     document.querySelector('.paginate_button.next').setAttribute('data-icon', 'rightangle');
-  }
 
-  resizeTable() {
-    let self = this;
+    for (let button of paginateButtons) {
+      button.classList.add('page-link');
+    }
 
-    let dataTablesScrollBody = document.querySelector('.dataTables_scrollBody');
-    dataTablesScrollBody.style.maxHeight = (self.contentSection.offsetHeight - self.getTableAdjustmentHeight()) + 'px';
-  }
-
-  getTableAdjustmentHeight() {
-    let tableViewMargin = 48; // .tableview .sproutreports | margin-bottom
-    let tableContentMargin = 40; // .tablecontent | margin-top|margin-bottom
-    let tableHeaderHeight = document.querySelector('.sprout-results-header').offsetHeight;
-    let tableFooterHeight = document.querySelector('.sprout-results-footer').offsetHeight;
-
-    return tableViewMargin + tableContentMargin + tableHeaderHeight + tableFooterHeight;
+    let $actionButton = $('#action-button');
+    $actionButton.prepend($('#sprout-results_paginate'));
+    $actionButton.prepend($('#sprout-results_info'));
   }
 }
 
-window.SproutReportDataTables = SproutReportDataTables;
+class ReportSettingsToggleButton {
+  constructor() {
+    this.$modifySettingsPanel = $('#modify-settings-panel');
+    this.initSettingsToggle();
+  }
+
+  initSettingsToggle() {
+    let self = this;
+    $('#modify-settings-icon').on('click', function() {
+
+      let isDisplayed = self.$modifySettingsPanel.css('display') === 'block';
+      let isInViewport = self.isInViewport(self.$modifySettingsPanel);
+
+      if (isInViewport) {
+        self.$modifySettingsPanel.slideToggle('fast');
+      } else {
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
+        if (!isDisplayed) {
+          self.$modifySettingsPanel.slideToggle('fast');
+        }
+      }
+    });
+  }
+
+  /**
+   * Determine if a given HTML element exists within the current viewport
+   *
+   * @returns {boolean}
+   */
+  isInViewport($element) {
+    let topOfElement = $element.offset().top;
+    let bottomOfElement = $element.offset().top + $element.outerHeight();
+    let bottomOfScreen = $(window).scrollTop() + $(window).innerHeight();
+    let topOfScreen = $(window).scrollTop();
+
+    return (bottomOfScreen > topOfElement) && (topOfScreen < bottomOfElement);
+  }
+}
+
+window.SproutReportsDataTables = SproutReportsDataTables;
+window.ReportSettingsToggleButton = ReportSettingsToggleButton;

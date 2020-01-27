@@ -1,5 +1,10 @@
-/* BASE STYLES
------------------------------------*/
+
+#btn-download-csv {
+    font-size: 14px;
+}
+
+///* BASE STYLES
+//-----------------------------------*/
 
 .tablecontent tr {
     height: 50px;
@@ -11,7 +16,8 @@
     height: 12px;
 }
 
-.tablecontent td, .tablecontent th {
+.tablecontent td,
+.tablecontent th {
     min-width: 180px;
 }
 
@@ -23,56 +29,18 @@
     border-right: 0 solid transparent;
 }
 
-/* SELECT REPORT HEADING
------------------------------------*/
-
-.selectreport h3,
-.selectreport form {
-    margin-left: 25px;
-}
-
-.selectreport form {
-    margin-bottom: 20px;
-}
-
-.selectreport td {
-    min-width: 220px;
-}
-
-/* RESULTS DATA
------------------------------------*/
+///* RESULTS DATA
+//-----------------------------------*/
 
 .tableview.sproutreports {
     height: auto;
-    max-height: 800px;
+    //max-height: 800px;
     overflow: hidden;
-}
-
-.sprout-reports-content #content {
-    overflow: hidden !important;
-    padding: 0 !important;
-}
-
-#modify-settings-panel {
-    padding: 24px 24px 0;
-}
-
-.sproutreports .tablecontent {
-    margin: 20px 0 20px 24px;
-}
-
-.dataTables_scrollHead {
-    border-bottom: 1px solid rgba(0, 0, 20, 0.1) !important;
-}
-
-.dataTables_scrollBody {
-    margin-top: -1px;
-    overflow: scroll;
 }
 
 .dataTables_scroll th.sorting_asc,
 .dataTables_scroll th.sorting_desc {
-    background-position: 100% -3px;
+    background-position: 100% 7px;
     background-image: url('../images/listview_sort_2x.png');
     background-size: 26px;
     background-repeat: no-repeat;
@@ -83,7 +51,7 @@
 }
 
 .dataTables_scroll th.sorting_desc {
-    background-position: 100% -34px;
+    background-position: 100% -24px;
 }
 
 .dataTables_scroll tr th:focus {
@@ -94,21 +62,16 @@
 .sproutreports .tablecontent tr td:first-child {
     padding-left: 10px;
 }
-
-/* Adjust margin/padding */
+//
+///* Adjust margin/padding */
 .sprout-results-header #sprout-results_filter input {
     width: 260px;
 }
 
 .sprout-results-header,
 .sprout-results-footer {
-    margin-right: 24px;
+    //margin-right: 24px;
     margin-bottom: 24px;
-}
-
-.dataTables_scroll {
-    margin-bottom: 24px;
-    margin-right: 0;
 }
 
 /* Prepare header stuff */
@@ -121,6 +84,15 @@
 .sprout-results-header #sprout-results_length {
     flex-grow: 1;
 }
+#sprout-results_length,
+#sprout-results_info {
+    font-size: 14px;
+}
+#sprout-results_info {
+    margin-right: 14px;
+    margin-top: 1px;
+    padding: 7px;
+}
 
 .sprout-results-header #sprout-results_filter {
     text-align: right;
@@ -130,45 +102,26 @@
     padding-right: 7px !important;
 }
 
-#sprout-results_filter.texticon.clearable .text {
-    /* Set the search input border to zero to avoid a flash on load */
-    border: 0;
-}
-
-#sprout-results_filter {
-    /* Apply border styles to search wrapper instead */
-    border: 1px solid rgba(0, 0, 20, 0.1);
-    border-radius: 2px;
-}
-
-/* Fix footer in place */
-.sprout-results-footer {
-    background-color: #ffffff;
-    bottom: 0;
-    position: fixed;
-    margin-bottom: 0;
-    padding: 10px;
-    width: 100%;
-}
-
 #sprout-results_paginate {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.5;
-    margin-bottom: 5px;
+    margin-top: -8px;
+    padding-top: 5px;
     text-transform: uppercase;
-    float: left;
 }
 
 .paginate_button {
+    border: 1px solid #eee;
     margin-right: 7px;
+    outline: none;
 }
-
+.paginate_button.page-link {
+    padding: 6px 15px 10px;
+}
 .paginate_button.previous {
-    margin-left: 0;
+    //margin-left: 0;
 }
 
 .paginate_button.current {
     font-weight: bold;
 }
-
-
