@@ -4,7 +4,9 @@ mix
   .sass(
     'src/web/assets/reports/src/scss/reports.scss',
     'src/web/assets/reports/dist/css/reports.css',
-  )
+  ).options({
+    processCssUrls: false
+  })
   .js([
     'src/web/assets/reports/src/js/reports.js'
   ], 'src/web/assets/reports/dist/js/reports.js')
