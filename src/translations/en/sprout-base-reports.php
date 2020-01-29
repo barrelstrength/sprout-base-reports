@@ -112,5 +112,7 @@ return [
     'Twig Template' => 'Twig Template',
     'Results template cannot be blank.' => 'Results template cannot be blank.',
     'Create a report using Twig in your templates folder.' => 'Create a report using Twig in your templates folder.',
-    'Display Custom Query in quick edit view?' => 'Display Custom Query in quick edit view?'
+    'Display Custom Query in quick edit view?' => 'Display Custom Query in quick edit view?',
+    'Email Column <span class=\'info\'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>' => 'Email Column <span class=\'info\'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>',
+    'Email Column ' => 'Email Column '
 ];
