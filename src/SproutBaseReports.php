@@ -7,31 +7,26 @@
 
 namespace barrelstrength\sproutbasereports;
 
-use barrelstrength\sproutbasereports\controllers\ReportsController;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
+use barrelstrength\sproutbasereports\controllers\ReportsController;
 use barrelstrength\sproutbasereports\datasources\CustomQuery;
 use barrelstrength\sproutbasereports\datasources\CustomTwigTemplate;
 use barrelstrength\sproutbasereports\datasources\Users;
 use barrelstrength\sproutbasereports\services\App;
 use barrelstrength\sproutbasereports\services\DataSources;
+use Craft;
 use craft\events\RegisterComponentTypesEvent;
-use yii\base\Event;
-use yii\base\InvalidConfigException;
-use \yii\base\Module;
-use craft\web\View;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\ArrayHelper;
 use craft\i18n\PhpMessageSource;
-use Craft;
+use craft\web\View;
+use yii\base\Event;
+use yii\base\InvalidConfigException;
+use yii\base\Module;
 
 class SproutBaseReports extends Module
 {
     use BaseSproutTrait;
-
-    /**
-     * @var string
-     */
-    public $handle;
 
     /**
      * @var App
@@ -44,6 +39,11 @@ class SproutBaseReports extends Module
      * @var string
      */
     public static $pluginHandle = 'sprout-base-reports';
+
+    /**
+     * @var string
+     */
+    public $handle;
 
     /**
      * @var string|null The translation category that this module translation messages should use. Defaults to the lowercase plugin handle.

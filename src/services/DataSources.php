@@ -12,12 +12,12 @@ use barrelstrength\sproutbasereports\base\DataSourceInterface;
 use barrelstrength\sproutbasereports\datasources\MissingDataSource;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
+use Craft;
+use craft\db\Query;
 use craft\errors\MissingComponentException;
+use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component as ComponentHelper;
 use yii\base\Component;
-use craft\events\RegisterComponentTypesEvent;
-use craft\db\Query;
-use Craft;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 
@@ -61,6 +61,7 @@ class DataSources extends Component
         if (class_exists($dataSourceRecord->type)) {
             $dataSource = new $dataSourceRecord->type;
             $dataSource->id = $dataSourceRecord->id;
+
             return $dataSource;
         }
 
@@ -194,6 +195,7 @@ class DataSources extends Component
 
         if (!$dataSourceRecord->validate()) {
             $dataSource->addErrors($dataSourceRecord->getErrors());
+
             return false;
         }
 

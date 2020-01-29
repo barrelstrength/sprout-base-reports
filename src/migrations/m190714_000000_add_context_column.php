@@ -61,6 +61,7 @@ class m190714_000000_add_context_column extends Migration
     public function safeDown(): bool
     {
         echo "m190714_000000_add_context_column cannot be reverted.\n";
+
         return false;
     }
 }

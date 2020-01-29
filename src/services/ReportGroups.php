@@ -3,13 +3,13 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\models\ReportGroup;
+use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
+use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use craft\db\Query;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
 use yii\base\Component;
-use barrelstrength\sproutbasereports\models\ReportGroup as ReportGroupModel;
-use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -51,6 +51,7 @@ class ReportGroups extends Component
         }
 
         $group->addErrors($groupRecord->getErrors());
+
         return false;
     }
 

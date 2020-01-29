@@ -8,18 +8,18 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\records\Report as ReportRecord;
+use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\base\ElementInterface;
 use craft\db\Query;
+use craft\helpers\DateTimeHelper;
 use DateTime;
 use DateTimeZone;
 use Throwable;
 use yii\base\Component;
-use barrelstrength\sproutbasereports\records\Report as ReportRecord;
-use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use yii\base\Exception;
-use craft\helpers\DateTimeHelper;
 
 /**
  *
@@ -53,6 +53,7 @@ class Reports extends Component
     {
         if (!$report) {
             Craft::info('Report not saved due to validation error.', __METHOD__);
+
             return false;
         }
 
@@ -83,26 +84,6 @@ class Reports extends Component
     }
 
     /**
-     * @param Report $report
-     *
-     * @return bool
-     */
-    protected function validateSettings(Report $report): bool
-    {
-        $errors = [];
-
-        $dataSource = $report->getDataSource();
-
-        if ($dataSource AND !$dataSource->validateSettings($report->settings, $errors)) {
-            $report->addError('settings', $errors);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param $dataSourceId
      *
      * @return array
@@ -122,33 +103,6 @@ class Reports extends Component
         $rows = $this->getReportsQuery()->all();
 
         return $this->populateReports($rows);
-    }
-
-    private function getReportsQuery(): Query
-    {
-        $query = new Query();
-        // We only get reports that currently has dataSourceId or existing installed dataSource
-        $query->select('reports.*')
-            ->from('{{%sproutreports_reports}} as reports')
-            ->innerJoin('{{%sproutreports_datasources}} as datasource', '[[datasource.id]] = [[reports.dataSourceId]]');
-
-        return $query;
-    }
-
-    private function populateReports($rows): array
-    {
-        $reports = [];
-
-        if ($rows) {
-            foreach ($rows as $row) {
-
-                $model = new Report();
-                $model->setAttributes($row, false);
-                $reports[] = $model;
-            }
-        }
-
-        return $reports;
     }
 
     /**
@@ -192,6 +146,7 @@ class Reports extends Component
                 ];
             }
         }
+
         return $options;
     }
 
@@ -295,6 +250,100 @@ class Reports extends Component
         return $dateTime;
     }
 
+    public function getDateRanges($withQuarter = true)
+    {
+        $currentMonth = date('F');
+        $lastMonth = date('F', strtotime(date('Y-m').' -1 month'));
+        $thisQuarter = $this->thisQuarter();
+        $thisQuarterInitialMonth = date('F', strtotime($thisQuarter['startDate']));
+        $thisQuarterFinalMonth = date('F', strtotime($thisQuarter['endDate']));
+        $thisQuarterYear = date('Y', strtotime($thisQuarter['endDate']));
+
+        $lastQuarter = $this->lastQuarter();
+        $lastQuarterInitialMonth = date('F', strtotime($lastQuarter['startDate']));
+        $lastQuarterFinalMonth = date('F', strtotime($lastQuarter['endDate']));
+        $lastQuarterYear = date('Y', strtotime($lastQuarter['endDate']));
+
+        $currentYear = date('Y');
+        $previousYear = date('Y', strtotime('-1 year'));
+
+        $ranges = [
+            'thisWeek' => Craft::t('sprout-base-reports', 'Last 7 Days'),
+            'thisMonth' => Craft::t('sprout-base-reports', 'This Month ({month})', ['month' => $currentMonth]),
+            'lastMonth' => Craft::t('sprout-base-reports', 'Last Month ({month})', ['month' => $lastMonth])
+        ];
+
+        if ($withQuarter) {
+            $ranges = array_merge($ranges, [
+                'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter ({iMonth} - {fMonth} {year})', [
+                    'iMonth' => $thisQuarterInitialMonth,
+                    'fMonth' => $thisQuarterFinalMonth,
+                    'year' => $thisQuarterYear
+                ]),
+                'lastQuarter' => Craft::t('sprout-base-reports', 'Last Quarter ({iMonth} - {fMonth} {year})', [
+                    'iMonth' => $lastQuarterInitialMonth,
+                    'fMonth' => $lastQuarterFinalMonth,
+                    'year' => $lastQuarterYear
+                ]),
+            ]);
+        }
+
+        $ranges = array_merge($ranges, [
+            'thisYear' => Craft::t('sprout-base-reports', 'This Year ({year})', ['year' => $currentYear]),
+            'lastYear' => Craft::t('sprout-base-reports', 'Last Year ({year})', ['year' => $previousYear]),
+            'customRange' => Craft::t('sprout-base-reports', 'Custom Date Range')
+        ]);
+
+        return $ranges;
+    }
+
+    /**
+     * @param Report $report
+     *
+     * @return bool
+     */
+    protected function validateSettings(Report $report): bool
+    {
+        $errors = [];
+
+        $dataSource = $report->getDataSource();
+
+        if ($dataSource AND !$dataSource->validateSettings($report->settings, $errors)) {
+            $report->addError('settings', $errors);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function getReportsQuery(): Query
+    {
+        $query = new Query();
+        // We only get reports that currently has dataSourceId or existing installed dataSource
+        $query->select('reports.*')
+            ->from('{{%sproutreports_reports}} as reports')
+            ->innerJoin('{{%sproutreports_datasources}} as datasource', '[[datasource.id]] = [[reports.dataSourceId]]');
+
+        return $query;
+    }
+
+    private function populateReports($rows): array
+    {
+        $reports = [];
+
+        if ($rows) {
+            foreach ($rows as $row) {
+
+                $model = new Report();
+                $model->setAttributes($row, false);
+                $reports[] = $model;
+            }
+        }
+
+        return $reports;
+    }
+
     private function thisQuarter(): array
     {
         $startDate = '';
@@ -346,52 +395,5 @@ class Reports extends Component
             'startDate' => date('Y-m-d H:i:s', $startDate),
             'endDate' => date('Y-m-d H:i:s', $endDate)
         ];
-    }
-
-    public function getDateRanges($withQuarter = true)
-    {
-        $currentMonth = date('F');
-        $lastMonth = date('F', strtotime(date('Y-m').' -1 month'));
-        $thisQuarter = $this->thisQuarter();
-        $thisQuarterInitialMonth = date('F', strtotime($thisQuarter['startDate']));
-        $thisQuarterFinalMonth = date('F', strtotime($thisQuarter['endDate']));
-        $thisQuarterYear = date('Y', strtotime($thisQuarter['endDate']));
-
-        $lastQuarter = $this->lastQuarter();
-        $lastQuarterInitialMonth = date('F', strtotime($lastQuarter['startDate']));
-        $lastQuarterFinalMonth = date('F', strtotime($lastQuarter['endDate']));
-        $lastQuarterYear = date('Y', strtotime($lastQuarter['endDate']));
-
-        $currentYear = date('Y');
-        $previousYear = date('Y', strtotime('-1 year'));
-
-        $ranges = [
-            'thisWeek' => Craft::t('sprout-base-reports', 'Last 7 Days'),
-            'thisMonth' => Craft::t('sprout-base-reports', 'This Month ({month})', ['month' => $currentMonth]),
-            'lastMonth' => Craft::t('sprout-base-reports', 'Last Month ({month})', ['month' => $lastMonth])
-        ];
-
-        if ($withQuarter) {
-            $ranges = array_merge($ranges, [
-                'thisQuarter' => Craft::t('sprout-base-reports', 'This Quarter ({iMonth} - {fMonth} {year})', [
-                    'iMonth' => $thisQuarterInitialMonth,
-                    'fMonth' => $thisQuarterFinalMonth,
-                    'year' => $thisQuarterYear
-                ]),
-                'lastQuarter' => Craft::t('sprout-base-reports', 'Last Quarter ({iMonth} - {fMonth} {year})', [
-                    'iMonth' => $lastQuarterInitialMonth,
-                    'fMonth' => $lastQuarterFinalMonth,
-                    'year' => $lastQuarterYear
-                ]),
-            ]);
-        }
-
-        $ranges = array_merge($ranges, [
-            'thisYear' => Craft::t('sprout-base-reports', 'This Year ({year})', ['year' => $currentYear]),
-            'lastYear' => Craft::t('sprout-base-reports', 'Last Year ({year})', ['year' => $previousYear]),
-            'customRange' => Craft::t('sprout-base-reports', 'Custom Date Range')
-        ]);
-
-        return $ranges;
     }
 }

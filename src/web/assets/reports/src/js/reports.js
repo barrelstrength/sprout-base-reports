@@ -98,7 +98,7 @@ class SproutReportsDataTables {
 
   resizeTable() {
     let leftAndRightPadding = 48;
-    $('.dataTables_scroll').width($('#header').width()-leftAndRightPadding);
+    $('.dataTables_scroll').width($('#header').width() - leftAndRightPadding);
   }
 
   stylePagination() {
@@ -135,7 +135,7 @@ class ReportSettingsToggleButton {
       if (isInViewport) {
         self.$modifySettingsPanel.slideToggle('fast');
       } else {
-        $('html, body').animate({ scrollTop: 0 }, 'fast');
+        $('html, body').animate({scrollTop: 0}, 'fast');
         if (!isDisplayed) {
           self.$modifySettingsPanel.slideToggle('fast');
         }

@@ -3,9 +3,9 @@
 namespace barrelstrength\sproutbasereports\datasources;
 
 use barrelstrength\sproutbasereports\base\DataSource;
+use Craft;
 use craft\base\MissingComponentInterface;
 use craft\base\MissingComponentTrait;
-use Craft;
 
 /**
  * Class MissingDataSource

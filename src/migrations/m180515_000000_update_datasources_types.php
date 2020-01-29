@@ -42,6 +42,7 @@ class m180515_000000_update_datasources_types extends Migration
     public function safeDown(): bool
     {
         echo "m180515_000000_update_datasources_types cannot be reverted.\n";
+
         return false;
     }
 }

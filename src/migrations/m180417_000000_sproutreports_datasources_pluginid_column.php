@@ -32,6 +32,7 @@ class m180417_000000_sproutreports_datasources_pluginid_column extends Migration
     public function safeDown(): bool
     {
         echo "m180417_000000_sproutreports_datasources_pluginid_column cannot be reverted.\n";
+
         return false;
     }
 }

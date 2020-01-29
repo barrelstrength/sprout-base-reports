@@ -4,8 +4,8 @@ namespace barrelstrength\sproutbasereports\models;
 
 use barrelstrength\sproutbase\base\SharedPermissionsInterface;
 use barrelstrength\sproutbase\base\SproutSettingsInterface;
-use craft\base\Model;
 use Craft;
+use craft\base\Model;
 
 /**
  *

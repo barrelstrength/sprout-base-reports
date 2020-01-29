@@ -36,6 +36,7 @@ class m190212_000002_update_report_element_types extends Migration
     public function safeDown(): bool
     {
         echo "m190212_000002_update_report_element_types cannot be reverted.\n";
+
         return false;
     }
 }

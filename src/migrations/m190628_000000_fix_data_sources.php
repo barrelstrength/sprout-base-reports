@@ -2,8 +2,8 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
-use craft\db\Migration;
 use Craft;
+use craft\db\Migration;
 use craft\db\Query;
 use Throwable;
 use yii\base\Exception as BaseException;
@@ -15,6 +15,7 @@ use yii\db\Exception;
 class m190628_000000_fix_data_sources extends Migration
 {
     private $reportTable = '{{%sproutreports_reports}}';
+
     private $dataSourcesTable = '{{%sproutreports_datasources}}';
 
     /**

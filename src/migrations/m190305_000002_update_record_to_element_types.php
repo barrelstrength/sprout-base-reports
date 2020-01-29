@@ -2,10 +2,10 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
-use craft\db\Migration;
-use Craft;
-use craft\db\Query;
 use barrelstrength\sproutbasereports\elements\Report;
+use Craft;
+use craft\db\Migration;
+use craft\db\Query;
 use craft\errors\ElementNotFoundException;
 use Throwable;
 use yii\base\Exception as BaseException;

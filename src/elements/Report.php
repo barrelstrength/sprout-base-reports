@@ -7,19 +7,19 @@
 
 namespace barrelstrength\sproutbasereports\elements;
 
-use barrelstrength\sproutbase\SproutBase;
-use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
 use barrelstrength\sproutbase\base\BaseSproutTrait;
+use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
+use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
 use barrelstrength\sproutbasereports\elements\db\ReportQuery;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
-use craft\helpers\Json;
-use craft\helpers\UrlHelper;
 use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
+use craft\helpers\Json;
+use craft\helpers\UrlHelper;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 use DateTime;
@@ -86,23 +86,6 @@ class Report extends Element
     public $viewContext;
 
     /**
-     * @return string
-     * @throws Throwable
-     */
-    public function __toString()
-    {
-        if ($this->hasNameFormat && $this->nameFormat) {
-            try {
-                return $this->processNameFormat();
-            } catch (Exception $exception) {
-                return Craft::t('sprout-base-reports', 'Invalid name format for report: '.$this->name);
-            }
-        }
-
-        return (string)$this->name;
-    }
-
-    /**
      * Returns the element type name.
      *
      * @return string
@@ -128,58 +111,6 @@ class Report extends Element
     public static function hasStatuses(): bool
     {
         return true;
-    }
-
-    /**
-     * Returns whether the Report can be .
-     *
-     * @return bool
-     */
-    public function getIsEditable(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Returns whether a Report can be deleted
-     *
-     * This is used when integrations like Sprout Forms or Sprout Lists want to
-     * dynamically create a Report when something else happens, like when a Form
-     * is created or when a list is created. This allows Sprout Forms to be sure
-     * to have a report for each specific Form, or Sprout Lists to have a Mailing List
-     * for each specific List.
-     *
-     * @return bool
-     */
-    public function canBeDeleted(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Returns the element's CP edit URL.
-     *
-     * @param null   $dataSourceBaseUrl
-     * @param string $pluginHandle
-     *
-     * @return string|null
-     */
-    public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
-    {
-        // Data Source is used on the Results page, but we have a case where we need to get the value differently
-        if (Craft::$app->getRequest()->getIsActionRequest()) {
-            // criteria.pluginHandle is used on the Report Element index page
-            $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
-            $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
-        }
-
-        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
-
-        if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
-            return null;
-        }
-
-        return UrlHelper::cpUrl($dataSourceBaseUrl.$this->dataSourceId.'/edit/'.$this->id);
     }
 
     /**
@@ -216,6 +147,11 @@ class Report extends Element
         return $tableAttributes;
     }
 
+    public static function defineSearchableAttributes(): array
+    {
+        return ['name'];
+    }
+
     protected static function defineDefaultTableAttributes(string $source): array
     {
         // index or modal
@@ -229,48 +165,6 @@ class Report extends Element
         }
 
         return $tableAttributes;
-    }
-
-    /**
-     * @param string $attribute
-     *
-     * @return string
-     */
-    public function getTableAttributeHtml(string $attribute): string
-    {
-        $viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
-        $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
-        $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
-
-        if ($attribute === 'results') {
-            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
-
-            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run report').'</a>';
-        }
-
-        if ($attribute === 'download') {
-            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
-                    'reportId' => $this->id,
-                    'pluginHandle' => $pluginHandle,
-                    'viewContext' => $viewContext
-                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
-        }
-
-        if ($attribute === 'dataSourceId') {
-
-            $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
-
-            if (!$dataSource) {
-                $message = Craft::t('sprout-base-reports', 'Data Source not found: {dataSourceId}', [
-                    'dataSourceId' => $attribute
-                ]);
-                return '<span class="error">'.$message.'</span>';
-            }
-
-            return $dataSource::displayName();
-        }
-
-        return parent::getTableAttributeHtml($attribute);
     }
 
     /**
@@ -361,9 +255,128 @@ class Report extends Element
         return $sources;
     }
 
-    public static function defineSearchableAttributes(): array
+    /**
+     * @inheritdoc
+     */
+    protected static function defineActions(string $source = null): array
     {
-        return ['name'];
+        $actions = [];
+
+        $actions[] = DeleteReport::class;
+
+        return $actions;
+    }
+
+    /**
+     * @return string
+     * @throws Throwable
+     */
+    public function __toString()
+    {
+        if ($this->hasNameFormat && $this->nameFormat) {
+            try {
+                return $this->processNameFormat();
+            } catch (Exception $exception) {
+                return Craft::t('sprout-base-reports', 'Invalid name format for report: '.$this->name);
+            }
+        }
+
+        return (string)$this->name;
+    }
+
+    /**
+     * Returns whether the Report can be .
+     *
+     * @return bool
+     */
+    public function getIsEditable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Returns whether a Report can be deleted
+     *
+     * This is used when integrations like Sprout Forms or Sprout Lists want to
+     * dynamically create a Report when something else happens, like when a Form
+     * is created or when a list is created. This allows Sprout Forms to be sure
+     * to have a report for each specific Form, or Sprout Lists to have a Mailing List
+     * for each specific List.
+     *
+     * @return bool
+     */
+    public function canBeDeleted(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Returns the element's CP edit URL.
+     *
+     * @param null   $dataSourceBaseUrl
+     * @param string $pluginHandle
+     *
+     * @return string|null
+     */
+    public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
+    {
+        // Data Source is used on the Results page, but we have a case where we need to get the value differently
+        if (Craft::$app->getRequest()->getIsActionRequest()) {
+            // criteria.pluginHandle is used on the Report Element index page
+            $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
+            $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
+        }
+
+        $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
+
+        if (!isset($permissions['sproutReports-viewReports']) || !Craft::$app->getUser()->checkPermission($permissions['sproutReports-viewReports'])) {
+            return null;
+        }
+
+        return UrlHelper::cpUrl($dataSourceBaseUrl.$this->dataSourceId.'/edit/'.$this->id);
+    }
+
+    /**
+     * @param string $attribute
+     *
+     * @return string
+     */
+    public function getTableAttributeHtml(string $attribute): string
+    {
+        $viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
+        $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
+        $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
+
+        if ($attribute === 'results') {
+            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
+
+            return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run report').'</a>';
+        }
+
+        if ($attribute === 'download') {
+            return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
+                    'reportId' => $this->id,
+                    'pluginHandle' => $pluginHandle,
+                    'viewContext' => $viewContext
+                ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
+        }
+
+        if ($attribute === 'dataSourceId') {
+
+            $dataSource = SproutBaseReports::$app->dataSources->getDataSourceById($this->dataSourceId);
+
+            if (!$dataSource) {
+                $message = Craft::t('sprout-base-reports', 'Data Source not found: {dataSourceId}', [
+                    'dataSourceId' => $attribute
+                ]);
+
+                return '<span class="error">'.$message.'</span>';
+            }
+
+            return $dataSource::displayName();
+        }
+
+        return parent::getTableAttributeHtml($attribute);
     }
 
     /**
@@ -432,32 +445,6 @@ class Report extends Element
     }
 
     /**
-     * @return array
-     * @throws InvalidConfigException
-     */
-    protected function defineRules(): array
-    {
-        $rules = parent::defineRules();
-
-        $rules[] = [['name', 'handle'], 'required'];
-        $rules[] = [
-            ['handle'],
-            HandleValidator::class,
-            'reservedWords' => [
-                'id', 'dateCreated', 'dateUpdated', 'uid', 'title'
-            ]
-        ];
-        $rules[] = [
-            ['name', 'handle'],
-            UniqueValidator::class,
-            'targetClass' => ReportRecord::class
-        ];
-
-        return $rules;
-    }
-
-
-    /**
      * @param array $results
      */
     public function setResults(array $results = [])
@@ -507,19 +494,6 @@ class Report extends Element
         parent::afterSave($isNew);
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    protected static function defineActions(string $source = null): array
-    {
-        $actions = [];
-
-        $actions[] = DeleteReport::class;
-
-        return $actions;
-    }
-
     /**
      * @return $this
      * @throws Exception
@@ -552,5 +526,30 @@ class Report extends Element
     public function getEndDate(): DateTime
     {
         return $this->endDate;
+    }
+
+    /**
+     * @return array
+     * @throws InvalidConfigException
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+
+        $rules[] = [['name', 'handle'], 'required'];
+        $rules[] = [
+            ['handle'],
+            HandleValidator::class,
+            'reservedWords' => [
+                'id', 'dateCreated', 'dateUpdated', 'uid', 'title'
+            ]
+        ];
+        $rules[] = [
+            ['name', 'handle'],
+            UniqueValidator::class,
+            'targetClass' => ReportRecord::class
+        ];
+
+        return $rules;
     }
 }

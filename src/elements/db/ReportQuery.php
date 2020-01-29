@@ -9,9 +9,9 @@ namespace barrelstrength\sproutbasereports\elements\db;
 
 
 use barrelstrength\sproutbasereports\base\DataSource;
+use Craft;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
-use Craft;
 
 class ReportQuery extends ElementQuery
 {
@@ -54,6 +54,7 @@ class ReportQuery extends ElementQuery
      * @var string
      */
     public $dataSourceBaseUrl;
+
     public $pluginHandle;
 
     /**

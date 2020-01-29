@@ -12,7 +12,9 @@ use craft\db\Migration;
 class Install extends Migration
 {
     private $reportTable = '{{%sproutreports_reports}}';
+
     private $reportGroupTable = '{{%sproutreports_reportgroups}}';
+
     private $dataSourcesTable = '{{%sproutreports_datasources}}';
 
     /**

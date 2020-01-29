@@ -101,6 +101,7 @@ class m180307_042132_craft3_schema_changes extends Migration
     public function safeDown(): bool
     {
         echo "m180307_042132_craft3_schema_changes cannot be reverted.\n";
+
         return false;
     }
 }

@@ -33,6 +33,7 @@ class m200110_000000_add_reports_emailColumn_column extends Migration
     public function safeDown(): bool
     {
         echo "m200110_000000_add_reports_emailColumn_column cannot be reverted.\n";
+
         return false;
     }
 }
