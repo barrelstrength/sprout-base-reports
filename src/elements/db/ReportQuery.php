@@ -83,16 +83,13 @@ class ReportQuery extends ElementQuery
 
         // Property is used for Element Sources in sidebar
         if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest()) {
-//          The request is available on the Element Index page and used for plugin integrations using Sprout Reports
+            // The request is available on the Element Index page and used for plugin integrations using Sprout Reports
             $this->viewContext = Craft::$app->getRequest()->getBodyParam('criteria.viewContext');
         }
 
-        // sprout-reports = all, don't limit by viewContext
-        // sprout-forms = all sprout-reports + sprout-forms viewContext
-        // sprout-email = all sprout-reports + sprout-email viewContext
+        // Limit results by viewContext when not viewing in Sprout Reports
         if ($this->viewContext && $this->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $viewContextList = array_unique([
-                DataSource::DEFAULT_VIEW_CONTEXT,
                 $this->viewContext
             ]);
 

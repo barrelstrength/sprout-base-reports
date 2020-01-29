@@ -81,8 +81,21 @@ class ReportsController extends Controller
             /** @var $dataSource DataSource */
             $dataSource->baseUrl = $this->dataSourceBaseUrl;
 
-            // Ignore the allowNew setting if we're displaying a Reports integration
-            if ($dataSource->allowNew || $viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+            if (!$dataSource->allowNew) {
+                continue;
+            }
+
+            if (
+                // The page loading matches the current viewContext
+                $dataSource->viewContext === $viewContext
+                ||
+                ((
+                    // The page loading doesn't match the current viewContext
+                    $dataSource->viewContext !== $viewContext
+                    &&
+                    // BUT we're loading the main Sprout Reports page so load it anyway
+                    $viewContext === DataSource::DEFAULT_VIEW_CONTEXT
+                ))) {
                 $newReportOptions[] = [
                     'name' => $dataSource::displayName(),
                     'url' => $dataSource->getUrl($dataSource->id.'/new')
