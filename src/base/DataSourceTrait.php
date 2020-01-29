@@ -10,9 +10,6 @@ use craft\base\Plugin;
  */
 trait DataSourceTrait
 {
-    // Properties
-    // =========================================================================
-
     public $viewContext;
 
     /**

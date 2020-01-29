@@ -28,6 +28,7 @@ class Exports extends Component
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws \yii\base\Exception
      */
     public function toHtml(array &$values, array $labels = [], array $variables = []): string
     {

@@ -116,6 +116,7 @@ class Users extends DataSource
         // Add and identify User Groups as columns
         foreach ($usersById as $key => $user) {
             if ($displayUserGroupColumns) {
+
                 // Add User Groups as columns to user array
                 $user = array_merge($user, $userGroupsByName);
 
@@ -138,6 +139,7 @@ class Users extends DataSource
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws \yii\base\Exception
      */
     public function getSettingsHtml(array $settings = [])
     {

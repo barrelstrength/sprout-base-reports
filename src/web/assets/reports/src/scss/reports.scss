@@ -34,7 +34,6 @@
 
 .tableview.sproutreports {
     height: auto;
-    //max-height: 800px;
     overflow: hidden;
 }
 
@@ -69,9 +68,7 @@
     width: 260px;
 }
 
-.sprout-results-header,
-.sprout-results-footer {
-    //margin-right: 24px;
+.sprout-results-header {
     margin-bottom: 24px;
 }
 

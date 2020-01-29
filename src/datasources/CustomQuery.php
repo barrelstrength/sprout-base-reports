@@ -66,6 +66,7 @@ class CustomQuery extends DataSource
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws \yii\base\Exception
      */
     public function getSettingsHtml(array $settings = [])
     {

@@ -40,7 +40,7 @@ class SproutReportsDataTables {
       columnDefs: [
         {
           targets: '_all',
-          render: function(data, type, row, meta) {
+          render: function(data, type) {
 
             if (type === 'display' && data.length > 65 && self.allowHtml === false) {
               return data.substr(0, 65) + '… <span class="info" style="margin-right:10px;">' + data + '</span>';
@@ -50,7 +50,7 @@ class SproutReportsDataTables {
           }
         }
       ],
-      initComplete: function(settings, json) {
+      initComplete: function() {
 
         let searchInput = document.querySelector('#sprout-results_filter input');
         let sproutResultsFilter = document.getElementById('sprout-results_filter');

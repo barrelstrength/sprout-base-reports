@@ -105,5 +105,12 @@ return [
     'Email Column is set by Data Source' => 'Email Column is set by Data Source',
     'Create reports about your users and user groups.' => 'Create reports about your users and user groups.',
     'Users' => 'Users',
-    'None' => 'None'
+    'None' => 'None',
+    'Create reports using a custom database query' => 'Create reports using a custom database query',
+    'Query cannot be blank.' => 'Query cannot be blank.',
+    'Report' => 'Report',
+    'Twig Template' => 'Twig Template',
+    'Results template cannot be blank.' => 'Results template cannot be blank.',
+    'Create a report using Twig in your templates folder.' => 'Create a report using Twig in your templates folder.',
+    'Display Custom Query in quick edit view?' => 'Display Custom Query in quick edit view?'
 ];
