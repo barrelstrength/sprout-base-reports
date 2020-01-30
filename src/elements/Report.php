@@ -185,6 +185,7 @@ class Report extends Element
      */
     protected static function defineSources(string $context = null): array
     {
+        $sources = [];
         $viewContext = null;
 
         // Just in case this gets run from the console for some reason,
@@ -219,7 +220,7 @@ class Report extends Element
             ];
         }
 
-        if ($viewContext === DataSource::DEFAULT_VIEW_CONTEXT) {
+        if ($viewContext === DataSource::DEFAULT_VIEW_CONTEXT || $viewContext === 'mailingListModal') {
 
             $sources[] = [
                 'key' => 'mailingList',
@@ -231,7 +232,9 @@ class Report extends Element
                     'emailColumn' => ':notempty:'
                 ]
             ];
+        }
 
+        if ($viewContext === DataSource::DEFAULT_VIEW_CONTEXT) {
             $groups = SproutBaseReports::$app->reportGroups->getReportGroups();
 
             if ($groups) {
