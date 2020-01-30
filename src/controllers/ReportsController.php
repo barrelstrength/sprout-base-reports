@@ -103,6 +103,10 @@ class ReportsController extends Controller
             }
         }
 
+        Craft::$app->getSession()->set('sprout.dataSourceBaseUrl', $this->dataSourceBaseUrl);
+        Craft::$app->getSession()->set('sprout.pluginHandle', $pluginHandle);
+        Craft::$app->getSession()->set('sprout.viewContext', $viewContext);
+
         return $this->renderTemplate('sprout-base-reports/reports/index', [
             'dataSources' => $dataSources,
             'groupId' => $groupId,
@@ -112,8 +116,7 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
-            'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
-            'pluginHandle' => $pluginHandle
+            'dataSourceBaseUrl' => $this->dataSourceBaseUrl
         ]);
     }
 

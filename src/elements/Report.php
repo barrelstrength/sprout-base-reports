@@ -315,20 +315,19 @@ class Report extends Element
     }
 
     /**
-     * Returns the element's CP edit URL.
-     *
      * @param null   $dataSourceBaseUrl
      * @param string $pluginHandle
      *
      * @return string|null
+     * @throws \craft\errors\MissingComponentException
      */
     public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
     {
         // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
-            $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
-            $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
+            $pluginHandle = Craft::$app->getSession()->get('sprout.pluginHandle');
+            $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.dataSourceBaseUrl');
         }
 
         $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
@@ -344,12 +343,11 @@ class Report extends Element
      * @param string $attribute
      *
      * @return string
+     * @throws \craft\errors\MissingComponentException
      */
     public function getTableAttributeHtml(string $attribute): string
     {
-        $viewContext = Craft::$app->request->getBodyParam('criteria.viewContext');
-        $dataSourceBaseUrl = Craft::$app->request->getBodyParam('criteria.dataSourceBaseUrl');
-        $pluginHandle = Craft::$app->request->getBodyParam('criteria.pluginHandle');
+        $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.dataSourceBaseUrl');
 
         if ($attribute === 'results') {
             $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
@@ -359,9 +357,7 @@ class Report extends Element
 
         if ($attribute === 'download') {
             return '<a href="'.UrlHelper::actionUrl('sprout-base-reports/reports/export-report', [
-                    'reportId' => $this->id,
-                    'pluginHandle' => $pluginHandle,
-                    'viewContext' => $viewContext
+                    'reportId' => $this->id
                 ]).'" class="btn small">'.Craft::t('sprout-base-reports', 'Export').'</a>';
         }
 
