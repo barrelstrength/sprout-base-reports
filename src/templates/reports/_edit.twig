@@ -168,38 +168,42 @@
         }) }}
     </div>
 
-    <div id="sprout-reports-mailing-list-sidebar" class="meta">
+    {% set sproutReportsIsEnabled = craft.app.getPlugins().isPluginEnabled('sprout-reports') %}
 
-        <div class="field sprout-meta-heading">
-            <div class="heading"><h6>{{ "Mailing List"|t('sprout-base-reports') }}</h6></div>
+    {% if sproutReportsIsEnabled %}
+        <div id="sprout-reports-mailing-list-sidebar" class="meta">
+
+            <div class="field sprout-meta-heading">
+                <div class="heading"><h6>{{ "Mailing List"|t('sprout-base-reports') }}</h6></div>
+            </div>
+
+            {% set emailColumnLabel = "Email Column <span class='info'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>"|t('sprout-base-reports') %}
+
+            {% if report.getDataSource().isEmailColumnEditable() %}
+                {{ forms.field({
+                    label: emailColumnLabel,
+                    placeholder: 'Email'|t('sprout-base-reports'),
+                }, sproutFields.selectOther({
+                    name: 'emailColumn',
+                    options: emailColumnOptions,
+                    value: report.emailColumn,
+                    otherPlaceholderText: 'email'|t('sprout-forms')
+                })) }}
+            {% else %}
+                {# Email column not editable and set by Data Source #}
+                {{ forms.textField({
+                    label: emailColumnLabel,
+                    name: 'emailColumn',
+                    class: 'code',
+                    value: report is defined ? report.getDataSource().getDefaultEmailColumn() : "",
+                    errors: report is defined ? report.getErrors('emailColumn') : "",
+                    warning: 'Email Column is set by Data Source'|t('sprout-base-reports'),
+                    readonly: true
+                }) }}
+            {% endif %}
+
         </div>
-
-        {% set emailColumnLabel = "Email Column <span class='info'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>"|t('sprout-base-reports') %}
-
-        {% if report.getDataSource().isEmailColumnEditable() %}
-            {{ forms.field({
-                label: emailColumnLabel,
-                placeholder: 'Email'|t('sprout-base-reports'),
-            }, sproutFields.selectOther({
-                name: 'emailColumn',
-                options: emailColumnOptions,
-                value: report.emailColumn,
-                otherPlaceholderText: 'email'|t('sprout-forms')
-            })) }}
-        {% else %}
-            {# Email column not editable and set by Data Source #}
-            {{ forms.textField({
-                label: emailColumnLabel,
-                name: 'emailColumn',
-                class: 'code',
-                value: report is defined ? report.getDataSource().getDefaultEmailColumn() : "",
-                errors: report is defined ? report.getErrors('emailColumn') : "",
-                warning: 'Email Column is set by Data Source'|t('sprout-base-reports'),
-                readonly: true
-            }) }}
-        {% endif %}
-
-    </div>
+    {% endif %}
 
     <div class="meta read-only">
         <div class="data">
@@ -207,21 +211,12 @@
             <div class="value">{{ dataSource.displayName() }}</div>
         </div>
     </div>
-    <hr>
 
 {% endblock %}
 
 {% if report is not defined or not report.handle %}
     {% js "new Craft.HandleGenerator('#name', '#handle');" %}
 {% endif %}
-
-{% js on ready %}
-
-    if (Craft.SproutFields !== null) {
-    Craft.SproutFields.initFields($(".field"));
-    }
-
-{% endjs %}
 
 {% css %}
     #sprout-reports-mailing-list-sidebar .warning {
