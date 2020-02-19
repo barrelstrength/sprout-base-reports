@@ -83,7 +83,7 @@ class ReportQuery extends ElementQuery
         $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
 
         // Property is used for Element Sources in sidebar
-        if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest()) {
+        if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest() && Craft::$app->getSession()->getIsActive()) {
             // Request available on Element Index page and used for plugin integrations using Sprout Reports
             $this->viewContext = Craft::$app->getSession()->get('sprout.viewContext');
         }
