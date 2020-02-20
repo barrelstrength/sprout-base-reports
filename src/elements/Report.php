@@ -326,8 +326,8 @@ class Report extends Element
         // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
-            $pluginHandle = Craft::$app->getSession()->get('sprout.pluginHandle');
-            $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.dataSourceBaseUrl');
+            $pluginHandle = Craft::$app->getSession()->get('sprout.reports.pluginHandle');
+            $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
         }
 
         $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
@@ -347,7 +347,7 @@ class Report extends Element
      */
     public function getTableAttributeHtml(string $attribute): string
     {
-        $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.dataSourceBaseUrl');
+        $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
 
         if ($attribute === 'results') {
             $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);

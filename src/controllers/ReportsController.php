@@ -103,9 +103,9 @@ class ReportsController extends Controller
             }
         }
 
-        Craft::$app->getSession()->set('sprout.dataSourceBaseUrl', $this->dataSourceBaseUrl);
-        Craft::$app->getSession()->set('sprout.pluginHandle', $pluginHandle);
-        Craft::$app->getSession()->set('sprout.viewContext', $viewContext);
+        Craft::$app->getSession()->set('sprout.reports.dataSourceBaseUrl', $this->dataSourceBaseUrl);
+        Craft::$app->getSession()->set('sprout.reports.pluginHandle', $pluginHandle);
+        Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
 
         return $this->renderTemplate('sprout-base-reports/reports/index', [
             'dataSources' => $dataSources,
@@ -202,6 +202,8 @@ class ReportsController extends Controller
     public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
+
+        Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
 
         $reportElement = new Report();
         $reportElement->enabled = 1;
