@@ -18,6 +18,7 @@ use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
+use craft\errors\MissingComponentException;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\validators\HandleValidator;
@@ -319,7 +320,7 @@ class Report extends Element
      * @param string $pluginHandle
      *
      * @return string|null
-     * @throws \craft\errors\MissingComponentException
+     * @throws MissingComponentException
      */
     public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
     {
@@ -343,7 +344,7 @@ class Report extends Element
      * @param string $attribute
      *
      * @return string
-     * @throws \craft\errors\MissingComponentException
+     * @throws MissingComponentException
      */
     public function getTableAttributeHtml(string $attribute): string
     {

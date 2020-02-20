@@ -11,6 +11,7 @@ namespace barrelstrength\sproutbasereports\elements\db;
 use barrelstrength\sproutbasereports\base\DataSource;
 use Craft;
 use craft\elements\db\ElementQuery;
+use craft\errors\MissingComponentException;
 use craft\helpers\Db;
 
 class ReportQuery extends ElementQuery
@@ -59,7 +60,7 @@ class ReportQuery extends ElementQuery
 
     /**
      * @return bool
-     * @throws \craft\errors\MissingComponentException
+     * @throws MissingComponentException
      */
     protected function beforePrepare(): bool
     {

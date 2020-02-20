@@ -9,6 +9,7 @@ use craft\db\Query;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use yii\base\Exception;
 
 /**
  *
@@ -139,7 +140,7 @@ class Users extends DataSource
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function getSettingsHtml(array $settings = [])
     {

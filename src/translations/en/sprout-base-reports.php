@@ -82,7 +82,6 @@ return [
     'Title Format <span class=\'info\'>Auto-generate your Report name using settings values, such as {startDate|date(\'F d, Y\')}</span>' => 'Title Format <span class=\'info\'>Auto-generate your Report name using settings values, such as {startDate|date(\'F d, Y\')}</span>',
     'Could not delete Data Source.' => 'Could not delete Data Source.',
     'Default Results to Display' => 'Default Results to Display',
-    'Email Column <span class=\'info\'>The column name that represents a valid email address. Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report.</span>' => 'Email Column <span class=\'info\'>The column name that represents a valid email address. Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report.</span>',
     'Last Year ({year})' => 'Last Year ({year})',
     'Group' => 'Group',
     'This Year ({year})' => 'This Year ({year})',
@@ -112,7 +111,6 @@ return [
     'Twig Template' => 'Twig Template',
     'Results template cannot be blank.' => 'Results template cannot be blank.',
     'Create a report using Twig in your templates folder.' => 'Create a report using Twig in your templates folder.',
-    'Display Custom Query in quick edit view?' => 'Display Custom Query in quick edit view?',
     'Email Column <span class=\'info\'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>' => 'Email Column <span class=\'info\'>Selecting an Email Column will convert this report into a Mailing List. Column name is case sensitive and should match the exactly match the column name in the header of the report. Messages will only be sent to valid email addresses. </span>',
-    'Email Column ' => 'Email Column '
+    'Email' => 'Email'
 ];

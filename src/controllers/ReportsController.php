@@ -198,6 +198,7 @@ class ReportsController extends Controller
      * @return Response
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
+     * @throws MissingComponentException
      */
     public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
@@ -302,6 +303,7 @@ class ReportsController extends Controller
         $settings = $request->getBodyParam('settings');
 
         if ($reportId && $settings) {
+            /** @var Report $reportElement */
             $reportElement = Craft::$app->elements->getElementById($reportId, Report::class);
 
             if (!$reportElement) {
@@ -460,6 +462,7 @@ class ReportsController extends Controller
 
         $reportId = Craft::$app->getRequest()->getParam('reportId');
 
+        /** @var Report $report */
         $report = Craft::$app->elements->getElementById($reportId, Report::class);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];
 

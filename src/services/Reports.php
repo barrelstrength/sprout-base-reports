@@ -12,7 +12,6 @@ use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
-use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\helpers\DateTimeHelper;
 use DateTime;
