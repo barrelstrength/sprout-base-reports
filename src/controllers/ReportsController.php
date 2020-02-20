@@ -136,7 +136,7 @@ class ReportsController extends Controller
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
         if ($report === null) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId);
+            $report = Craft::$app->elements->getElementById($reportId, Report::class);
         }
 
         if (!$report) {
@@ -209,7 +209,7 @@ class ReportsController extends Controller
         if ($report !== null) {
             $reportElement = $report;
         } elseif ($reportId !== null) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
+            $reportElement = Craft::$app->elements->getElementById($reportId, Report::class);
         }
 
         // This is for creating new report
@@ -300,7 +300,7 @@ class ReportsController extends Controller
         $settings = $request->getBodyParam('settings');
 
         if ($reportId && $settings) {
-            $reportElement = SproutBaseReports::$app->reports->getReport($reportId);
+            $reportElement = Craft::$app->elements->getElementById($reportId, Report::class);
 
             if (!$reportElement) {
                 throw new NotFoundHttpException('No report exists with the ID: '.$reportId);
@@ -458,7 +458,7 @@ class ReportsController extends Controller
 
         $reportId = Craft::$app->getRequest()->getParam('reportId');
 
-        $report = SproutBaseReports::$app->reports->getReport($reportId);
+        $report = Craft::$app->elements->getElementById($reportId, Report::class);
         $settings = Craft::$app->getRequest()->getBodyParam('settings') ?? [];
 
         if ($report) {
@@ -492,7 +492,7 @@ class ReportsController extends Controller
         $reportId = $request->getBodyParam('id');
 
         if ($reportId) {
-            $report = SproutBaseReports::$app->reports->getReport($reportId);
+            $report = Craft::$app->elements->getElementById($reportId, Report::class);
 
             if (!$report) {
                 $report->addError('id', Craft::t('sprout-base-reports', 'Could not find a report with id {reportId}', [

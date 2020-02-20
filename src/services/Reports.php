@@ -30,20 +30,6 @@ use yii\base\Exception;
 class Reports extends Component
 {
     /**
-     * @param        $reportId
-     *
-     * @return Report|ElementInterface
-     */
-    public function getReport($reportId)
-    {
-        $query = Report::find();
-        $query->id($reportId);
-        $query->siteId(null);
-
-        return $query->one();
-    }
-
-    /**
      * @param Report $report
      *
      * @return bool
