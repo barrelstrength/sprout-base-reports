@@ -528,6 +528,35 @@ class Report extends Element
         return $this->endDate;
     }
 
+    public function getEditorHtml(): string
+    {
+        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
+            [
+                'label' => Craft::t('sprout-base-reports', 'Name'),
+                'siteId' => $this->siteId,
+                'id' => 'name',
+                'name' => 'name',
+                'value' => $this->name,
+                'errors' => $this->getErrors('name'),
+                'first' => true,
+                'autofocus' => true,
+                'required' => true
+            ]
+        ]);
+
+        if ($this->dataSource instanceof DataSource) {
+            $settingsHtml = $this->dataSource->getSettingsHtml();
+            if ($settingsHtml) {
+                $html .= $settingsHtml;
+            }
+        }
+
+        // Render the custom fields (we don't have any but it's good to call our parents)
+        $html .= parent::getEditorHtml();
+
+        return $html;
+    }
+
     /**
      * @return array
      * @throws InvalidConfigException
