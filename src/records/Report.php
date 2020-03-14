@@ -22,10 +22,12 @@ use yii\db\ActiveQueryInterface;
  * @property string               $handle
  * @property string               $description
  * @property bool                 $allowHtml
+ * @property string               $sortOrder
+ * @property string               $sortColumn
+ * @property string               $emailColumn
  * @property string               $settings
  * @property int                  $dataSourceId
  * @property bool                 $enabled
- * @property string               $emailColumn
  * @property ActiveQueryInterface $element
  * @property int                  $groupId
  */

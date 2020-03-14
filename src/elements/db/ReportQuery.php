@@ -30,11 +30,15 @@ class ReportQuery extends ElementQuery
 
     public $allowHtml;
 
+    public $sortOrder;
+
+    public $sortColumn;
+
+    public $emailColumn;
+
     public $settings;
 
     public $viewContext;
-
-    public $emailColumn;
 
     public $dataSourceId;
 
@@ -74,10 +78,12 @@ class ReportQuery extends ElementQuery
             'sproutreports_reports.handle',
             'sproutreports_reports.description',
             'sproutreports_reports.allowHtml',
+            'sproutreports_reports.sortOrder',
+            'sproutreports_reports.sortColumn',
+            'sproutreports_reports.emailColumn',
             'sproutreports_reports.settings',
             'sproutreports_reports.groupId',
             'sproutreports_reports.enabled',
-            'sproutreports_reports.emailColumn',
             'sproutreports_datasources.viewContext',
         ]);
 

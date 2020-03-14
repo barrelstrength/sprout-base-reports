@@ -55,6 +55,10 @@ class Report extends Element
 
     public $allowHtml;
 
+    public $sortOrder;
+
+    public $sortColumn;
+
     public $emailColumn;
 
     public $settings;
@@ -487,9 +491,11 @@ class Report extends Element
         $reportRecord->handle = $this->handle;
         $reportRecord->description = $this->description;
         $reportRecord->allowHtml = $this->allowHtml;
+        $reportRecord->sortOrder = $this->sortOrder;
+        $reportRecord->sortColumn = $this->sortColumn;
+        $reportRecord->emailColumn = $this->emailColumn;
         $reportRecord->settings = $this->settings;
         $reportRecord->enabled = $this->enabled;
-        $reportRecord->emailColumn = $this->emailColumn;
         $reportRecord->save(false);
 
         parent::afterSave($isNew);

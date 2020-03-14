@@ -167,6 +167,13 @@ class ReportsController extends Controller
             $labels = array_keys($firstItemInArray);
         }
 
+        // Get the position of our sort column for the Data Table settings
+        $sortColumnPosition = array_search($report->sortColumn, $labels, true);
+
+        if (!is_int($sortColumnPosition)) {
+            $sortColumnPosition = null;
+        }
+
         $this->getView()->registerAssetBundle(CpAsset::class);
 
         /** @var SproutReports $plugin */
@@ -182,6 +189,7 @@ class ReportsController extends Controller
             'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
+            'sortColumnPosition' => $sortColumnPosition,
             'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
             'pluginHandle' => $pluginHandle,
             'viewContext' => $viewContext
@@ -520,6 +528,8 @@ class ReportsController extends Controller
         $report->dataSourceId = $request->getBodyParam('dataSourceId');
         $report->enabled = $request->getBodyParam('enabled', false);
         $report->groupId = $request->getBodyParam('groupId');
+        $report->sortOrder = $request->getBodyParam('sortOrder');
+        $report->sortColumn = $request->getBodyParam('sortColumn');
 
         $dataSource = $report->getDataSource();
 

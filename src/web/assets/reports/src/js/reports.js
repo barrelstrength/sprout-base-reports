@@ -8,6 +8,9 @@ class SproutReportsDataTables {
   constructor(settings) {
     this.allowHtml = settings.allowHtml ?? false;
     this.defaultPageLength = settings.defaultPageLength ?? 10;
+    this.sortOrder = settings.sortOrder ?? null;
+    this.sortColumnPosition = settings.sortColumnPosition ?? null;
+    this.orderSetting = [];
     this.sproutResultsTable = $('#sprout-results');
 
     this.initializeDataTable();
@@ -16,10 +19,18 @@ class SproutReportsDataTables {
   initializeDataTable() {
     let self = this;
 
+    let sortOrder = self.sortOrder;
+    let sortColumnPosition = self.sortColumnPosition;
+
+    if (sortOrder && sortColumnPosition) {
+      self.orderSetting = [[sortColumnPosition, sortOrder]];
+    }
+
     this.sproutResultsTable.DataTable({
       dom: '<"sprout-results-header"pilf>t',
       responsive: true,
       scrollX: "100vw",
+      order: self.orderSetting,
       pageLength: self.defaultPageLength,
       lengthMenu: [
         [10, 25, 50, 100, 250, -1],

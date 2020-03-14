@@ -153,6 +153,24 @@
             errors: report is defined ? report.getErrors('nameFormat') : ""
         }) }}
 
+        {{ forms.selectField({
+            label: "Sort Order <span class='info'>The order that the column defined in the Sort Column setting will be displayed. Sort Column setting must also be defined.</span>"|t('sprout-base-reports'),
+            name: 'sortOrder',
+            options: [
+                { label: 'None', value: '' },
+                { label: 'Ascending (A-Z)', value: 'asc' },
+                { label: 'Descending (Z-A)', value: 'desc' }
+            ],
+            value: report.sortOrder
+        }) }}
+
+        {{ forms.textField({
+            label: "Sort Column <span class='info'>The case-sensitive, column name in the Report results that you want to sort by default. Leave blank for none. Sort Order setting must also be defined.</span>"|t('sprout-base-reports'),
+            name: 'sortColumn',
+            value: report.sortColumn,
+            errors: report is defined ? report.getErrors('sortColumn') : ""
+        }) }}
+
         {% if dataSource.isAllowHtmlEditable() %}
             {{ forms.lightSwitchField({
                 label: "Allow HTML <span class='info'>Render HTML in your report results. Don't enable this setting if you allow user submitted content.</span>"|t('sprout-base-reports'),

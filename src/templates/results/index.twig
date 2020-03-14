@@ -129,7 +129,9 @@
 
     new SproutReportsDataTables({
     allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
-    defaultPageLength: {{ settings.defaultPageLength ?? '10' }}
+    defaultPageLength: {{ settings.defaultPageLength ?? '10' }},
+    sortOrder: '{{ report.sortOrder }}',
+    sortColumnPosition: '{{ sortColumnPosition }}'
     });
 
     new ReportSettingsToggleButton();
