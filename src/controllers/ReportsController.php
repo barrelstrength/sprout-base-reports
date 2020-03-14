@@ -103,8 +103,7 @@ class ReportsController extends Controller
                 ];
             }
         }
-
-        Craft::$app->getSession()->set('sprout.reports.dataSourceBaseUrl', $this->dataSourceBaseUrl);
+        
         Craft::$app->getSession()->set('sprout.reports.pluginHandle', $pluginHandle);
         Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
 
