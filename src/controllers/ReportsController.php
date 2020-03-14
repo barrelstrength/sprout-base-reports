@@ -89,7 +89,7 @@ class ReportsController extends Controller
             if (!$dataSource->allowNew) {
                 continue;
             }
-
+            
             if (
                 // The page loading matches the current viewContext
                 $dataSource->viewContext === $viewContext

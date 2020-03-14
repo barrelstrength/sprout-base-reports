@@ -74,6 +74,7 @@
     {{ parent() }}
 
     {% if hideSidebar %}
+        $('#main-content').removeClass('has-sidebar');
         $('#sidebar-toggle-container').remove();
         $('#sidebar-container').remove();
     {% endif %}
