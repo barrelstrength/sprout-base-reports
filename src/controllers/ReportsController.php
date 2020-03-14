@@ -47,6 +47,7 @@ class ReportsController extends Controller
             $segmentTwo = Craft::$app->getRequest()->getSegment(2);
 
             $this->dataSourceBaseUrl = UrlHelper::cpUrl($segmentOne.'/'.$segmentTwo).'/';
+            Craft::$app->getSession()->set('sprout.reports.dataSourceBaseUrl', $this->dataSourceBaseUrl);
         }
 
         parent::init();
@@ -227,7 +228,8 @@ class ReportsController extends Controller
         }
 
         // Set the base URL so we can use the $dataSource->getUrl method
-        $dataSource->baseUrl = $this->dataSourceBaseUrl;
+        // If it's not set, we couldn't derive it from the URL so check for it in the session
+        $dataSource->baseUrl = $this->dataSourceBaseUrl ?? Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
