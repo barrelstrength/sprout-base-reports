@@ -56,8 +56,6 @@ class SproutBaseReports extends Module
     public $sourceLanguage = 'en-US';
 
     /**
-     * @todo - Copied from craft/base/plugin. Ask P&T if this is the best approach
-     *
      * @inheritdoc
      */
     public function __construct($id, $parent = null, array $config = [])

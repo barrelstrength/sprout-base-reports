@@ -106,7 +106,6 @@ abstract class DataSource extends SavableComponent implements DataSourceInterfac
      */
     final public function getPlugin()
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->plugin;
     }
 

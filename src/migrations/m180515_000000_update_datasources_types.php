@@ -1,6 +1,4 @@
-<?php /** @noinspection ClassConstantCanBeUsedInspection */
-
-/** @noinspection ClassConstantCanBeUsedInspection */
+<?php
 
 namespace barrelstrength\sproutbasereports\migrations;
 

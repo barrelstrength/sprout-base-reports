@@ -27,6 +27,9 @@ use DateTime;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 
@@ -535,6 +538,13 @@ class Report extends Element
         return $this->endDate;
     }
 
+    /**
+     * @return string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \yii\base\Exception
+     */
     public function getEditorHtml(): string
     {
         $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [

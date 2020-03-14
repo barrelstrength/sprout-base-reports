@@ -37,6 +37,10 @@ class ReportsController extends Controller
 
     private $dataSourceBaseUrl;
 
+    /**
+     * @throws InvalidConfigException
+     * @throws MissingComponentException
+     */
     public function init()
     {
         $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
@@ -103,7 +107,7 @@ class ReportsController extends Controller
                 ];
             }
         }
-        
+
         Craft::$app->getSession()->set('sprout.reports.pluginHandle', $pluginHandle);
         Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
 
