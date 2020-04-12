@@ -7,7 +7,6 @@
 
 namespace barrelstrength\sproutbasereports\elements;
 
-use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
@@ -42,8 +41,6 @@ use yii\web\NotFoundHttpException;
  */
 class Report extends Element
 {
-    use BaseSproutTrait;
-
     public $id;
 
     public $name;

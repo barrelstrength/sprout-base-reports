@@ -8,6 +8,7 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use barrelstrength\sproutreports\SproutReports;
@@ -48,7 +49,7 @@ class Reports extends Component
 
         if ($report->hasErrors()) {
 
-            SproutReports::error('Unable to save Report.');
+            Craft::error('Unable to save Report.', __METHOD__);
 
             return false;
         }
@@ -307,8 +308,8 @@ class Reports extends Component
         $query = new Query();
         // We only get reports that currently has dataSourceId or existing installed dataSource
         $query->select('reports.*')
-            ->from('{{%sproutreports_reports}} as reports')
-            ->innerJoin('{{%sproutreports_datasources}} as datasource', '[[datasource.id]] = [[reports.dataSourceId]]');
+            ->from(ReportRecord::tableName().' reports')
+            ->innerJoin(DataSourceRecord::tableName().' datasource', '[[datasource.id]] = [[reports.dataSourceId]]');
 
         return $query;
     }

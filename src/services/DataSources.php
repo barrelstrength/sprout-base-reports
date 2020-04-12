@@ -120,9 +120,7 @@ class DataSources extends Component
                 $dataSources[$dataSourceType]->viewContext = $dataSource['viewContext'];
                 $dataSources[$dataSourceType]->allowNew = $dataSource['allowNew'];
             } else {
-                Craft::error(Craft::t('sprout-base-reports', 'Unable to find Data Source: {type}', [
-                    'type' => $dataSourceType
-                ]));
+                Craft::error('Unable to find Data Source: '.$dataSourceType, __METHOD__);
                 $dataSources[MissingDataSource::class] = new MissingDataSource();
                 $dataSources[MissingDataSource::class]->id = $dataSource['id'];
                 $dataSources[MissingDataSource::class]->setDescription($dataSourceType);

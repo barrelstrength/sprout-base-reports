@@ -7,7 +7,6 @@
 
 namespace barrelstrength\sproutbasereports\base;
 
-use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
@@ -28,7 +27,6 @@ use craft\helpers\UrlHelper;
  */
 abstract class DataSource extends SavableComponent implements DataSourceInterface
 {
-    use BaseSproutTrait;
     use DataSourceTrait;
 
     const DEFAULT_VIEW_CONTEXT = 'sprout-reports';
