@@ -11,6 +11,7 @@ use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\base\DataSourceInterface;
 use barrelstrength\sproutbasereports\datasources\MissingDataSource;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
+use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use craft\db\Query;
@@ -95,7 +96,7 @@ class DataSources extends Component
     {
         $query = (new Query())
             ->select(['*'])
-            ->from(['{{%sproutreports_datasources}}']);
+            ->from([DataSourceRecord::tableName()]);
 
         $dataSources = [];
 
@@ -218,13 +219,13 @@ class DataSources extends Component
 
         $source = $query
             ->select(['id', 'type'])
-            ->from(['{{%sproutreports_datasources}}'])
+            ->from([DataSourceRecord::tableName()])
             ->where(['type' => $type])
             ->one();
 
         if ($source) {
             $query->createCommand()
-                ->delete('{{%sproutreports_reports}}', ['[[dataSourceId]]' => $source['id']])
+                ->delete(ReportRecord::tableName(), ['[[dataSourceId]]' => $source['id']])
                 ->execute();
         }
 
@@ -272,14 +273,14 @@ class DataSources extends Component
         try {
             foreach ($reports as $report) {
                 Craft::$app->getDb()->createCommand()
-                    ->delete('{{%sproutreports_reports}}', [
+                    ->delete(ReportRecord::tableName(), [
                         '[[id]]' => $report->id
                     ])
                     ->execute();
             }
 
             Craft::$app->getDb()->createCommand()
-                ->delete('{{%sproutreports_datasources}}', [
+                ->delete(DataSourceRecord::tableName(), [
                     '[[id]]' => $dataSourceId
                 ])
                 ->execute();

@@ -7,30 +7,20 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
+use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
+use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
+use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use craft\db\Migration;
 
 class Install extends Migration
 {
-    private $reportTable = '{{%sproutreports_reports}}';
-
-    private $reportGroupTable = '{{%sproutreports_reportgroups}}';
-
-    private $dataSourcesTable = '{{%sproutreports_datasources}}';
-
     /**
      * @inheritdoc
      */
     public function safeUp()
     {
-        $this->createTables();
-    }
-
-    public function createTables()
-    {
-        $reportTable = $this->getDb()->tableExists($this->reportTable);
-
-        if ($reportTable == false) {
-            $this->createTable($this->reportTable,
+        if (!$this->getDb()->tableExists(ReportRecord::tableName())) {
+            $this->createTable(ReportRecord::tableName(),
                 [
                     'id' => $this->primaryKey(),
                     'dataSourceId' => $this->integer(),
@@ -52,19 +42,17 @@ class Install extends Migration
                 ]
             );
 
-            $this->addForeignKey(null, $this->reportTable, ['id'], '{{%elements}}', ['id'], 'CASCADE');
+            $this->addForeignKey(null, ReportRecord::tableName(), ['id'], '{{%elements}}', ['id'], 'CASCADE');
 
-            $this->createIndex($this->db->getIndexName($this->reportTable, 'handle', true, true),
-                $this->reportTable, 'handle', true);
+            $this->createIndex($this->db->getIndexName(ReportRecord::tableName(), 'handle', true, true),
+                ReportRecord::tableName(), 'handle', true);
 
-            $this->createIndex($this->db->getIndexName($this->reportTable, 'name', true, true),
-                $this->reportTable, 'name', true);
+            $this->createIndex($this->db->getIndexName(ReportRecord::tableName(), 'name', true, true),
+                ReportRecord::tableName(), 'name', true);
         }
 
-        $reportGroupTable = $this->getDb()->tableExists($this->reportGroupTable);
-
-        if ($reportGroupTable == false) {
-            $this->createTable($this->reportGroupTable, [
+        if (!$this->getDb()->tableExists(ReportGroupRecord::tableName())) {
+            $this->createTable(ReportGroupRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'name' => $this->string()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -73,16 +61,14 @@ class Install extends Migration
             ]);
 
             $this->createIndex(
-                $this->db->getIndexName($this->reportGroupTable, 'name', false, true),
-                $this->reportGroupTable,
+                $this->db->getIndexName(ReportGroupRecord::tableName(), 'name', false, true),
+                ReportGroupRecord::tableName(),
                 'name'
             );
         }
 
-        $dataSourcesTable = $this->getDb()->tableExists($this->dataSourcesTable);
-
-        if ($dataSourcesTable === false) {
-            $this->createTable($this->dataSourcesTable, [
+        if (!$this->getDb()->tableExists(DataSourceRecord::tableName())) {
+            $this->createTable(DataSourceRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'viewContext' => $this->string(),
                 'type' => $this->string(),
@@ -94,24 +80,10 @@ class Install extends Migration
         }
     }
 
-    public function dropTables()
+    public function safeDown()
     {
-        $reportTable = $this->getDb()->tableExists($this->reportTable);
-
-        if ($reportTable) {
-            $this->dropTable($this->reportTable);
-        }
-
-        $reportGroupTable = $this->getDb()->tableExists($this->reportGroupTable);
-
-        if ($reportGroupTable) {
-            $this->dropTable($this->reportGroupTable);
-        }
-
-        $dataSourcesTable = $this->getDb()->tableExists($this->dataSourcesTable);
-
-        if ($dataSourcesTable) {
-            $this->dropTable($this->dataSourcesTable);
-        }
+        $this->dropTableIfExists(ReportRecord::tableName());
+        $this->dropTableIfExists(ReportGroupRecord::tableName());
+        $this->dropTableIfExists(DataSourceRecord::tableName());
     }
 }
