@@ -116,7 +116,6 @@ class ReportsController extends Controller
             'groupId' => $groupId,
             'reports' => $reports,
             'newReportOptions' => $newReportOptions,
-            'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'hideSidebar' => $hideSidebar,
             'viewContext' => $viewContext,
@@ -190,7 +189,6 @@ class ReportsController extends Controller
             'values' => $values,
             'reportIndexUrl' => $reportIndexUrl,
             'redirectUrl' => $dataSource->baseUrl.'/view/'.$reportId,
-            'viewReportsPermission' => $this->permissions['sproutReports-viewReports'],
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => $plugin ? $plugin->getSettings() : null,
             'sortColumnPosition' => $sortColumnPosition,
@@ -287,7 +285,6 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
-            'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'pluginHandle' => $pluginHandle,
             'viewContext' => $viewContext,
             'emailColumnOptions' => $emailColumnOptions
