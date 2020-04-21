@@ -1,0 +1,24 @@
+
+{% import "_includes/forms" as forms %}
+
+<h4>Line Chart </h4>
+{{ forms.textField({
+    label: "Label column"|t,
+    id: 'visualizationLabelColumn',
+    name: 'labelColumn',
+    instructions: "Set the column from the report to be used as the labels in the visualization"|t,
+    value: settings.labelColumn
+  })
+}}
+
+
+{{ forms.textField({
+    label: "Data column"|t,
+    id: 'visualizationDataColumn',
+    name: 'dataColumn',
+    instructions: "Set the column from the report to be used as the data series in the visualization"|t,
+    value: settings.dataColumn
+    })
+}}
+
+

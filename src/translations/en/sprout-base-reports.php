@@ -134,5 +134,6 @@ return [
     'Sort  <span class=\'info\'>The group where this report should be displayed</span>' => 'Sort  <span class=\'info\'>The group where this report should be displayed</span>',
     'Sort' => 'Sort',
     'Sort Column <span class=\'info\'>The case-sensitive, column name in the Report results that you want to sort by default. Leave blank for none. Sort Order setting must also be defined.</span>' => 'Sort Column <span class=\'info\'>The case-sensitive, column name in the Report results that you want to sort by default. Leave blank for none. Sort Order setting must also be defined.</span>',
-    'Report not found.' => 'Report not found.'
+    'Report not found.' => 'Report not found.',
+    'Line chart' => 'Line x chart',
 ];

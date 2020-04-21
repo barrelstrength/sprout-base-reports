@@ -110,6 +110,46 @@
 
     {% endif %}
 
+    <h3>Chart Settings</h3>
+
+    {{settings|json_encode()}}
+
+    {{settings.visualization.type}}
+
+    {{ forms.selectField({
+      label: 'Visualization Type',
+      name: 'visualizationType',
+      value: settings.visualization.type,
+      options: visualizationOptions
+
+    })}}
+
+
+
+    {% for item in visualizationTypes %}
+      {% set isCurrent = (settings.visualization.type == className(item.chart)) %}
+      <div id="{{ className(item.chart)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+        {% namespace 'visualizations['~className(item.chart)~']' %}
+          {{item.chart.getSettingsHtml(settings.visualization)|raw }}
+        {% endnamespace %}
+      </div>
+
+    {% endfor %}
+
+
+
+    {#
+    {% for item in visualizationTypes %}
+        {% set isCurrent = (type == className(field)) %}
+        <div id="{{ type|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            {% namespace 'types['~type~']' %}
+                {% set _field = isCurrent ? field : craft.app.fields.createField(type) %}
+                {{ _field.getSettingsHtml()|raw }}
+            {% endnamespace %}
+        </div>
+    {% endfor %}
+    #}
+
 {% endblock %}
 
 {% block details %}
@@ -235,6 +275,7 @@
 {% if report is not defined or not report.handle %}
     {% js "new Craft.HandleGenerator('#name', '#handle');" %}
 {% endif %}
+
 
 {% css %}
     #sprout-reports-mailing-list-sidebar .warning {

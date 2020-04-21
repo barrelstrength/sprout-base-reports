@@ -32,6 +32,11 @@ class App extends Component
     public $reportGroups;
 
     /**
+     * @var Visualizations
+     */
+    public $visualizations;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -41,5 +46,6 @@ class App extends Component
         $this->exports = new Exports();
         $this->reportGroups = new ReportGroups();
         $this->reports = new Reports();
+        $this->visualizations =new Visualizations();
     }
 }

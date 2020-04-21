@@ -14,6 +14,7 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
+use barrelstrength\sproutbasereports\assetbundles\VisualizationAssetBundle;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\errors\ElementNotFoundException;
@@ -22,6 +23,7 @@ use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
+use craft\web\Request;
 use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
@@ -89,7 +91,7 @@ class ReportsController extends Controller
             if (!$dataSource->allowNew) {
                 continue;
             }
-            
+
             if (
                 // The page loading matches the current viewContext
                 $dataSource->viewContext === $viewContext
@@ -281,6 +283,30 @@ class ReportsController extends Controller
             'value' => 'custom'
         ];
 
+
+
+        $visualization = SproutBaseReports::$app->visualizations->getVisualization('someVisualizationClass');
+        $visualizations = SproutBaseReports::$app->visualizations->getVisualizations();
+        $visualizationOptions = array_merge([['value' => '', 'label' => 'none']], $visualizations);
+        $settings = json_decode($reportElement->settings, true);
+
+        //determine if the report settings have the basic visualization settings
+        if (array_key_exists('visualization', $settings) === false) {
+          $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumn' => ['']];
+        }
+
+        //determine if the report settings have the basic visualization settings
+        if (array_key_exists('labelColumn', $settings['visualization']) === false) {
+          $settings['visualization']['labelColumn'] = '';
+        }
+
+        //determine if the report settings have the basic visualization settings
+        if (array_key_exists('dataColumn', $settings['visualization']) === false) {
+          $settings['visualization']['dataColumn'] = '';
+        }
+
+        $this->view->registerAssetBundle(VisualizationAssetBundle::class);
+
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
             'report' => $reportElement,
             'dataSource' => $dataSource,
@@ -290,7 +316,11 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'pluginHandle' => $pluginHandle,
             'viewContext' => $viewContext,
-            'emailColumnOptions' => $emailColumnOptions
+            'emailColumnOptions' => $emailColumnOptions,
+            'settings' => $settings,
+            'visualization' => $visualization,
+            'visualizationOptions' =>  $visualizationOptions,
+            'visualizationTypes' =>  $visualizations,
         ]);
     }
 
@@ -359,7 +389,12 @@ class ReportsController extends Controller
         $this->requirePostRequest();
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
+        Craft::error('SAVE THE REPORT', 'SPROUTLOG');
+
+
         $report = $this->prepareFromPost();
+
+
 
         if (!Craft::$app->getElements()->saveElement($report)) {
             Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Couldn’t save report.'));
@@ -521,7 +556,10 @@ class ReportsController extends Controller
             $report = new Report();
         }
 
+
+
         $settings = $request->getBodyParam('settings');
+        $settings['visualization'] = $this->getVisualizationSettings($request);
 
         $report->name = $request->getBodyParam('name');
         $report->hasNameFormat = $request->getBodyParam('hasNameFormat');
@@ -535,6 +573,8 @@ class ReportsController extends Controller
         $report->sortOrder = $request->getBodyParam('sortOrder');
         $report->sortColumn = $request->getBodyParam('sortColumn');
 
+
+
         $dataSource = $report->getDataSource();
 
         if (!$dataSource) {
@@ -546,5 +586,16 @@ class ReportsController extends Controller
         $report->allowHtml = $request->getBodyParam('allowHtml', $dataSource->getDefaultAllowHtml());
 
         return $report;
+    }
+
+    private function getVisualizationSettings(Request $request): array
+    {
+      $visualizationType = $request->getBodyParam('visualizationType');
+      $visualizationSettings = $request->getBodyParam('visualizations.' . $visualizationType);
+      $visualizationSettings['type'] = $visualizationType;
+
+      //$visualizationSettings = array_merge($visualizationSettings, $visualization);
+      return $visualizationSettings;
+
     }
 }
