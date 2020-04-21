@@ -91,7 +91,6 @@ return [
     'This Quarter ({iMonth} - {fMonth} {year})' => 'This Quarter ({iMonth} - {fMonth} {year})',
     'Unable to find Data Source: {type}' => 'Unable to find Data Source: {type}',
     'Data Source installed.' => 'Data Source installed.',
-    'Save and add another segment' => 'Save and add another segment',
     'Last Quarter ({iMonth} - {fMonth} {year})' => 'Last Quarter ({iMonth} - {fMonth} {year})',
     'Unable to find installed Data Source. See logs for details.' => 'Unable to find installed Data Source. See logs for details.',
     'Custom Date Range' => 'Custom Date Range',
