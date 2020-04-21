@@ -179,9 +179,6 @@ class ReportsController extends Controller
 
         $this->getView()->registerAssetBundle(CpAsset::class);
 
-        /** @var SproutReports $plugin */
-        $plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
-
         return $this->renderTemplate('sprout-base-reports/results/index', [
             'report' => $report,
             'dataSource' => $dataSource,
@@ -190,7 +187,7 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'redirectUrl' => $dataSource->baseUrl.'/view/'.$reportId,
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
-            'settings' => $plugin ? $plugin->getSettings() : null,
+            'settings' => SproutBaseReports::$app->getReportsSettings(),
             'sortColumnPosition' => $sortColumnPosition,
             'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
             'pluginHandle' => $pluginHandle,
