@@ -14,7 +14,6 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
@@ -89,7 +88,7 @@ class ReportsController extends Controller
             if (!$dataSource->allowNew) {
                 continue;
             }
-            
+
             if (
                 // The page loading matches the current viewContext
                 $dataSource->viewContext === $viewContext
