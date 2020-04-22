@@ -11,6 +11,10 @@ use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use craft\base\Component;
 
+/**
+ *
+ * @property \barrelstrength\sproutbasereports\models\Settings $reportsSettings
+ */
 class App extends Component
 {
     /**
