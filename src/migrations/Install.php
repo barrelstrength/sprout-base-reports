@@ -7,10 +7,12 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
+use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use craft\db\Migration;
+use craft\db\Table;
 
 class Install extends Migration
 {
@@ -82,6 +84,9 @@ class Install extends Migration
 
     public function safeDown()
     {
+        // Delete Report Elements
+        $this->delete(Table::ELEMENTS, ['type', Report::class]);
+
         $this->dropTableIfExists(ReportRecord::tableName());
         $this->dropTableIfExists(ReportGroupRecord::tableName());
         $this->dropTableIfExists(DataSourceRecord::tableName());
