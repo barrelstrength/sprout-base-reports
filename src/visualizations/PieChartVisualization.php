@@ -4,7 +4,7 @@ namespace barrelstrength\sproutbasereports\visualizations;
 
 use Craft;
 
-class LineChartVisualization extends BaseVisualization implements VisualizationInterface
+class PieChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
   /**
@@ -13,7 +13,7 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
 
   public static function displayName(): string
   {
-    return Craft::t('sprout-base-reports', 'Line chart');
+    return Craft::t('sprout-base-reports', 'Pie chart');
   }
 
   /**
@@ -21,7 +21,7 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
    */
   public static function getVisualizationType(): string
   {
-    return LineChartVisualization::class;
+    return PieChartVisualization::class;
   }
 
   /**
@@ -30,26 +30,22 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
 
   public function getSettingsHtml($settings): string
   {
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/LineChart/settings.twig', ['settings' => $settings]);
+    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/PieChart/settings.twig', ['settings' => $settings]);
   }
 
-  /**
+   /**
    * @inheritdoc
    */
 
   public function getVisualizationHtml(): string
   {
     parent::getVisualizationHtml();
-
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/LineChart/visualization.twig',
+    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/PieChart/visualization.twig',
       [
         'visualization' => $this,
         'labels' => $this->getLabels(),
-        'dataSeries' => $this->getDataSeries()
+        'dataSeries' => $this->getDataSeries(),
+        'settings' => $this->settings
       ]);
   }
-
-
-
-
 }

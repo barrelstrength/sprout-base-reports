@@ -1,5 +1,5 @@
 <?php
-namespace barrelstrength\sproutbasereports\assetbundles;
+namespace barrelstrength\sproutbasereports\web\assets\visualizations;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
@@ -10,7 +10,7 @@ class VisualizationAssetBundle extends AssetBundle
     {
         // define the path that your publishable resources live
 
-        $this->sourcePath = "@sproutbasereports/resources/dist";
+        $this->sourcePath = "@sproutbasereports/web/assets/visualizations/src";
 
         // define the dependencies
         $this->depends = [
@@ -20,11 +20,11 @@ class VisualizationAssetBundle extends AssetBundle
         // define the relative path to CSS/JS files that should be registered with the page
         // when this asset bundle is registered
         $this->js = [
-            'js/scripts.js',
+            'js/apexcharts.js',
+            'js/visualizations.js',
         ];
 
         $this->css = [
-            'css/styles.css',
         ];
 
         parent::init();

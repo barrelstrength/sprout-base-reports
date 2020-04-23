@@ -1,0 +1,5 @@
+<div id="chart"></div>
+
+{% js on ready %}
+  Craft.SproutVisualizations.createLineChart({{labels|json_encode()|raw}}, {{dataSeries|json_encode()|raw}}, '#chart');
+{% endjs %}

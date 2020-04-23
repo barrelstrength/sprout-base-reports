@@ -33,6 +33,21 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
     return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/BarChart/settings.twig', ['settings' => $settings]);
   }
 
+   /**
+   * @inheritdoc
+   */
+
+  public function getVisualizationHtml(): string
+  {
+    parent::getVisualizationHtml();
+    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/BarChart/visualization.twig',
+      [
+        'visualization' => $this,
+        'labels' => $this->getLabels(),
+        'dataSeries' => $this->getDataSeries()
+      ]);
+  }
+
 
 
 

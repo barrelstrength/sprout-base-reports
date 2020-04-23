@@ -14,7 +14,7 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutbasereports\assetbundles\VisualizationAssetBundle;
+use barrelstrength\sproutbasereports\web\assets\visualizations\VisualizationSettingsAssetBundle;
 use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\errors\ElementNotFoundException;
@@ -184,9 +184,20 @@ class ReportsController extends Controller
 
         /** @var SproutReports $plugin */
         $plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
+        $settings = \json_decode($report->settings, true);
+
+        if (array_key_exists('visualization', $settings)) {
+          $visualization = new $settings['visualization']['type'];
+          $visualization->setSettings($settings['visualization']);
+          $visualization->setLabels($labels);
+          $visualization->setValues($values);
+        } else {
+          $visualization = false;
+        }
 
         return $this->renderTemplate('sprout-base-reports/results/index', [
             'report' => $report,
+            'visualization' => $visualization,
             'dataSource' => $dataSource,
             'labels' => $labels,
             'values' => $values,
@@ -283,15 +294,17 @@ class ReportsController extends Controller
             'value' => 'custom'
         ];
 
-
-
-        $visualization = SproutBaseReports::$app->visualizations->getVisualization('someVisualizationClass');
         $visualizations = SproutBaseReports::$app->visualizations->getVisualizations();
         $visualizationOptions = array_merge([['value' => '', 'label' => 'none']], $visualizations);
-        $settings = json_decode($reportElement->settings, true);
+
+        if (is_array($reportElement->settings) === false){
+           $settings = json_decode($reportElement->settings, true);
+        } else {
+          $settings = $report->settings;
+        }
 
         //determine if the report settings have the basic visualization settings
-        if (array_key_exists('visualization', $settings) === false) {
+        if (is_null($settings) || array_key_exists('visualization', $settings) === false) {
           $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumn' => ['']];
         }
 
@@ -302,10 +315,10 @@ class ReportsController extends Controller
 
         //determine if the report settings have the basic visualization settings
         if (array_key_exists('dataColumn', $settings['visualization']) === false) {
-          $settings['visualization']['dataColumn'] = '';
+          $settings['visualization']['dataColumn'] = [''];
         }
 
-        $this->view->registerAssetBundle(VisualizationAssetBundle::class);
+        $this->view->registerAssetBundle(VisualizationSettingsAssetBundle::class);
 
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
             'report' => $reportElement,
@@ -318,7 +331,6 @@ class ReportsController extends Controller
             'viewContext' => $viewContext,
             'emailColumnOptions' => $emailColumnOptions,
             'settings' => $settings,
-            'visualization' => $visualization,
             'visualizationOptions' =>  $visualizationOptions,
             'visualizationTypes' =>  $visualizations,
         ]);
@@ -556,8 +568,6 @@ class ReportsController extends Controller
             $report = new Report();
         }
 
-
-
         $settings = $request->getBodyParam('settings');
         $settings['visualization'] = $this->getVisualizationSettings($request);
 
@@ -572,8 +582,6 @@ class ReportsController extends Controller
         $report->groupId = $request->getBodyParam('groupId');
         $report->sortOrder = $request->getBodyParam('sortOrder');
         $report->sortColumn = $request->getBodyParam('sortColumn');
-
-
 
         $dataSource = $report->getDataSource();
 
@@ -593,9 +601,6 @@ class ReportsController extends Controller
       $visualizationType = $request->getBodyParam('visualizationType');
       $visualizationSettings = $request->getBodyParam('visualizations.' . $visualizationType);
       $visualizationSettings['type'] = $visualizationType;
-
-      //$visualizationSettings = array_merge($visualizationSettings, $visualization);
       return $visualizationSettings;
-
     }
 }

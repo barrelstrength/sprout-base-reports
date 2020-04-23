@@ -119,14 +119,20 @@
         {% endif %}
     </div>
 
+    {% if visualization %}
+      {{visualization.getVisualizationHtml()|raw }}
+    {% endif %}
+
 {% endblock %}
 
 {% do view.registerAssetBundle("barrelstrength\\sproutbase\\web\\assets\\cp\\CpAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\reports\\SproutReportsAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\datatables\\DataTablesAsset") %}
 
-{% js on ready %}
 
+
+{% js on ready %}
+  console.log('report is ready');
     new SproutReportsDataTables({
     allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
     defaultPageLength: {{ settings.defaultPageLength ?? '10' }},
@@ -138,84 +144,3 @@
 
 {% endjs %}
 
-
-{% js at head %}
-
-let script = document.createElement('script');
-script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
-document.head.append(script);
-{% endjs %}
-
-{% js on ready %}
-
-
-
-
-
-    var title = 'title';
-    var reportLabels = [];
-
-    {% set labelColumn = 'title' %}
-    {% set dataColumn = 'id' %}
-
-
-    var labelColumn = '{{labelColumn}}';
-    var dataColumn = '{{dataColumn}}';
-    var labels = {{labels|json_encode()|raw}}
-    var data = {{values|json_encode()|raw}}
-
-    var labelIndex = labels.indexOf(labelColumn);
-    var dataIndex = labels.indexOf(dataColumn);
-
-    console.log(`${labelIndex} - ${dataIndex}`);
-    console.log()
-
-    var labelSeries = data.map(item => item[labelIndex]);
-    var dataSeries = data.map(item => Number(item[dataIndex]));
-
-    console.log('visualizations');
-
-    console.log(labelSeries);
-    console.log(dataSeries);
-
-    //var series = {{values|map(item => item.2.handle)|json_encode()|raw}}
-    //series = [1,2];
-    //console.log(series);
-
-    {% set seriesData = [40, 80] %}
-
-    setTimeout(function(){
-
-        var options = {
-        series: dataSeries,
-        chart: {
-        width: 380,
-        type: 'pie',
-      },
-      title: {
-        text: 'Product Trends by Month',
-        align: 'left'
-      },
-      labels: labelSeries,
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }]
-      };
-
-      var chart3 = new ApexCharts(document.querySelector("#chart"), options);
-      chart3.render();
-    },2000);
-
-
-
-
-
-{% endjs %}

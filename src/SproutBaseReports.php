@@ -14,12 +14,14 @@ use barrelstrength\sproutbasereports\datasources\CustomTwigTemplate;
 use barrelstrength\sproutbasereports\datasources\Users;
 use barrelstrength\sproutbasereports\services\App;
 use barrelstrength\sproutbasereports\services\DataSources;
+use barrelstrength\sproutbasereports\widgets\Visualizations;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\ArrayHelper;
 use craft\i18n\PhpMessageSource;
 use craft\web\View;
+use craft\services\Dashboard;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 use yii\base\Module;
@@ -126,5 +128,9 @@ class SproutBaseReports extends Module
             $event->types[] = CustomTwigTemplate::class;
             $event->types[] = Users::class;
         });
+
+        Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES, function(RegisterComponentTypesEvent $event) {
+          $event->types[] = Visualizations::class;
+      });
     }
 }

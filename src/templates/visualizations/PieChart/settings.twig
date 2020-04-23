@@ -1,23 +1,23 @@
 
 {% import "_includes/forms" as forms %}
-DATA:
-{{settings|json_encode()}}
-<h4>Bar Chart </h4>
+
+<h4>Pie Chart </h4>
 {{ forms.textField({
     label: "Label column"|t,
     id: 'visualizationLabelColumn',
     name: 'labelColumn',
     instructions: "Set the column from the report to be used as the labels in the visualization"|t,
     value: settings.labelColumn
-    })
+  })
 }}
-
 
 {{ forms.textField({
     label: "Data column"|t,
     id: 'visualizationDataColumn',
-    name: 'dataColumn[]',
+    name: 'dataColumn',
     instructions: "Set the column from the report to be used as the data series in the visualization"|t,
     value: settings.dataColumn
     })
 }}
+
+

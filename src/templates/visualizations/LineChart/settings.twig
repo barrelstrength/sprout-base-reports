@@ -11,14 +11,19 @@
   })
 }}
 
+{% for dataColumn in settings.dataColumn %}
 
 {{ forms.textField({
     label: "Data column"|t,
     id: 'visualizationDataColumn',
-    name: 'dataColumn',
+    name: 'dataColumn[]',
     instructions: "Set the column from the report to be used as the data series in the visualization"|t,
-    value: settings.dataColumn
+    value: dataColumn
     })
 }}
+
+{% endfor %}
+
+<button class="btn submit js-add-data-series">Add Data Series</button>
 
 
