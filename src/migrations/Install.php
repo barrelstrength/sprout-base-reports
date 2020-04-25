@@ -85,7 +85,7 @@ class Install extends Migration
     public function safeDown()
     {
         // Delete Report Elements
-        $this->delete(Table::ELEMENTS, ['type', Report::class]);
+        $this->delete(Table::ELEMENTS, ['type' => Report::class]);
 
         $this->dropTableIfExists(ReportRecord::tableName());
         $this->dropTableIfExists(ReportGroupRecord::tableName());
