@@ -58,7 +58,7 @@ class ReportQuery extends ElementQuery
      *
      * @var string
      */
-    public $dataSourceBaseUrl;
+    public $currentBaseUrl;
 
     public $pluginHandle;
 

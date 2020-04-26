@@ -83,7 +83,7 @@
     groupSettingsSelector: '#groupsettingsbtn',
 
     newGroupAction: 'sprout-base-reports/reports/save-group',
-    newGroupOnSuccessUrlBase: '{{ dataSourceBaseUrl }}',
+    newGroupOnSuccessUrlBase: '{{ currentBaseUrl }}',
     newGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not create the group:'),
 
     renameGroupAction: 'sprout-base-reports/reports/save-group',
@@ -93,7 +93,7 @@
     promptForGroupNameMessage: Craft.t('sprout-base-reports', 'What do you want to name your group?'),
 
     deleteGroupAction: 'sprout-base-reports/reports/delete-group',
-    deleteGroupOnSuccessUrl: '{{ dataSourceBaseUrl }}',
+    deleteGroupOnSuccessUrl: '{{ currentBaseUrl }}',
     deleteGroupConfirmMessage: Craft.t('sprout-base-reports', 'Are you sure you want to delete this group and all its reports?'),
     deleteGroupOnErrorMessage: Craft.t('sprout-base-reports', 'Could not delete the group.'),
     });

@@ -15,7 +15,7 @@
 {% if currentUser.can(editReportsPermission) %}
     {% set crumbs = crumbs|merge([{
         label: "Edit "|t('sprout-base-reports') ~ report.name,
-        url: report.getCpEditUrl(dataSourceBaseUrl, pluginHandle)
+        url: report.getCpEditUrl(currentBaseUrl, pluginHandle)
     }]) %}
 {% endif %}
 
