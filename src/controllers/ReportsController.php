@@ -7,11 +7,12 @@
 
 namespace barrelstrength\sproutbasereports\controllers;
 
+use barrelstrength\sproutbase\controllers\SharedController;
 use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
-use barrelstrength\sproutbasereports\models\Settings;
+use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
@@ -30,35 +31,37 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class ReportsController extends Controller
+class ReportsController extends SharedController
 {
-    private $permissions = [];
-
-    private $dataSourceBaseUrl;
-
     /**
      * @throws InvalidConfigException
      * @throws MissingComponentException
      */
     public function init()
     {
-        $this->permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports');
-
-        // Only use dataSourceBaseUrl variable in template routes, segments won't be accurate in action requests
-        if (!Craft::$app->getRequest()->getIsActionRequest()) {
-            $segmentOne = Craft::$app->getRequest()->getSegment(1);
-            $segmentTwo = Craft::$app->getRequest()->getSegment(2);
-
-            $this->dataSourceBaseUrl = UrlHelper::cpUrl($segmentOne.'/'.$segmentTwo).'/';
-            Craft::$app->getSession()->set('sprout.reports.dataSourceBaseUrl', $this->dataSourceBaseUrl);
-        }
-
         parent::init();
+
+        Craft::$app->getSession()->set('sprout.reports.currentBaseUrl', $this->currentBaseUrl);
+        Craft::$app->getSession()->set('sprout.reports.pluginHandle', $this->pluginHandle);
+        Craft::$app->getSession()->set('sprout.reports.viewContext', $this->viewContext);
+    }
+
+    public function getDefaultPluginHandle(): string
+    {
+        return 'sprout-reports';
+    }
+
+    public function getDefaultViewContext(): string
+    {
+        return DataSource::DEFAULT_VIEW_CONTEXT;
+    }
+
+    public function getSharedSettingsModel()
+    {
+        return new SproutBaseReportsSettings();
     }
 
     /**
-     * @param string $viewContext
-     * @param string $pluginHandle
      * @param null   $groupId
      * @param bool   $hideSidebar
      *
@@ -66,11 +69,11 @@ class ReportsController extends Controller
      * @throws Exception
      * @throws ForbiddenHttpException
      */
-    public function actionReportsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', $groupId = null, $hideSidebar = false): Response
+    public function actionReportsIndexTemplate($groupId = null, $hideSidebar = false): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
-        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources($viewContext);
+        $dataSources = SproutBaseReports::$app->dataSources->getInstalledDataSources($this->viewContext);
 
         if ($groupId !== null) {
             $reports = SproutBaseReports::$app->reports->getReportsByGroupId($groupId);
@@ -83,7 +86,7 @@ class ReportsController extends Controller
         foreach ($dataSources as $dataSource) {
 
             /** @var $dataSource DataSource */
-            $dataSource->baseUrl = $this->dataSourceBaseUrl;
+            $dataSource->baseUrl = $this->currentBaseUrl;
 
             if (!$dataSource->allowNew) {
                 continue;
@@ -91,14 +94,14 @@ class ReportsController extends Controller
 
             if (
                 // The page loading matches the current viewContext
-                $dataSource->viewContext === $viewContext
+                $dataSource->viewContext === $this->viewContext
                 ||
                 ((
                     // The page loading doesn't match the current viewContext
-                    $dataSource->viewContext !== $viewContext
+                    $dataSource->viewContext !== $this->viewContext
                     &&
                     // BUT we're loading the main Sprout Reports page so load it anyway
-                    $viewContext === DataSource::DEFAULT_VIEW_CONTEXT
+                    $this->viewContext === DataSource::DEFAULT_VIEW_CONTEXT
                 ))) {
                 $newReportOptions[] = [
                     'name' => $dataSource::displayName(),
@@ -107,9 +110,6 @@ class ReportsController extends Controller
             }
         }
 
-        Craft::$app->getSession()->set('sprout.reports.pluginHandle', $pluginHandle);
-        Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
-
         return $this->renderTemplate('sprout-base-reports/reports/index', [
             'dataSources' => $dataSources,
             'groupId' => $groupId,
@@ -117,14 +117,12 @@ class ReportsController extends Controller
             'newReportOptions' => $newReportOptions,
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'hideSidebar' => $hideSidebar,
-            'viewContext' => $viewContext,
-            'dataSourceBaseUrl' => $this->dataSourceBaseUrl
+            'viewContext' => $this->viewContext,
+            'currentBaseUrl' => $this->currentBaseUrl
         ]);
     }
 
     /**
-     * @param string      $viewContext
-     * @param string      $pluginHandle
      * @param Report|null $report
      * @param int|null    $reportId
      *
@@ -133,7 +131,7 @@ class ReportsController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionResultsIndexTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', Report $report = null, int $reportId = null): Response
+    public function actionResultsIndexTemplate(Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-viewReports']);
 
@@ -154,11 +152,11 @@ class ReportsController extends Controller
         $labels = $dataSource->getDefaultLabels($report);
 
         // Set the base URL so we can use the $dataSource->getUrl method
-        $dataSource->baseUrl = $this->dataSourceBaseUrl;
+        $dataSource->baseUrl = $this->currentBaseUrl;
 
         $reportIndexUrl = $dataSource->getUrl($report->groupId);
 
-        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+        if ($this->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -188,15 +186,13 @@ class ReportsController extends Controller
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
             'settings' => SproutBaseReports::$app->getReportsSettings(),
             'sortColumnPosition' => $sortColumnPosition,
-            'dataSourceBaseUrl' => $this->dataSourceBaseUrl,
-            'pluginHandle' => $pluginHandle,
-            'viewContext' => $viewContext
+            'currentBaseUrl' => $this->currentBaseUrl,
+            'pluginHandle' => $this->pluginHandle,
+            'viewContext' => $this->viewContext
         ]);
     }
 
     /**
-     * @param string      $viewContext
-     * @param string      $pluginHandle
      * @param string      $dataSourceId
      * @param Report|null $report
      * @param int|null    $reportId
@@ -206,11 +202,9 @@ class ReportsController extends Controller
      * @throws NotFoundHttpException
      * @throws MissingComponentException
      */
-    public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
+    public function actionEditReportTemplate(string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
         $this->requirePermission($this->permissions['sproutReports-editReports']);
-
-        Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
 
         $reportElement = new Report();
         $reportElement->enabled = 1;
@@ -234,11 +228,11 @@ class ReportsController extends Controller
 
         // Set the base URL so we can use the $dataSource->getUrl method
         // If it's not set, we couldn't derive it from the URL so check for it in the session
-        $dataSource->baseUrl = $this->dataSourceBaseUrl ?? Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
+        $dataSource->baseUrl = $this->currentBaseUrl ?? Craft::$app->getSession()->get('sprout.reports.currentBaseUrl');
 
         $reportIndexUrl = $dataSource->getUrl($reportElement->groupId);
 
-        if ($viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
+        if ($this->viewContext !== DataSource::DEFAULT_VIEW_CONTEXT) {
             $reportIndexUrl = $dataSource->getUrl($dataSource->id);
         }
 
@@ -281,8 +275,8 @@ class ReportsController extends Controller
             'reportIndexUrl' => $reportIndexUrl,
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
-            'pluginHandle' => $pluginHandle,
-            'viewContext' => $viewContext,
+            'pluginHandle' => $this->pluginHandle,
+            'viewContext' => $this->viewContext,
             'emailColumnOptions' => $emailColumnOptions
         ]);
     }
