@@ -7,11 +7,15 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
+use barrelstrength\sproutbase\migrations\Install as SproutBaseInstall;
+use barrelstrength\sproutbase\records\Settings as SproutBaseSettingsRecord;
+use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;
 use craft\db\Migration;
+use craft\db\Query;
 use craft\db\Table;
 
 class Install extends Migration
@@ -85,6 +89,8 @@ class Install extends Migration
                 'uid' => $this->uid()
             ]);
         }
+
+        $this->insertDefaultSettings();
     }
 
     public function safeDown()
@@ -95,5 +101,43 @@ class Install extends Migration
         $this->dropTableIfExists(ReportRecord::tableName());
         $this->dropTableIfExists(ReportGroupRecord::tableName());
         $this->dropTableIfExists(DataSourceRecord::tableName());
+
+        $this->removeSharedSettings();
+    }
+
+    public function insertDefaultSettings()
+    {
+        $settingsRow = (new Query())
+            ->select(['*'])
+            ->from([SproutBaseSettingsRecord::tableName()])
+            ->where(['model' => SproutBaseReportsSettings::class])
+            ->one();
+
+        if ($settingsRow === null) {
+
+            $settings = new SproutBaseReportsSettings();
+
+            $settingsArray = [
+                'model' => SproutBaseReportsSettings::class,
+                'settings' => json_encode($settings->toArray())
+            ];
+
+            $this->insert(SproutBaseSettingsRecord::tableName(), $settingsArray);
+        }
+    }
+
+    public function removeSharedSettings()
+    {
+        $settingsExist = (new Query())
+            ->select(['*'])
+            ->from([SproutBaseSettingsRecord::tableName()])
+            ->where(['model' => SproutBaseReportsSettings::class])
+            ->exists();
+
+        if ($settingsExist) {
+            $this->delete(SproutBaseSettingsRecord::tableName(), [
+                'model' => SproutBaseReportsSettings::class
+            ]);
+        }
     }
 }
