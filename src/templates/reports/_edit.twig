@@ -239,3 +239,10 @@
     padding-bottom:24px;
     }
 {% endcss %}
+
+{% js on ready %}
+    // add support for select other field in sidebar
+    if (Craft.SproutFields != null) {
+    Craft.SproutFields.initFields($("#details"));
+    }
+{% endjs %}
