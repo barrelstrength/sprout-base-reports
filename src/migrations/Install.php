@@ -21,6 +21,11 @@ class Install extends Migration
      */
     public function safeUp()
     {
+        $migration = new SproutBaseInstall();
+        ob_start();
+        $migration->safeUp();
+        ob_end_clean();
+
         if (!$this->getDb()->tableExists(ReportRecord::tableName())) {
             $this->createTable(ReportRecord::tableName(),
                 [
