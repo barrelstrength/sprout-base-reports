@@ -52,6 +52,8 @@
             if (targetSelector.length){
               targetSelector = '#' + this.getToggleVal();
               this.$target = $(targetSelector);
+            } else {
+              this.$target = false;
             }
           },
 

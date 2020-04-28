@@ -186,13 +186,17 @@ class ReportsController extends Controller
         $plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
         $settings = \json_decode($report->settings, true);
 
-        if (array_key_exists('visualization', $settings)) {
-          $visualization = new $settings['visualization']['type'];
-          $visualization->setSettings($settings['visualization']);
-          $visualization->setLabels($labels);
-          $visualization->setValues($values);
-          $visualization->setTitle($report->name);
-        } else {
+        try {
+          if ((array_key_exists('visualization', $settings)) && (array_key_exists('type', $settings['visualization'])) && ($settings['visualization']['type'] != "")) {
+            $visualization = new $settings['visualization']['type'];
+            $visualization->setSettings($settings['visualization']);
+            $visualization->setLabels($labels);
+            $visualization->setValues($values);
+            $visualization->setTitle($report->name);
+          } else {
+            $visualization = false;
+          }
+        } catch (Exception $error){
           $visualization = false;
         }
 

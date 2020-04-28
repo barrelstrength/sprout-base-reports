@@ -175,7 +175,7 @@
     },
 
     setLastDate(value) {
-      this.lastDate = lastDate;
+      this.lastDate = value;
     }
 
   });

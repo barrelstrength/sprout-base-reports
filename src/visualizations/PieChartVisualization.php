@@ -7,6 +7,11 @@ use Craft;
 class PieChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
+  protected $settingsTemplate = 'sprout-base-reports/visualizations/PieChart/settings.twig';
+
+  protected $resultsTemplate = 'sprout-base-reports/visualizations/PieChart/visualization.twig';
+
+
   /**
    * @inheritdoc
    */
@@ -22,28 +27,5 @@ class PieChartVisualization extends BaseVisualization implements VisualizationIn
   public static function getVisualizationType(): string
   {
     return PieChartVisualization::class;
-  }
-
-  /**
-   * @inheritdoc
-   */
-
-  public function getSettingsHtml($settings): string
-  {
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/PieChart/settings.twig', ['settings' => $settings]);
-  }
-
-   /**
-   * @inheritdoc
-   */
-
-  public function getVisualizationHtml($options = []): string
-  {
-    parent::getVisualizationHtml();
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/PieChart/visualization.twig',
-      [
-        'visualization' => $this,
-        'options' => $options
-      ]);
   }
 }

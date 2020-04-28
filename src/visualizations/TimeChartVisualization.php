@@ -7,6 +7,11 @@ use Craft;
 class TimeChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
+  protected $settingsTemplate = 'sprout-base-reports/visualizations/TimeChart/settings.twig';
+
+  protected $resultsTemplate = 'sprout-base-reports/visualizations/TimeChart/visualization.twig';
+
+
   /**
    * @inheritdoc
    */
@@ -24,26 +29,4 @@ class TimeChartVisualization extends BaseVisualization implements VisualizationI
     return TimeChartVisualization::class;
   }
 
-  /**
-   * @inheritdoc
-   */
-
-  public function getSettingsHtml($settings): string
-  {
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/TimeChart/settings.twig', ['settings' => $settings]);
-  }
-
-   /**
-   * @inheritdoc
-   */
-
-  public function getVisualizationHtml($options = []): string
-  {
-    parent::getVisualizationHtml();
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/TimeChart/visualization.twig',
-      [
-        'visualization' => $this,
-        'options' => $options
-      ]);
-  }
 }

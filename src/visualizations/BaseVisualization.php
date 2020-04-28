@@ -8,6 +8,9 @@ use Craft;
 
 abstract class BaseVisualization extends Component {
 
+  protected $settingsTemplate = "";
+
+  protected $resultsTemplate = "";
 
   protected $title = "";
 
@@ -242,16 +245,34 @@ abstract class BaseVisualization extends Component {
   }
 
   /**
-   * Return the visualiation results html. The individual visualization implementations must
-   * extend this method. By calling parent::getVisualizationHtml() the implementation
-   * can easily get the required asset bundle
+   * Return the visualization settings template.
+   *
+   * @params $settings
    *
    * @return string
    */
 
-  public function getVisualizationHtml($options = null)
+  public function getSettingsHtml($settings): string
+  {
+    return Craft::$app->getView()->renderTemplate($this->settingsTemplate, ['settings' => $settings]);
+  }
+
+  /**
+   * Return the visualiation results html.
+   *
+   * @params $options values to pass through to the javascript charting instance
+   *
+   * @return string
+   */
+
+  public function getVisualizationHtml(array $options = []): string
   {
     Craft::$app->getView()->registerAssetBundle(VisualizationAssetBundle::class);
+    return Craft::$app->getView()->renderTemplate($this->resultsTemplate,
+      [
+        'visualization' => $this,
+        'options' => $options,
+      ]);
   }
 
 }
