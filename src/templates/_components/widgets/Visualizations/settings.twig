@@ -1,31 +1,21 @@
 {% import "_includes/forms" as forms %}
 
-{% if 1 == 1 %}
-
-
-{% set reportInput %}
+{% if reports|length  %}
+  {% set reportInput %}
     <div class="select">
-        <select id="report" name="report">
-            {% for report in reports %}
-
-                <option value="{{ report.id }}"{% if report.id == selectedReport %} selected{% endif %}>{{ report.name|t('site') }}</option>
-
-            {% endfor %}
-        </select>
+      <select id="reportId" name="reportId">
+        {% for report in reports %}
+          <option value="{{ report.id }}"{% if report.id == reportId %} selected{% endif %}>{{ report.name|t('site') }}</option>
+        {% endfor %}
+      </select>
     </div>
-{% endset %}
+  {% endset %}
 
-{{ forms.field({
+  {{ forms.field({
     label: "Report"|t('app'),
     instructions: "Which report do you want to display?"|t('app'),
     id: 'section',
-}, reportInput) }}
-
-
-
-
+  }, reportInput) }}
 {% else %}
-
-    <p>{{ "No reports are available."|t('app') }}</p>
-
+  <p>{{ "No reports are available."|t('app') }}</p>
 {% endif %}

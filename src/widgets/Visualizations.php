@@ -10,8 +10,10 @@ namespace barrelstrength\sproutbasereports\widgets;
 use Craft;
 use craft\base\Widget;
 use craft\helpers\Json;
+use craft\helpers\UrlHelper;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-
+use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\base\DataSource;
 
 /**
  * RecentEntries represents a Recent Entries dashboard widget.
@@ -26,7 +28,7 @@ class Visualizations extends Widget
      */
     public static function displayName(): string
     {
-        return Craft::t('app', 'Sprout Report Visualizations');
+        return Craft::t('sprout-base-reports', 'Sprout Report Chart');
     }
 
     /**
@@ -37,6 +39,12 @@ class Visualizations extends Widget
         return Craft::getAlias('@app/icons/clock.svg');
     }
 
+    /**
+     * string The reportId of the report to be displayed
+     */
+
+    public $reportId = 0;
+
 
     /**
      * @inheritdoc
@@ -44,31 +52,29 @@ class Visualizations extends Widget
     public function init()
     {
         parent::init();
-
-
     }
 
     /**
      * @inheritdoc
      */
-    /*protected function defineRules(): array
+    protected function defineRules(): array
     {
         $rules = parent::defineRules();
-        $rules[] = [['siteId', 'limit'], 'number', 'integerOnly' => true];
+        $rules[] = [['reportId'], 'number', 'integerOnly' => true];
         return $rules;
-    }*/
+    }
 
     /**
      * @inheritdoc
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('sprout-base-reports/_components/widgets/Visualizations/settings.twig',
-            [
-                'widget' => $this,
-                'reports' => SproutBaseReports::$app->reports->getAllReports(),
-                'selectedReport' => 0
-            ]);
+      return Craft::$app->getView()->renderTemplate('sprout-base-reports/_components/widgets/Visualizations/settings.twig',
+      [
+          'widget' => $this,
+          'reports' => SproutBaseReports::$app->reports->getAllReports(),
+          'reportId' => $this->reportId
+      ]);
     }
 
     /**
@@ -76,33 +82,11 @@ class Visualizations extends Widget
      */
     public function getTitle(): string
     {
-        if (is_numeric($this->section)) {
-            $section = Craft::$app->getSections()->getSectionById($this->section);
-
-            if ($section) {
-                $title = Craft::t('app', 'Recent {section} Entries', [
-                    'section' => Craft::t('site', $section->name)
-                ]);
-            }
-        }
-
-        /** @noinspection UnSafeIsSetOverArrayInspection - FP */
-        if (!isset($title)) {
-            $title = Craft::t('app', 'Recent Entries');
-        }
-
-        // See if they are pulling entries from a different site
-        $targetSiteId = $this->_getTargetSiteId();
-
-        if ($targetSiteId !== false && $targetSiteId != Craft::$app->getSites()->getCurrentSite()->id) {
-            $site = Craft::$app->getSites()->getSiteById($targetSiteId);
-
-            if ($site) {
-                $title = Craft::t('app', '{title} ({site})', [
-                    'title' => $title,
-                    'site' => Craft::t('site', $site->name),
-                ]);
-            }
+        $report = Craft::$app->elements->getElementById($this->reportId, Report::class);
+        if ($report){
+          $title = $report->name;
+        } else {
+          $title = Craft::t('sprout-base-reports', 'Sprout Report Chart');
         }
 
         return $title;
@@ -113,112 +97,55 @@ class Visualizations extends Widget
      */
     public function getBodyHtml()
     {
-        $params = [];
 
-        if (is_numeric($this->section)) {
-            $params['sectionId'] = (int)$this->section;
+        $report = false;
+        $dataSource = false;
+        $visualization = false;
+        $reportIndexUrl = '';
+
+        $report = Craft::$app->elements->getElementById($this->reportId, Report::class);
+
+        if ($report) {
+          $dataSource = $report->getDataSource();
+        }
+
+        if ($report && $dataSource)
+        {
+          $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
+          $reportIndexUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$report->id);
+
+          $labels = $dataSource->getDefaultLabels($report);
+          $values = $dataSource->getResults($report);
+
+          if (empty($labels) && !empty($values)) {
+              $firstItemInArray = reset($values);
+              $labels = array_keys($firstItemInArray);
+          }
+
+          $settings = \json_decode($report->settings, true);
+
+          if (array_key_exists('visualization', $settings)) {
+            $visualization = new $settings['visualization']['type'];
+            $visualization->setSettings($settings['visualization']);
+            $visualization->setLabels($labels);
+            $visualization->setValues($values);
+            $visualization->setTitle($report->name);
+          } else {
+            $visualization = false;
+          }
+        } else {
+          $visualization = false;
+          $reportIndexUrl = '';
         }
 
         $view = Craft::$app->getView();
 
-        $view->registerAssetBundle(RecentEntriesAsset::class);
-        $js = 'new Craft.RecentEntriesWidget(' . $this->id . ', ' . Json::encode($params) . ');';
-        $view->registerJs($js);
-
-        $entries = $this->_getEntries();
-
-        return $view->renderTemplate('_components/widgets/RecentEntries/body',
-            [
-                'entries' => $entries
-            ]);
+        return $view->renderTemplate('sprout-base-reports/_components/widgets/Visualizations/body',
+          [
+            'title' => 'report title',
+            'visualization' => $visualization,
+            'reportIndexUrl' => $reportIndexUrl
+          ]);
     }
 
-    /**
-     * Returns the recent entries, based on the widget settings and user permissions.
-     *
-     * @return array
-     */
-    private function _getEntries(): array
-    {
-        $targetSiteId = $this->_getTargetSiteId();
-
-        if ($targetSiteId === false) {
-            // Hopeless
-            return [];
-        }
-
-        // Normalize the target section ID value.
-        $editableSectionIds = $this->_getEditableSectionIds();
-        $targetSectionId = $this->section;
-
-        if (!$targetSectionId || $targetSectionId === '*' || !in_array($targetSectionId, $editableSectionIds, false)) {
-            $targetSectionId = array_merge($editableSectionIds);
-        }
-
-        if (!$targetSectionId) {
-            return [];
-        }
-
-        $query = Entry::find();
-        $query->anyStatus();
-        $query->siteId($targetSiteId);
-        $query->sectionId($targetSectionId);
-        $query->editable(true);
-        $query->limit($this->limit ?: 100);
-        $query->orderBy('elements.dateCreated desc');
-
-        return $query->all();
-    }
-
-    /**
-     * Returns the Channel and Structure section IDs that the user is allowed to edit.
-     *
-     * @return array
-     */
-    private function _getEditableSectionIds(): array
-    {
-        $sectionIds = [];
-
-        foreach (Craft::$app->getSections()->getEditableSections() as $section) {
-            if ($section->type != Section::TYPE_SINGLE) {
-                $sectionIds[] = $section->id;
-            }
-        }
-
-        return $sectionIds;
-    }
-
-    /**
-     * Returns the target site ID for the widget.
-     *
-     * @return string|false
-     */
-    private function _getTargetSiteId()
-    {
-        if (!Craft::$app->getIsMultiSite()) {
-            return $this->siteId;
-        }
-
-        // Make sure that the user is actually allowed to edit entries in the current site. Otherwise grab entries in
-        // their first editable site.
-
-        // Figure out which sites the user is actually allowed to edit
-        $editableSiteIds = Craft::$app->getSites()->getEditableSiteIds();
-
-        // If they aren't allowed to edit *any* sites, return false
-        if (empty($editableSiteIds)) {
-            return false;
-        }
-
-        // Figure out which site was selected in the settings
-        $targetSiteId = $this->siteId;
-
-        // Only use that site if it still exists and they're allowed to edit it.
-        // Otherwise go with the first site that they are allowed to edit.
-        if (!in_array($targetSiteId, $editableSiteIds, false)) {
-            $targetSiteId = $editableSiteIds[0];
-        }
-
-        return $targetSiteId;
-    }
 }

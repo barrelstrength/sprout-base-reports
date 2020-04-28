@@ -37,15 +37,14 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
    * @inheritdoc
    */
 
-  public function getVisualizationHtml(): string
+  public function getVisualizationHtml($options = []): string
   {
     parent::getVisualizationHtml();
 
     return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/LineChart/visualization.twig',
       [
         'visualization' => $this,
-        'labels' => $this->getLabels(),
-        'dataSeries' => $this->getDataSeries()
+        'options' => $options
       ]);
   }
 

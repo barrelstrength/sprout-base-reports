@@ -1,12 +1,12 @@
 <?php
 
-
 namespace barrelstrength\sproutbasereports\services;
 
 use craft\base\Component;
 use barrelstrength\sproutbasereports\visualizations\BarChartVisualization;
 use barrelstrength\sproutbasereports\visualizations\LineChartVisualization;
 use barrelstrength\sproutbasereports\visualizations\PieChartVisualization;
+use barrelstrength\sproutbasereports\visualizations\TimeChartVisualization;
 
 class Visualizations extends Component
 {
@@ -22,6 +22,7 @@ class Visualizations extends Component
         BarChartVisualization::class,
         LineChartVisualization::class,
         PieChartVisualization::class,
+        TimeChartVisualization::class,
       ];
 
       foreach ($visualizationTypes  as $class) {

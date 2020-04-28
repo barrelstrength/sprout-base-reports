@@ -129,10 +129,7 @@
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\reports\\SproutReportsAsset") %}
 {% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\datatables\\DataTablesAsset") %}
 
-
-
 {% js on ready %}
-  console.log('report is ready');
     new SproutReportsDataTables({
     allowHtml: {{ report.allowHtml ? 'true' : 'false' }},
     defaultPageLength: {{ settings.defaultPageLength ?? '10' }},

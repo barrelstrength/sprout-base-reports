@@ -37,15 +37,13 @@ class PieChartVisualization extends BaseVisualization implements VisualizationIn
    * @inheritdoc
    */
 
-  public function getVisualizationHtml(): string
+  public function getVisualizationHtml($options = []): string
   {
     parent::getVisualizationHtml();
     return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/PieChart/visualization.twig',
       [
         'visualization' => $this,
-        'labels' => $this->getLabels(),
-        'dataSeries' => $this->getDataSeries(),
-        'settings' => $this->settings
+        'options' => $options
       ]);
   }
 }

@@ -191,6 +191,7 @@ class ReportsController extends Controller
           $visualization->setSettings($settings['visualization']);
           $visualization->setLabels($labels);
           $visualization->setValues($values);
+          $visualization->setTitle($report->name);
         } else {
           $visualization = false;
         }
@@ -227,6 +228,7 @@ class ReportsController extends Controller
      */
     public function actionEditReportTemplate(string $viewContext = DataSource::DEFAULT_VIEW_CONTEXT, $pluginHandle = 'sprout-reports', string $dataSourceId = null, Report $report = null, int $reportId = null): Response
     {
+
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
         Craft::$app->getSession()->set('sprout.reports.viewContext', $viewContext);
@@ -235,9 +237,9 @@ class ReportsController extends Controller
         $reportElement->enabled = 1;
 
         if ($report !== null) {
-            $reportElement = $report;
+          $reportElement = $report;
         } elseif ($reportId !== null) {
-            $reportElement = Craft::$app->elements->getElementById($reportId, Report::class);
+          $reportElement = Craft::$app->elements->getElementById($reportId, Report::class);
         }
 
         // This is for creating new report
@@ -305,7 +307,7 @@ class ReportsController extends Controller
 
         //determine if the report settings have the basic visualization settings
         if (is_null($settings) || array_key_exists('visualization', $settings) === false) {
-          $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumn' => ['']];
+          $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumns' => ['']];
         }
 
         //determine if the report settings have the basic visualization settings
@@ -314,8 +316,8 @@ class ReportsController extends Controller
         }
 
         //determine if the report settings have the basic visualization settings
-        if (array_key_exists('dataColumn', $settings['visualization']) === false) {
-          $settings['visualization']['dataColumn'] = [''];
+        if (array_key_exists('dataColumns', $settings['visualization']) === false) {
+          $settings['visualization']['dataColumns'] = [''];
         }
 
         $this->view->registerAssetBundle(VisualizationSettingsAssetBundle::class);

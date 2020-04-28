@@ -135,5 +135,8 @@ return [
     'Sort' => 'Sort',
     'Sort Column <span class=\'info\'>The case-sensitive, column name in the Report results that you want to sort by default. Leave blank for none. Sort Order setting must also be defined.</span>' => 'Sort Column <span class=\'info\'>The case-sensitive, column name in the Report results that you want to sort by default. Leave blank for none. Sort Order setting must also be defined.</span>',
     'Report not found.' => 'Report not found.',
-    'Line chart' => 'Line x chart',
+    'Sprout Report Chart' => 'Sprout Report Chart',
+    'Bar chart' => 'Bar chart',
+    'Line chart' => 'Line chart',
+    'Pie chart' => 'Pie chart',
 ];

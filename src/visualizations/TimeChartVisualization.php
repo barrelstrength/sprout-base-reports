@@ -4,7 +4,7 @@ namespace barrelstrength\sproutbasereports\visualizations;
 
 use Craft;
 
-class BarChartVisualization extends BaseVisualization implements VisualizationInterface
+class TimeChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
   /**
@@ -13,7 +13,7 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
 
   public static function displayName(): string
   {
-    return Craft::t('sprout-base-reports', 'Bar chart');
+    return Craft::t('sprout-base-reports', 'Time chart');
   }
 
   /**
@@ -21,7 +21,7 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
    */
   public static function getVisualizationType(): string
   {
-    return BarChartVisualization::class;
+    return TimeChartVisualization::class;
   }
 
   /**
@@ -30,7 +30,7 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
 
   public function getSettingsHtml($settings): string
   {
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/BarChart/settings.twig', ['settings' => $settings]);
+    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/TimeChart/settings.twig', ['settings' => $settings]);
   }
 
    /**
@@ -40,10 +40,10 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
   public function getVisualizationHtml($options = []): string
   {
     parent::getVisualizationHtml();
-    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/BarChart/visualization.twig',
+    return Craft::$app->getView()->renderTemplate('sprout-base-reports/visualizations/TimeChart/visualization.twig',
       [
         'visualization' => $this,
-        'options' => $options,
+        'options' => $options
       ]);
   }
 }

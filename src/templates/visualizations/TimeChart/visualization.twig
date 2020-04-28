@@ -1,0 +1,40 @@
+{% import "_includes/forms" as forms %}
+
+<div class="visualization-filters">
+
+  <div class="field">
+    <div class="heading">
+      <label>Report From</label>
+    </div>
+    <div class="input">
+      {{ forms.dateField({
+          label: ""|t('app'),
+          id: 'reportDateFrom',
+          name: 'reportDateFrom',
+          placeholder: 'from'
+      }) }}
+    </div>
+  </div>
+  <div class="field">
+    <div class="heading">
+      <label>Report To</label>
+    </div>
+    <div class="input">
+    {{ forms.dateField({
+        label: ""|t('app'),
+        id: 'reportDateTo',
+        name: 'reportDateTo',
+    }) }}
+    </div>
+  </div>
+
+</div>
+
+<div id="chart"></div>
+
+{% js on ready %}
+
+  Craft.SproutVisualizations.createTimeChart('{{visualization.getTitle()}}', {{visualization.getLabels()|json_encode()|raw}}, {{visualization.getTimeSeries()|json_encode()|raw}}, {{options|json_encode()|raw}}, '#chart');
+  Craft.SproutVisualizations.setFirstDate({{visualization.getFirstDate()|raw}});
+  Craft.SproutVisualizations.setLastDate({{visualization.getLastDate()|raw}});
+{% endjs %}

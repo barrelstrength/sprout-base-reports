@@ -3,35 +3,105 @@
 namespace barrelstrength\sproutbasereports\visualizations;
 
 use barrelstrength\sproutbasereports\web\assets\visualizations\VisualizationAssetBundle;
+use craft\base\Component;
 use Craft;
 
-abstract class BaseVisualization {
+abstract class BaseVisualization extends Component {
 
 
-  protected $dataColumn;
+  protected $title = "";
+
+  /**
+   * Set the report title
+   * @param string title
+   */
+
+  public function setTitle($title)
+  {
+    $this->title = $title;
+  }
+
+  /**
+   * Returns the visualization title
+   *
+   * @returns string
+   */
+
+  public function getTitle()
+  {
+    return $this->title;
+  }
+
+  /**
+   * if this is a date time report stores the earliest timestamp value from the data series
+   */
+  protected $firstDate = 0;
+
+  /**
+   * if this is a date time report stores the latest timestamp value from the data series
+   */
+  protected $lastDate = 0;
+
+  /**
+   * Returns the first (earliest) timestamp value from the data series for a time series visualizaton
+   *
+   * @returns Number
+   */
+  public function getFirstDate()
+  {
+    return $this->firstDate;
+  }
+
+  /**
+   * Returns the last (latest) timestamp value from the data series for a time series visualizaton
+   *
+   * @returns Number
+   */
+  public function getLastDate()
+  {
+    return $this->lastDate;
+  }
+
+  /**
+   * Set the visualization settings
+   *
+   * Settings must include ['labelColumn' => string, 'dataColumns' => array(string)]
+   *
+   * @param Array $settings
+   */
+
+  public function setSettings($settings)
+  {
+    $this->settings = $settings;
+  }
+
+  protected $dataColumns;
 
   /**
    * Returns an array of the defined data columns
-   * @inheritdoc
+   *
+   * @return array
    */
 
   public function getDataColumns():array {
     if ($this->settings){
-      if (is_array($this->settings['dataColumn'])) {
-        return $this->settings['dataColumn'];
+      if (is_array($this->settings['dataColumns'])) {
+        return $this->settings['dataColumns'];
       } else {
-        return [$this->settings['dataColumn']];
+        return [$this->settings['dataColumns']];
       }
     } else {
       return false;
     }
-    return $dataColumn;
+    return $dataColumns;
   }
 
   protected $labelColumn;
 
   /**
-   * @inheritdoc
+   * Returns the label column
+   *
+   * @return string
    */
 
   public function getLabelColumn(): string {
@@ -43,17 +113,9 @@ abstract class BaseVisualization {
   }
 
   /**
-   * @inheritdoc
-   */
-
-  public $settings;
-
-  public function setSettings(array $settings) {
-    $this->settings = $settings;
-  }
-
-  /**
-   * @inheritdoc
+   * Set the visualization raw data values
+   *
+   * @param Array $values
    */
 
   protected $values;
@@ -63,7 +125,9 @@ abstract class BaseVisualization {
   }
 
   /**
-   * @inheritdoc
+   * Set the visualization labels
+   *
+   * @param Array $labels
    */
 
   protected $labels;
@@ -90,6 +154,13 @@ abstract class BaseVisualization {
     return $labels;
   }
 
+  /**
+   * Return the data series for each defined data column.
+   * Each series contains a 'name' and 'data' value
+   *
+   * @return Array;
+   */
+
   public function getDataSeries()
   {
     $dataColumns = $this->getDataColumns();
@@ -98,21 +169,87 @@ abstract class BaseVisualization {
     foreach($dataColumns as $dataColumn) {
 
       $data = [];
-      $dataIndex = array_search($dataColumn, $this->labels);
+
       foreach($this->values as $row) {
         if(array_key_exists($dataColumn, $row)){
           $data[] = $row[$dataColumn];
         } else {
+          $dataIndex = array_search($dataColumn, $this->labels);
           $data[] = $row[$dataIndex];
         }
       }
       $dataSeries[] = ['name' => $dataColumn, 'data' => $data];
     }
     return $dataSeries;
-
   }
 
-  public function getVisualizationHtml()
+  /**
+   * Return the data series for each defined data column.
+   * Each series contains a 'name' and 'data' value
+   *
+   * @return Array;
+   */
+
+  public function getTimeSeries()
+  {
+    $dataColumns = $this->getDataColumns();
+    $labelColumn = $this->getLabelColumn();
+
+    $dataSeries = [];
+    foreach($dataColumns as $dataColumn) {
+
+      $data = [];
+
+      foreach($this->values as $row) {
+        $point = [];
+        if(array_key_exists($dataColumn, $row)){
+          $point['y'] = $row[$dataColumn];
+        } else {
+          $dataIndex = array_search($dataColumn, $this->labels);
+          $point['y'] = $row[$dataIndex];
+        }
+
+        if(array_key_exists($labelColumn, $row)){
+          $point['x'] = $row[$labelColumn];
+        } else {
+          $labelIndex = array_search($labelColumn, $this->labels);
+          $point['x'] = $row[$labelIndex];
+        }
+
+         //convert value to timestamp
+         //incoming date format should be in ISO-8601 format, ie 2020-04-27T15:19:21+00:00
+         //in Twig this entry.postDate|date('c')
+         $time = strtotime($point['x']);
+         if ($time){
+            $time = $time * 1000;
+            $point['x'] = $time;
+
+            if ($this->firstDate == 0 || $time < $this->firstDate) {
+             $this->firstDate = $time;
+            }
+
+            if ($this->lastDate == 0 || $time > $this->lastDate) {
+              $this->lastDate = $time;
+            }
+         }
+
+
+        $data[] = $point;
+      }
+      $dataSeries[] = ['name' => $dataColumn, 'data' => $data];
+    }
+    return $dataSeries;
+  }
+
+  /**
+   * Return the visualiation results html. The individual visualization implementations must
+   * extend this method. By calling parent::getVisualizationHtml() the implementation
+   * can easily get the required asset bundle
+   *
+   * @return string
+   */
+
+  public function getVisualizationHtml($options = null)
   {
     Craft::$app->getView()->registerAssetBundle(VisualizationAssetBundle::class);
   }
