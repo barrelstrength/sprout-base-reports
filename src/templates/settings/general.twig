@@ -1,5 +1,13 @@
 {% import "_includes/forms" as forms %}
 
+{% macro configWarning(setting) -%}
+    {{ "This is being overridden by the {setting} config setting."|t('sprout-forms-google-recaptcha', {
+        setting: setting
+    })|raw }}
+{%- endmacro %}
+
+{% from _self import configWarning %}
+
 {% if not currentUser.admin %}
     {% redirect 'sprout-reports' %}
 {% endif %}
@@ -12,7 +20,8 @@
     value: settings.pluginNameOverride,
     autofocus: true,
     first: true,
-    errors: ''
+    errors: '',
+    warning: config.pluginNameOverride is defined ? configWarning('pluginNameOverride')
 }) }}
 
 {{ forms.selectField({
@@ -27,5 +36,6 @@
         { label: '100', value: '100' },
         { label: '250', value: '250' }
     ],
-    value: settings.defaultPageLength
+    value: settings.defaultPageLength,
+    warning: config.defaultPageLength is defined ? configWarning('defaultPageLength')
 }) }}

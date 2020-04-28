@@ -7,8 +7,8 @@
 
 namespace barrelstrength\sproutbasereports\elements\db;
 
-
 use barrelstrength\sproutbasereports\base\DataSource;
+use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use Craft;
 use craft\elements\db\ElementQuery;
 use craft\errors\MissingComponentException;
@@ -58,7 +58,7 @@ class ReportQuery extends ElementQuery
      *
      * @var string
      */
-    public $dataSourceBaseUrl;
+    public $currentBaseUrl;
 
     public $pluginHandle;
 
@@ -87,7 +87,7 @@ class ReportQuery extends ElementQuery
             'sproutreports_datasources.viewContext',
         ]);
 
-        $this->query->innerJoin('{{%sproutreports_datasources}} sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
+        $this->query->innerJoin(DataSourceRecord::tableName().' sproutreports_datasources', '[[sproutreports_datasources.id]] = [[sproutreports_reports.dataSourceId]]');
 
         // Property is used for Element Sources in sidebar
         if (!$this->viewContext && !Craft::$app->getRequest()->getIsConsoleRequest() && Craft::$app->getSession()->getIsActive()) {

@@ -7,7 +7,6 @@
 
 namespace barrelstrength\sproutbasereports\elements;
 
-use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\actions\DeleteReport;
@@ -42,8 +41,6 @@ use yii\web\NotFoundHttpException;
  */
 class Report extends Element
 {
-    use BaseSproutTrait;
-
     public $id;
 
     public $name;
@@ -323,19 +320,19 @@ class Report extends Element
     }
 
     /**
-     * @param null   $dataSourceBaseUrl
+     * @param null   $currentBaseUrl
      * @param string $pluginHandle
      *
      * @return string|null
      * @throws MissingComponentException
      */
-    public function getCpEditUrl($dataSourceBaseUrl = null, $pluginHandle = 'sprout-reports')
+    public function getCpEditUrl($currentBaseUrl = null, $pluginHandle = 'sprout-reports')
     {
         // Data Source is used on the Results page, but we have a case where we need to get the value differently
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             // criteria.pluginHandle is used on the Report Element index page
             $pluginHandle = Craft::$app->getSession()->get('sprout.reports.pluginHandle');
-            $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
+            $currentBaseUrl = Craft::$app->getSession()->get('sprout.reports.currentBaseUrl');
         }
 
         $permissions = SproutBase::$app->settings->getPluginPermissions(new Settings(), 'sprout-reports', $pluginHandle);
@@ -344,7 +341,7 @@ class Report extends Element
             return null;
         }
 
-        return UrlHelper::cpUrl($dataSourceBaseUrl.$this->dataSourceId.'/edit/'.$this->id);
+        return UrlHelper::cpUrl($currentBaseUrl.$this->dataSourceId.'/edit/'.$this->id);
     }
 
     /**
@@ -355,10 +352,10 @@ class Report extends Element
      */
     public function getTableAttributeHtml(string $attribute): string
     {
-        $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
+        $currentBaseUrl = Craft::$app->getSession()->get('sprout.reports.currentBaseUrl');
 
         if ($attribute === 'results') {
-            $resultsUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$this->id);
+            $resultsUrl = UrlHelper::cpUrl($currentBaseUrl.'view/'.$this->id);
 
             return '<a href="'.$resultsUrl.'" class="btn small">'.Craft::t('sprout-base-reports', 'Run report').'</a>';
         }

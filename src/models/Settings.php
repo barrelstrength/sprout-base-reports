@@ -22,7 +22,7 @@ class Settings extends Model implements SproutSettingsInterface, SharedPermissio
     /**
      * @var string
      */
-    public $defaultPageLength;
+    public $defaultPageLength = 10;
 
     /**
      * @inheritdoc

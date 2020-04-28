@@ -7,8 +7,14 @@
 
 namespace barrelstrength\sproutbasereports\services;
 
+use barrelstrength\sproutbase\SproutBase;
+use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use craft\base\Component;
 
+/**
+ *
+ * @property \barrelstrength\sproutbasereports\models\Settings $reportsSettings
+ */
 class App extends Component
 {
     /**
@@ -47,5 +53,16 @@ class App extends Component
         $this->reportGroups = new ReportGroups();
         $this->reports = new Reports();
         $this->visualizations =new Visualizations();
+    }
+
+    /**
+     * @return SproutBaseReportsSettings
+     */
+    public function getReportsSettings(): SproutBaseReportsSettings
+    {
+        /** @var SproutBaseReportsSettings $settings */
+        $settings = SproutBase::$app->settings->getBaseSettings(SproutBaseReportsSettings::class, 'sprout-reports');
+
+        return $settings;
     }
 }

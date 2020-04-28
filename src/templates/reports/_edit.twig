@@ -1,5 +1,3 @@
-{% requirePermission editReportsPermission %}
-
 {% extends "sprout-base-reports/_layouts/base" %}
 {% import "_includes/forms" as forms %}
 {% import "sprout-base-fields/_includes/forms" as sproutFields %}
@@ -51,7 +49,7 @@
                     </li>
                     <li><a class="formsubmit"
                             data-redirect="{{ dataSource.getUrl(dataSource.id ~ '/new')|hash }}">
-                            {{ "Save and add another segment"|t('sprout-base-reports') }}</a>
+                            {{ "Save and add another report"|t('sprout-base-reports') }}</a>
                     </li>
                 </ul>
 
@@ -261,3 +259,10 @@
     padding-bottom:24px;
     }
 {% endcss %}
+
+{% js on ready %}
+    // add support for select other field in sidebar
+    if (Craft.SproutFields != null) {
+    Craft.SproutFields.initFields($("#details"));
+    }
+{% endjs %}

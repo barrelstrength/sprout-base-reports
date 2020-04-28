@@ -81,7 +81,7 @@ class ReportGroups extends Component
     {
         $query = (new Query())
             ->select('*')
-            ->from('{{%sproutreports_reportgroups}}')
+            ->from(ReportGroupRecord::tableName())
             ->indexBy('id');
 
         $results = $query->all();

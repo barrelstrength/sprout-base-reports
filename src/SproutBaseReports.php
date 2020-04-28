@@ -7,7 +7,6 @@
 
 namespace barrelstrength\sproutbasereports;
 
-use barrelstrength\sproutbase\base\BaseSproutTrait;
 use barrelstrength\sproutbasereports\controllers\ReportsController;
 use barrelstrength\sproutbasereports\datasources\CustomQuery;
 use barrelstrength\sproutbasereports\datasources\CustomTwigTemplate;
@@ -28,19 +27,10 @@ use yii\base\Module;
 
 class SproutBaseReports extends Module
 {
-    use BaseSproutTrait;
-
     /**
      * @var App
      */
     public static $app;
-
-    /**
-     * Identify our plugin for BaseSproutTrait
-     *
-     * @var string
-     */
-    public static $pluginHandle = 'sprout-base-reports';
 
     /**
      * @var string
