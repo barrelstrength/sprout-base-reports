@@ -293,7 +293,7 @@ class Reports extends Component
 
         $dataSource = $report->getDataSource();
 
-        if ($dataSource AND !$dataSource->validateSettings($report->settings, $errors)) {
+        if ($dataSource && !$dataSource->validateSettings($report->settings, $errors)) {
             $report->addError('settings', $errors);
 
             return false;

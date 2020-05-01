@@ -9,8 +9,8 @@ namespace barrelstrength\sproutbasereports\migrations;
 
 use barrelstrength\sproutbase\migrations\Install as SproutBaseInstall;
 use barrelstrength\sproutbase\records\Settings as SproutBaseSettingsRecord;
-use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\records\DataSource as DataSourceRecord;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\records\ReportGroup as ReportGroupRecord;

@@ -8,7 +8,6 @@
 namespace barrelstrength\sproutbasereports\controllers;
 
 use barrelstrength\sproutbase\controllers\SharedController;
-use barrelstrength\sproutbase\SproutBase;
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
@@ -21,7 +20,6 @@ use craft\errors\MissingComponentException;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\assets\cp\CpAsset;
-use craft\web\Controller;
 use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
@@ -62,8 +60,8 @@ class ReportsController extends SharedController
     }
 
     /**
-     * @param null   $groupId
-     * @param bool   $hideSidebar
+     * @param null $groupId
+     * @param bool $hideSidebar
      *
      * @return Response
      * @throws Exception
