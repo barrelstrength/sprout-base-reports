@@ -66,8 +66,8 @@ class ReportsController extends SharedController
     }
 
     /**
-     * @param null   $groupId
-     * @param bool   $hideSidebar
+     * @param null $groupId
+     * @param bool $hideSidebar
      *
      * @return Response
      * @throws Exception

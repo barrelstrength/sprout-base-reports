@@ -13,7 +13,7 @@ use craft\base\Component;
 
 /**
  *
- * @property \barrelstrength\sproutbasereports\models\Settings $reportsSettings
+ * @property SproutBaseReportsSettings $reportsSettings
  */
 class App extends Component
 {
