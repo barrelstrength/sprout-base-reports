@@ -48,11 +48,11 @@ class m200501_000000_migrate_shared_report_settings extends Migration
 
         $newReportsSharedSettings = [
             'pluginNameOverride' => $sproutReportsSettings['pluginNameOverride'] ?? '',
-            'sentEmailsLimit' => $sproutReportsSettings['defaultPageLength'] ?? 50
+            'defaultPageLength' => $sproutReportsSettings['defaultPageLength'] ?? 50
         ];
 
         /** @noinspection ClassConstantCanBeUsedInspection */
-        $this->insert('{{%sprout_settings}}', [
+        $this->update('{{%sprout_settings}}', [
             'model' => 'barrelstrength\sproutbasereports\models\Settings',
             'settings' => json_encode($newReportsSharedSettings)
         ]);
