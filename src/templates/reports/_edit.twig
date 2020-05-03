@@ -13,6 +13,19 @@
     { label: 'Reports'|t('sprout-base-reports'), url: reportIndexUrl }
 ] %}
 
+{% set tabs = [
+    {
+        label: 'Report',
+        url: '#tab-report',
+        class: null,
+    },
+    {
+        label: 'Visualization',
+        url: '#tab-visualization',
+        class: null,
+    }
+] %}
+
 {% set fullPageForm = true %}
 
 {% if groups | length %}
@@ -76,56 +89,62 @@
         <input type="hidden" name="id" value="{{ report.id }}">
     {% endif %}
 
-    {{ forms.textField({
-        label: "Name"|t('sprout-base-reports'),
-        instructions: "What this report will be called in the CP."|t('sprout-base-reports'),
-        id: "name",
-        name: 'name',
-        value: report is defined ? report.name : "",
-        errors: report is defined ? report.getErrors('name') : "",
-        required: true,
-        first: true,
-        autofocus: true
-    }) }}
+    <div id="tab-report">
 
-    {{ forms.textField({
-        label: "Description"|t('sprout-base-reports'),
-        instructions: "A description of your report that will appear in the info bubble next to your Report Name on the Reports Index page."|t('sprout-base-reports'),
-        name: 'description',
-        rows: 3,
-        value: report is defined ? report.description : "",
-        errors: report is defined ? report.getErrors('description') : ""
-    }) }}
+        {{ forms.textField({
+            label: "Name"|t('sprout-base-reports'),
+            instructions: "What this report will be called in the CP."|t('sprout-base-reports'),
+            id: "name",
+            name: 'name',
+            value: report is defined ? report.name : "",
+            errors: report is defined ? report.getErrors('name') : "",
+            required: true,
+            first: true,
+            autofocus: true
+        }) }}
 
-    {% if dataSource is defined %}
+        {{ forms.textField({
+            label: "Description"|t('sprout-base-reports'),
+            instructions: "A description of your report that will appear in the info bubble next to your Report Name on the Reports Index page."|t('sprout-base-reports'),
+            name: 'description',
+            rows: 3,
+            value: report is defined ? report.description : "",
+            errors: report is defined ? report.getErrors('description') : ""
+        }) }}
 
-        {% set settingsHtml = dataSource.getSettingsHtml() %}
+        {% if dataSource is defined %}
 
-        {% if settingsHtml %}
-            <hr>
-            {{ settingsHtml | raw }}
+            {% set settingsHtml = dataSource.getSettingsHtml() %}
+
+            {% if settingsHtml %}
+                <hr>
+                {{ settingsHtml | raw }}
+            {% endif %}
+
         {% endif %}
 
-    {% endif %}
+    </div>
 
-    <h3>Visualization Settings</h3>
+    <div id="tab-visualization" class="hidden">
+        
+        {{ forms.selectField({
+            label: 'Visualization Type',
+            name: 'visualizationType',
+            value: settings.visualization.type,
+            options: visualizationOptions
 
-    {{ forms.selectField({
-      label: 'Visualization Type',
-      name: 'visualizationType',
-      value: settings.visualization.type,
-      options: visualizationOptions
+        }) }}
 
-    })}}
+        {% for item in visualizationTypes %}
+            {% set isCurrent = (settings.visualization.type == className(item.chart)) %}
+            <div id="{{ className(item.chart)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+                {% namespace 'visualizations['~className(item.chart)~']' %}
+                    {{ item.chart.getSettingsHtml(settings.visualization)|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
 
-    {% for item in visualizationTypes %}
-      {% set isCurrent = (settings.visualization.type == className(item.chart)) %}
-      <div id="{{ className(item.chart)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
-        {% namespace 'visualizations['~className(item.chart)~']' %}
-          {{item.chart.getSettingsHtml(settings.visualization)|raw }}
-        {% endnamespace %}
-      </div>
-    {% endfor %}
+    </div>
 
 {% endblock %}
 
