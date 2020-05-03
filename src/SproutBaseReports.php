@@ -19,8 +19,8 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\ArrayHelper;
 use craft\i18n\PhpMessageSource;
-use craft\web\View;
 use craft\services\Dashboard;
+use craft\web\View;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 use yii\base\Module;
@@ -120,7 +120,7 @@ class SproutBaseReports extends Module
         });
 
         Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES, function(RegisterComponentTypesEvent $event) {
-          $event->types[] = Visualizations::class;
-      });
+            $event->types[] = Visualizations::class;
+        });
     }
 }

@@ -74,7 +74,7 @@
         {% if values is defined and values is iterable and values|length %}
 
             {% if visualization %}
-                {{visualization.getVisualizationHtml()|raw }}
+                {{ visualization.getVisualizationHtml()|raw }}
             {% endif %}
 
             <div class="tablecontent">

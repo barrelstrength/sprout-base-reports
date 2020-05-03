@@ -7,25 +7,25 @@ use Craft;
 class LineChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/settings.twig';
+    protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/visualization.twig';
+    protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/visualization.twig';
 
-  /**
-   * @inheritdoc
-   */
+    /**
+     * @inheritdoc
+     */
 
-  public static function displayName(): string
-  {
-    return Craft::t('sprout-base-reports', 'Line Chart');
-  }
+    public static function displayName(): string
+    {
+        return Craft::t('sprout-base-reports', 'Line Chart');
+    }
 
-  /**
-   * @inheritdoc
-   */
-  public static function getVisualizationType(): string
-  {
-    return LineChartVisualization::class;
-  }
+    /**
+     * @inheritdoc
+     */
+    public static function getVisualizationType(): string
+    {
+        return LineChartVisualization::class;
+    }
 
 }

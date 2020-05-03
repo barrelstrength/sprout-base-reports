@@ -1,22 +1,22 @@
 .visualization-filters {
-  display:flex;
-  justify-content:flex-end;
-  padding-right:10px;
-  margin-bottom:10px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    padding-right: 10px;
 }
 
 .visualization-filters .field {
-  margin: 0 0 0 20px;
- xpadding-left:10px;
- display:flex;
- align-items: center;
+    align-items: center;
+    display: flex;
+    margin: 0 0 0 20px;
+    xpadding-left: 10px;
 }
 
 .visualization-filters .input .field {
-  margin: 0;
+    margin: 0;
 }
 
 .visualization-filters .field .heading {
-  margin: 0 5px 0 0;
+    margin: 0 5px 0 0;
 }
 

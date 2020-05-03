@@ -1,6 +1,6 @@
 {% if visualization %}
-  {{visualization.getVisualizationHtml({chart:{height:300, toolbar: {show:false}}})|raw}}
-  <a href="{{reportIndexUrl}}">View report</a>
+    {{ visualization.getVisualizationHtml({chart:{height:300, toolbar: {show:false}}})|raw }}
+    <a href="{{ reportIndexUrl }}">View report</a>
 {% else %}
-  Visualization not found
+    Visualization not found
 {% endif %}

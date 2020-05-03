@@ -7,25 +7,25 @@ use Craft;
 class PieChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/settings.twig';
+    protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/visualization.twig';
+    protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/visualization.twig';
 
 
-  /**
-   * @inheritdoc
-   */
+    /**
+     * @inheritdoc
+     */
 
-  public static function displayName(): string
-  {
-    return Craft::t('sprout-base-reports', 'Pie Chart');
-  }
+    public static function displayName(): string
+    {
+        return Craft::t('sprout-base-reports', 'Pie Chart');
+    }
 
-  /**
-   * @inheritdoc
-   */
-  public static function getVisualizationType(): string
-  {
-    return PieChartVisualization::class;
-  }
+    /**
+     * @inheritdoc
+     */
+    public static function getVisualizationType(): string
+    {
+        return PieChartVisualization::class;
+    }
 }

@@ -52,7 +52,7 @@ class App extends Component
         $this->exports = new Exports();
         $this->reportGroups = new ReportGroups();
         $this->reports = new Reports();
-        $this->visualizations =new Visualizations();
+        $this->visualizations = new Visualizations();
     }
 
     /**
