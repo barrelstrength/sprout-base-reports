@@ -2,7 +2,6 @@
 
 namespace barrelstrength\sproutbasereports\visualizations;
 
-use barrelstrength\sproutbasereports\web\assets\visualizations\VisualizationAssetBundle;
 use craft\base\Component;
 use Craft;
 
@@ -258,7 +257,7 @@ abstract class BaseVisualization extends Component {
   }
 
   /**
-   * Return the visualiation results html.
+   * Return the visualization results html.
    *
    * @params $options values to pass through to the javascript charting instance
    *
@@ -267,7 +266,6 @@ abstract class BaseVisualization extends Component {
 
   public function getVisualizationHtml(array $options = []): string
   {
-    Craft::$app->getView()->registerAssetBundle(VisualizationAssetBundle::class);
     return Craft::$app->getView()->renderTemplate($this->resultsTemplate,
       [
         'visualization' => $this,

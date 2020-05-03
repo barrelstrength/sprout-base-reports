@@ -1,14 +1,13 @@
 <?php
 /**
- * @link https://sprout.barrelstrengthdesign.com
+ * @link      https://sprout.barrelstrengthdesign.com
  * @copyright Copyright (c) Barrel Strength Design LLC
- * @license https://craftcms.github.io/license
+ * @license   https://craftcms.github.io/license
  */
 
-namespace barrelstrength\sproutbasereports\web\assets\datatables;
+namespace barrelstrength\sproutbasereports\web\assets\apexcharts;
 
 use craft\web\AssetBundle;
-use craft\web\assets\cp\CpAsset;
 
 class ApexChartsAsset extends AssetBundle
 {

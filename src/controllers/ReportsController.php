@@ -16,7 +16,6 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutbasereports\web\assets\visualizations\VisualizationSettingsAssetBundle;
 
 use Craft;
 use craft\errors\ElementNotFoundException;
@@ -317,8 +316,6 @@ class ReportsController extends SharedController
         if (array_key_exists('dataColumns', $settings['visualization']) === false) {
           $settings['visualization']['dataColumns'] = [''];
         }
-
-        $this->view->registerAssetBundle(VisualizationSettingsAssetBundle::class);
 
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
             'report' => $reportElement,

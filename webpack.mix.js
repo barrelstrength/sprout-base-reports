@@ -4,11 +4,18 @@ mix
   .sass(
     'src/web/assets/reports/src/scss/reports.scss',
     'src/web/assets/reports/dist/css/reports.css',
-  ).options({
+  )
+  .sass(
+    'src/web/assets/reports/src/scss/visualizations.scss',
+    'src/web/assets/reports/dist/css/visualizations.css',
+  )
+  .options({
     processCssUrls: false
   })
   .js([
-    'src/web/assets/reports/src/js/reports.js'
+    'src/web/assets/reports/src/js/reports.js',
+    'src/web/assets/reports/src/js/visualizations.js',
+    'src/web/assets/reports/src/js/visualization-settings.js'
   ], 'src/web/assets/reports/dist/js/reports.js')
   .copy('src/web/assets/reports/src/images',
     'src/web/assets/reports/dist/images')
