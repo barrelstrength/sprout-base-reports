@@ -137,6 +137,16 @@
 
     <div id="tab-visualization" class="hidden">
 
+        <h3>Visualizations</h3>
+
+        <div style="padding: 14px;background-color: #f3f7fc;border-radius:4px;">
+
+            <p>{{ "Visualizations allow you to configure your report to display a graphic on the results page. While all Visualization Types are displayed below, visualizations will only work if the columns returned in the report results have the correct data types used in the visualization."|t('sprout-base-reports') }}<p>
+
+            <p>{{ "The settings for the Visualization Type you select below will help Sprout Reports know how to display the graphic."|t('sprout-base-reports') }}<p>
+
+        </div>
+
         {{ forms.selectField({
             label: 'Visualization Type',
             name: 'visualizationType',
