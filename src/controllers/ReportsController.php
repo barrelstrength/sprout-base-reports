@@ -327,15 +327,12 @@ class ReportsController extends SharedController
             'groups' => $groups,
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
             'editReportsPermission' => $this->permissions['sproutReports-editReports'],
-            'pluginHandle' => $pluginHandle,
-            'viewContext' => $viewContext,
+            'pluginHandle' => $this->pluginHandle,
+            'viewContext' => $this->viewContext,
             'emailColumnOptions' => $emailColumnOptions,
             'settings' => $settings,
             'visualizationOptions' =>  $visualizationOptions,
             'visualizationTypes' =>  $visualizations,
-            'pluginHandle' => $this->pluginHandle,
-            'viewContext' => $this->viewContext,
-            'emailColumnOptions' => $emailColumnOptions
         ]);
     }
 
