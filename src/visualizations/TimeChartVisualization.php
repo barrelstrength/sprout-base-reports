@@ -7,9 +7,9 @@ use Craft;
 class TimeChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/visualizations/TimeChart/settings.twig';
+  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/TimeChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/visualizations/TimeChart/visualization.twig';
+  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/TimeChart/visualization.twig';
 
 
   /**

@@ -7,9 +7,9 @@ use Craft;
 class BarChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/visualizations/BarChart/settings.twig';
+  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/BarChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/visualizations/BarChart/visualization.twig';
+  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/BarChart/visualization.twig';
 
   /**
    * @inheritdoc
@@ -17,6 +17,7 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
 
   public static function displayName(): string
   {
+    return Craft::t('sprout-base-reports', 'Bar Chart');
   }
 
   /**

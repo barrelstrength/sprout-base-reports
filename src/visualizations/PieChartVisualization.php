@@ -7,9 +7,9 @@ use Craft;
 class PieChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/visualizations/PieChart/settings.twig';
+  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/visualizations/PieChart/visualization.twig';
+  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/visualization.twig';
 
 
   /**

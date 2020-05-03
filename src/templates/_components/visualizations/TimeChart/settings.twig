@@ -1,12 +1,11 @@
 
 {% import "_includes/forms" as forms %}
 
-<h4>Pie Chart </h4>
 {{ forms.textField({
-    label: "Label column"|t,
+    label: "Time column"|t,
     id: 'visualizationLabelColumn',
     name: 'labelColumn',
-    instructions: "Set the column from the report to be used as the labels in the visualization"|t,
+    instructions: "Set the column from the report to be used as the time (x axis) in the visualization"|t,
     value: settings.labelColumn
   })
 }}
@@ -19,5 +18,6 @@
     value: settings.dataColumns[0]
     })
 }}
+
 
 

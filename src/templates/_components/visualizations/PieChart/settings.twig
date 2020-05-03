@@ -1,12 +1,11 @@
 
 {% import "_includes/forms" as forms %}
 
-<h4>Line Chart </h4>
 {{ forms.textField({
-    label: "Time column"|t,
+    label: "Label column"|t,
     id: 'visualizationLabelColumn',
     name: 'labelColumn',
-    instructions: "Set the column from the report to be used as the time (x axis) in the visualization"|t,
+    instructions: "Set the column from the report to be used as the labels in the visualization"|t,
     value: settings.labelColumn
   })
 }}
@@ -19,6 +18,5 @@
     value: settings.dataColumns[0]
     })
 }}
-
 
 

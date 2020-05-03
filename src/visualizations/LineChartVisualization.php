@@ -7,9 +7,9 @@ use Craft;
 class LineChartVisualization extends BaseVisualization implements VisualizationInterface
 {
 
-  protected $settingsTemplate = 'sprout-base-reports/visualizations/LineChart/settings.twig';
+  protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/settings.twig';
 
-  protected $resultsTemplate = 'sprout-base-reports/visualizations/LineChart/visualization.twig';
+  protected $resultsTemplate = 'sprout-base-reports/_components/visualizations/LineChart/visualization.twig';
 
   /**
    * @inheritdoc
