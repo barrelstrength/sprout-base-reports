@@ -72,6 +72,11 @@
 
     <div class="tableview sproutreports">
         {% if values is defined and values is iterable and values|length %}
+
+            {% if visualization %}
+                {{visualization.getVisualizationHtml()|raw }}
+            {% endif %}
+
             <div class="tablecontent">
                 <table id="sprout-results" class="data fullwidth nowrap" style="opacity:0;">
                     <thead>
@@ -116,10 +121,6 @@
 
         {% endif %}
     </div>
-
-    {% if visualization %}
-      {{visualization.getVisualizationHtml()|raw }}
-    {% endif %}
 
 {% endblock %}
 
