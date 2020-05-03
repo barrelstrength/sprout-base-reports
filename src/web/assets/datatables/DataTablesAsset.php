@@ -14,14 +14,14 @@ class DataTablesAsset extends AssetBundle
 {
     public function init()
     {
-        $this->sourcePath = '@sproutbasereportslib/datatables';
+        $this->sourcePath = '@sproutbasereportslib/datatables.net';
 
         $this->depends = [
             CpAsset::class
         ];
 
         $this->js = [
-            'js/jquery.dataTables.1.10.19.min.js'
+            'jquery.dataTables.min.js'
         ];
 
         parent::init();

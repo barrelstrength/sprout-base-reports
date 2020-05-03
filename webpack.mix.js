@@ -11,7 +11,11 @@ mix
     'src/web/assets/reports/src/js/reports.js'
   ], 'src/web/assets/reports/dist/js/reports.js')
   .copy('src/web/assets/reports/src/images',
-    'src/web/assets/reports/dist/images');
+    'src/web/assets/reports/dist/images')
+  .copy('node_modules/apexcharts/dist',
+    'lib/apexcharts')
+  .copy('node_modules/datatables.net/js',
+    'lib/datatables.net');
 
 // Full API
 // mix.js(src, output);
