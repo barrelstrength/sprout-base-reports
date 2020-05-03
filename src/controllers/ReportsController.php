@@ -295,7 +295,7 @@ class ReportsController extends SharedController
         ];
 
         $visualizations = SproutBaseReports::$app->visualizations->getVisualizations();
-        $visualizationOptions = array_merge([['value' => '', 'label' => 'none']], $visualizations);
+        $visualizationOptions = array_merge([['value' => '', 'label' => 'None']], $visualizations);
 
         if (is_array($reportElement->settings) === false){
            $settings = json_decode($reportElement->settings, true);

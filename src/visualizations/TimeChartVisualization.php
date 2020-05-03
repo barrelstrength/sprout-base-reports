@@ -18,7 +18,7 @@ class TimeChartVisualization extends BaseVisualization implements VisualizationI
 
   public static function displayName(): string
   {
-    return Craft::t('sprout-base-reports', 'Time chart');
+    return Craft::t('sprout-base-reports', 'Time Series');
   }
 
   /**

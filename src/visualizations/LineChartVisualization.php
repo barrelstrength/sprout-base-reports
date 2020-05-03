@@ -17,7 +17,7 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
 
   public static function displayName(): string
   {
-    return Craft::t('sprout-base-reports', 'Line chart');
+    return Craft::t('sprout-base-reports', 'Line Chart');
   }
 
   /**
