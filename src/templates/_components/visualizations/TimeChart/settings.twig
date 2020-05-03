@@ -1,9 +1,9 @@
-
 {% import "_includes/forms" as forms %}
 
 {{ forms.textField({
-    label: "Time column"|t,
+    label: "Time Column"|t,
     id: 'visualizationLabelColumn',
+    class: 'code',
     name: 'labelColumn',
     instructions: "Set the column from the report to be used as the time (x axis) in the visualization"|t,
     value: settings.labelColumn
@@ -11,7 +11,7 @@
 }}
 
 {{ forms.textField({
-    label: "Data column"|t,
+    label: "Data Column"|t,
     id: 'visualizationDataColumn',
     name: 'dataColumns[]',
     instructions: "Set the column from the report to be used as the data series in the visualization"|t,

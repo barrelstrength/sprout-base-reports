@@ -1,8 +1,9 @@
 {% import "_includes/forms" as forms %}
 
 {{ forms.textField({
-    label: "Label column"|t,
+    label: "Label Column"|t,
     id: 'visualizationLabelColumn',
+    class: 'code',
     name: 'labelColumn',
     instructions: "Set the column from the report to be used as the labels in the visualization"|t,
     value: settings.labelColumn
