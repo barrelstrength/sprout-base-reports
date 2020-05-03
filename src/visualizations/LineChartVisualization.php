@@ -19,13 +19,4 @@ class LineChartVisualization extends BaseVisualization implements VisualizationI
     {
         return Craft::t('sprout-base-reports', 'Line Chart');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getVisualizationType(): string
-    {
-        return LineChartVisualization::class;
-    }
-
 }

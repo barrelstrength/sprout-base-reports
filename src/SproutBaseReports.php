@@ -119,7 +119,7 @@ class SproutBaseReports extends Module
             $event->types[] = Users::class;
         });
 
-        Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES, function(RegisterComponentTypesEvent $event) {
+        Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES, static function(RegisterComponentTypesEvent $event) {
             $event->types[] = Visualizations::class;
         });
     }

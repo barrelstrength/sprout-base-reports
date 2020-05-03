@@ -14,13 +14,11 @@ use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
-use barrelstrength\sproutreports\SproutReports;
 use Craft;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
-use craft\web\assets\cp\CpAsset;
 use craft\web\Request;
 use Throwable;
 use yii\base\Exception;
@@ -129,7 +127,6 @@ class ReportsController extends SharedController
      *
      * @return Response
      * @throws ForbiddenHttpException
-     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionResultsIndexTemplate(Report $report = null, int $reportId = null): Response
@@ -175,15 +172,10 @@ class ReportsController extends SharedController
             $sortColumnPosition = null;
         }
 
-        $this->getView()->registerAssetBundle(CpAsset::class);
-
-
-        /** @var SproutReports $plugin */
-        $plugin = Craft::$app->getPlugins()->getPlugin('sprout-reports');
         $settings = json_decode($report->settings, true);
 
         try {
-            if ((array_key_exists('visualization', $settings)) && (array_key_exists('type', $settings['visualization'])) && ($settings['visualization']['type'] != "")) {
+            if ((array_key_exists('visualization', $settings)) && (array_key_exists('type', $settings['visualization'])) && ($settings['visualization']['type'] != '')) {
                 $visualization = new $settings['visualization']['type'];
                 $visualization->setSettings($settings['visualization']);
                 $visualization->setLabels($labels);
@@ -301,7 +293,7 @@ class ReportsController extends SharedController
         }
 
         //determine if the report settings have the basic visualization settings
-        if (is_null($settings) || array_key_exists('visualization', $settings) === false) {
+        if ($settings === null || array_key_exists('visualization', $settings) === false) {
             $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumns' => ['']];
         }
 
@@ -396,11 +388,7 @@ class ReportsController extends SharedController
         $this->requirePostRequest();
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
-        Craft::error('SAVE THE REPORT', 'SPROUTLOG');
-
-
         $report = $this->prepareFromPost();
-
 
         if (!Craft::$app->getElements()->saveElement($report)) {
             Craft::$app->getSession()->setError(Craft::t('sprout-base-reports', 'Couldn’t save report.'));

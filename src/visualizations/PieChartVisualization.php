@@ -20,12 +20,4 @@ class PieChartVisualization extends BaseVisualization implements VisualizationIn
     {
         return Craft::t('sprout-base-reports', 'Pie Chart');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getVisualizationType(): string
-    {
-        return PieChartVisualization::class;
-    }
 }

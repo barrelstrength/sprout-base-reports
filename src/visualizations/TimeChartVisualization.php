@@ -20,13 +20,4 @@ class TimeChartVisualization extends BaseVisualization implements VisualizationI
     {
         return Craft::t('sprout-base-reports', 'Time Series');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getVisualizationType(): string
-    {
-        return TimeChartVisualization::class;
-    }
-
 }

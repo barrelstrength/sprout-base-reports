@@ -7,11 +7,17 @@
 
 namespace barrelstrength\sproutbasereports\widgets;
 
+use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use craft\base\Widget;
+use craft\errors\MissingComponentException;
 use craft\helpers\UrlHelper;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\Exception;
 use function json_decode;
 
 /**
@@ -19,6 +25,10 @@ use function json_decode;
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since  3.0.0
+ *
+ * @property mixed  $bodyHtml
+ * @property mixed  $settingsHtml
+ * @property string $title
  */
 class Visualizations extends Widget
 {
@@ -45,15 +55,11 @@ class Visualizations extends Widget
     }
 
     /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
-    }
-
-    /**
-     * @inheritdoc
+     * @return string|null
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
     public function getSettingsHtml()
     {
@@ -81,15 +87,16 @@ class Visualizations extends Widget
     }
 
     /**
-     * @inheritdoc
+     * @return false|string
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws MissingComponentException
      */
     public function getBodyHtml()
     {
-
-        $report = false;
         $dataSource = false;
-        $visualization = false;
-        $reportIndexUrl = '';
 
         $report = Craft::$app->elements->getElementById($this->reportId, Report::class);
 
@@ -97,7 +104,7 @@ class Visualizations extends Widget
             $dataSource = $report->getDataSource();
         }
 
-        if ($report && $dataSource) {
+        if ($report instanceof Report && $dataSource instanceof DataSource) {
             $dataSourceBaseUrl = Craft::$app->getSession()->get('sprout.reports.dataSourceBaseUrl');
             $reportIndexUrl = UrlHelper::cpUrl($dataSourceBaseUrl.'view/'.$report->id);
 
@@ -125,14 +132,11 @@ class Visualizations extends Widget
             $reportIndexUrl = '';
         }
 
-        $view = Craft::$app->getView();
-
-        return $view->renderTemplate('sprout-base-reports/_components/widgets/Visualizations/body',
-            [
-                'title' => 'report title',
-                'visualization' => $visualization,
-                'reportIndexUrl' => $reportIndexUrl
-            ]);
+        return Craft::$app->getView()->renderTemplate('sprout-base-reports/_components/widgets/Visualizations/body', [
+            'title' => 'report title',
+            'visualization' => $visualization,
+            'reportIndexUrl' => $reportIndexUrl
+        ]);
     }
 
     /**

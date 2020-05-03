@@ -19,13 +19,4 @@ class BarChartVisualization extends BaseVisualization implements VisualizationIn
     {
         return Craft::t('sprout-base-reports', 'Bar Chart');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getVisualizationType(): string
-    {
-        return BarChartVisualization::class;
-    }
-
 }

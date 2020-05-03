@@ -8,11 +8,11 @@
         this.lastDate = 0;
 
         //setup listeners for date ranges
-        $('input[name="reportDateFrom[date]"]').on('change', this.udpateVisualizationDate.bind(this));
-        $('input[name="reportDateTo[date]"]').on('change', this.udpateVisualizationDate.bind(this));
+        $('input[name="reportDateFrom[date]"]').on('change', this.updateVisualizationDate.bind(this));
+        $('input[name="reportDateTo[date]"]').on('change', this.updateVisualizationDate.bind(this));
       },
 
-      udpateVisualizationDate(event) {
+      updateVisualizationDate(event) {
         event.preventDefault();
         var fromDate = $('input[name="reportDateFrom[date]"]').val();
         var toDate = $('input[name="reportDateTo[date]"]').val();

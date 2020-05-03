@@ -4,15 +4,27 @@ namespace barrelstrength\sproutbasereports\visualizations;
 
 use Craft;
 use craft\base\Component;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\Exception;
 
+/**
+ * Class BaseVisualization
+ *
+ * @package barrelstrength\sproutbasereports\visualizations
+ *
+ * @property array $timeSeries
+ * @property array $settings
+ * @property array $dataSeries
+ */
 abstract class BaseVisualization extends Component
 {
+    protected $settingsTemplate = '';
 
-    protected $settingsTemplate = "";
+    protected $resultsTemplate = '';
 
-    protected $resultsTemplate = "";
-
-    protected $title = "";
+    protected $title = '';
 
     /**
      * if this is a date time report stores the earliest timestamp value from the data series
@@ -31,7 +43,7 @@ abstract class BaseVisualization extends Component
     /**
      * Set the visualization raw data values
      *
-     * @param Array $values
+     * @param array $values
      */
 
     protected $values;
@@ -39,7 +51,7 @@ abstract class BaseVisualization extends Component
     /**
      * Set the visualization labels
      *
-     * @param Array $labels
+     * @param array $labels
      */
 
     protected $labels;
@@ -50,7 +62,7 @@ abstract class BaseVisualization extends Component
      * @returns string
      */
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -67,7 +79,7 @@ abstract class BaseVisualization extends Component
     }
 
     /**
-     * Returns the first (earliest) timestamp value from the data series for a time series visualizaton
+     * Returns the first (earliest) timestamp value from the data series for a time series visualization
      *
      * @returns Number
      */
@@ -77,7 +89,7 @@ abstract class BaseVisualization extends Component
     }
 
     /**
-     * Returns the last (latest) timestamp value from the data series for a time series visualizaton
+     * Returns the last (latest) timestamp value from the data series for a time series visualization
      *
      * @returns Number
      */
@@ -91,7 +103,7 @@ abstract class BaseVisualization extends Component
      *
      * Settings must include ['labelColumn' => string, 'dataColumns' => array(string)]
      *
-     * @param Array $settings
+     * @param array $settings
      */
 
     public function setSettings($settings)
@@ -104,20 +116,17 @@ abstract class BaseVisualization extends Component
      *
      * @return array
      */
-
     public function getDataColumns(): array
     {
-        if ($this->settings) {
-            if (is_array($this->settings['dataColumns'])) {
-                return $this->settings['dataColumns'];
-            } else {
-                return [$this->settings['dataColumns']];
-            }
-        } else {
-            return false;
+        if (!$this->settings) {
+            return [];
         }
 
-        return $dataColumns;
+        if (is_array($this->settings['dataColumns'])) {
+            return $this->settings['dataColumns'];
+        }
+
+        return [$this->settings['dataColumns']];
     }
 
     /**
@@ -130,9 +139,9 @@ abstract class BaseVisualization extends Component
     {
         if ($this->settings && array_key_exists('labelColumn', $this->settings)) {
             return $this->settings['labelColumn'];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function setValues(array $values)
@@ -146,7 +155,7 @@ abstract class BaseVisualization extends Component
         $labels = [];
 
         if ($labelColumn) {
-            $labelIndex = array_search($labelColumn, $this->labels);
+            $labelIndex = array_search($labelColumn, $this->labels, true);
             foreach ($this->values as $row) {
                 if (array_key_exists($labelColumn, $row)) {
                     $labels[] = $row[$labelColumn];
@@ -168,7 +177,7 @@ abstract class BaseVisualization extends Component
      * Return the data series for each defined data column.
      * Each series contains a 'name' and 'data' value
      *
-     * @return Array;
+     * @return array ;
      */
 
     public function getDataSeries()
@@ -184,7 +193,7 @@ abstract class BaseVisualization extends Component
                 if (array_key_exists($dataColumn, $row)) {
                     $data[] = $row[$dataColumn];
                 } else {
-                    $dataIndex = array_search($dataColumn, $this->labels);
+                    $dataIndex = array_search($dataColumn, $this->labels, true);
                     $data[] = $row[$dataIndex];
                 }
             }
@@ -198,7 +207,7 @@ abstract class BaseVisualization extends Component
      * Return the data series for each defined data column.
      * Each series contains a 'name' and 'data' value
      *
-     * @return Array;
+     * @return array ;
      */
 
     public function getTimeSeries()
@@ -216,14 +225,14 @@ abstract class BaseVisualization extends Component
                 if (array_key_exists($dataColumn, $row)) {
                     $point['y'] = $row[$dataColumn];
                 } else {
-                    $dataIndex = array_search($dataColumn, $this->labels);
+                    $dataIndex = array_search($dataColumn, $this->labels, true);
                     $point['y'] = $row[$dataIndex];
                 }
 
                 if (array_key_exists($labelColumn, $row)) {
                     $point['x'] = $row[$labelColumn];
                 } else {
-                    $labelIndex = array_search($labelColumn, $this->labels);
+                    $labelIndex = array_search($labelColumn, $this->labels, true);
                     $point['x'] = $row[$labelIndex];
                 }
 
@@ -232,7 +241,7 @@ abstract class BaseVisualization extends Component
                 //in Twig this entry.postDate|date('c')
                 $time = strtotime($point['x']);
                 if ($time) {
-                    $time = $time * 1000;
+                    $time *= 1000;
                     $point['x'] = $time;
 
                     if ($this->firstDate == 0 || $time < $this->firstDate) {
@@ -244,9 +253,9 @@ abstract class BaseVisualization extends Component
                     }
                 }
 
-
                 $data[] = $point;
             }
+
             $dataSeries[] = ['name' => $dataColumn, 'data' => $data];
         }
 
@@ -254,24 +263,33 @@ abstract class BaseVisualization extends Component
     }
 
     /**
-     * Return the visualization settings template.
+     * Returns the visualization settings template
      *
-     * @params $settings
+     * @param $settings
      *
      * @return string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
-
     public function getSettingsHtml($settings): string
     {
         return Craft::$app->getView()->renderTemplate($this->settingsTemplate, ['settings' => $settings]);
     }
 
     /**
-     * Return the visualization results html.
+     * Returns the visualization results HTML
      *
      * @params $options values to pass through to the javascript charting instance
      *
+     * @param array $options
+     *
      * @return string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
     public function getVisualizationHtml(array $options = []): string
     {
