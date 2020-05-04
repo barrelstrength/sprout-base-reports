@@ -35,7 +35,6 @@ class Visualization extends Widget
     /**
      * string The reportId of the report to be displayed
      */
-
     public $reportId = 0;
 
     /**

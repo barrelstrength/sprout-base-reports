@@ -7,11 +7,15 @@
    */
   class SproutReportsViz {
     constructor(type, settings) {
-      switch(type) {
-        case 'barChart': return new BarChart(settings);
-        case 'lineChart': return new LineChart(settings);
-        case 'pieChart': return new PieChart(settings);
-        case 'timeSeriesChart': return new TimeSeriesChart(settings);
+      switch (type) {
+        case 'barChart':
+          return new BarChart(settings);
+        case 'lineChart':
+          return new LineChart(settings);
+        case 'pieChart':
+          return new PieChart(settings);
+        case 'timeSeriesChart':
+          return new TimeSeriesChart(settings);
       }
     }
   }
