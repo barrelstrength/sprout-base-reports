@@ -14,7 +14,6 @@ class BarChartVisualization extends Visualization
     /**
      * @inheritdoc
      */
-
     public static function displayName(): string
     {
         return Craft::t('sprout-base-reports', 'Bar Chart');

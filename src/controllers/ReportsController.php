@@ -174,6 +174,7 @@ class ReportsController extends SharedController
         }
 
         $visualizationSettings = $report->getSetting('visualization');
+
         $visualizationType = $visualizationSettings['type'] ?? null;
         $visualization = class_exists($visualizationType) ? new $visualizationType() : null;
 

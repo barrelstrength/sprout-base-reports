@@ -48,9 +48,9 @@ abstract class Visualization extends Component implements VisualizationInterface
     /**
      * Returns the first (earliest) timestamp value from the data series for a time series visualization
      *
-     * @returns Number
+     * @returns int timestamp in milliseconds
      */
-    public function getStartDate()
+    public function getStartDate(): int
     {
         return $this->startDate;
     }
@@ -58,9 +58,9 @@ abstract class Visualization extends Component implements VisualizationInterface
     /**
      * Returns the last (latest) timestamp value from the data series for a time series visualization
      *
-     * @returns Number
+     * @returns int timestamp in milliseconds
      */
-    public function getEndDate()
+    public function getEndDate(): int
     {
         return $this->endDate;
     }
@@ -104,7 +104,6 @@ abstract class Visualization extends Component implements VisualizationInterface
      *
      * @param array $settings
      */
-
     public function setSettings($settings)
     {
         $this->settings = $settings;

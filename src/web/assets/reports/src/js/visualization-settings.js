@@ -60,7 +60,6 @@
     }
 
     showTarget($target) {
-
       if ($target && $target.length) {
         $target.removeClass('hidden');
       }
