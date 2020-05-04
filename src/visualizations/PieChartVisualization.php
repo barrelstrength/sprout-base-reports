@@ -2,9 +2,11 @@
 
 namespace barrelstrength\sproutbasereports\visualizations;
 
+use barrelstrength\sproutbasereports\base\Visualization;
+use barrelstrength\sproutbasereports\base\VisualizationInterface;
 use Craft;
 
-class PieChartVisualization extends BaseVisualization implements VisualizationInterface
+class PieChartVisualization extends Visualization implements VisualizationInterface
 {
 
     protected $settingsTemplate = 'sprout-base-reports/_components/visualizations/PieChart/settings.twig';

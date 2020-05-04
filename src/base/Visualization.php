@@ -1,6 +1,6 @@
 <?php
 
-namespace barrelstrength\sproutbasereports\visualizations;
+namespace barrelstrength\sproutbasereports\base;
 
 use Craft;
 use craft\base\Component;
@@ -10,7 +10,7 @@ use Twig\Error\SyntaxError;
 use yii\base\Exception;
 
 /**
- * Class BaseVisualization
+ * Class Visualization
  *
  * @package barrelstrength\sproutbasereports\visualizations
  *
@@ -18,7 +18,7 @@ use yii\base\Exception;
  * @property array $settings
  * @property array $dataSeries
  */
-abstract class BaseVisualization extends Component
+abstract class Visualization extends Component
 {
     protected $settingsTemplate = '';
 

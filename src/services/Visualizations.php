@@ -3,7 +3,7 @@
 namespace barrelstrength\sproutbasereports\services;
 
 use barrelstrength\sproutbasereports\visualizations\BarChartVisualization;
-use barrelstrength\sproutbasereports\visualizations\BaseVisualization;
+use barrelstrength\sproutbasereports\base\Visualization;
 use barrelstrength\sproutbasereports\visualizations\LineChartVisualization;
 use barrelstrength\sproutbasereports\visualizations\PieChartVisualization;
 use barrelstrength\sproutbasereports\visualizations\TimeChartVisualization;
@@ -22,7 +22,7 @@ class Visualizations extends Component
      */
     public function getVisualizations(): array
     {
-        /** @var BaseVisualization[] $visualizationTypes */
+        /** @var Visualization[] $visualizationTypes */
         $visualizationTypes = [
             BarChartVisualization::class,
             LineChartVisualization::class,

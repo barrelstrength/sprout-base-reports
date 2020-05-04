@@ -1,6 +1,6 @@
 <?php
 
-namespace barrelstrength\sproutbasereports\visualizations;
+namespace barrelstrength\sproutbasereports\base;
 
 interface VisualizationInterface
 {
@@ -11,7 +11,6 @@ interface VisualizationInterface
      *
      * @return string The HTML that should be shown for this visualization's settings
      */
-
     public function getSettingsHtml(array $settings): string;
 
     /**
@@ -37,6 +36,4 @@ interface VisualizationInterface
      */
 
     public function getLabelColumn(): string;
-
-
 }
