@@ -13,7 +13,7 @@ use barrelstrength\sproutbasereports\datasources\CustomTwigTemplate;
 use barrelstrength\sproutbasereports\datasources\Users;
 use barrelstrength\sproutbasereports\services\App;
 use barrelstrength\sproutbasereports\services\DataSources;
-use barrelstrength\sproutbasereports\widgets\Visualizations;
+use barrelstrength\sproutbasereports\widgets\Visualization;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
@@ -120,7 +120,7 @@ class SproutBaseReports extends Module
         });
 
         Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES, static function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Visualizations::class;
+            $event->types[] = Visualization::class;
         });
     }
 }

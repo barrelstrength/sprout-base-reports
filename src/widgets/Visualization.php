@@ -30,7 +30,7 @@ use function json_decode;
  * @property mixed  $settingsHtml
  * @property string $title
  */
-class Visualizations extends Widget
+class Visualization extends Widget
 {
     /**
      * string The reportId of the report to be displayed
