@@ -149,7 +149,7 @@ abstract class Visualization extends Component
         $this->values = $values;
     }
 
-    public function getLabels()
+    public function getLabels(): array
     {
         $labelColumn = $this->getLabelColumn();
         $labels = [];
@@ -177,10 +177,10 @@ abstract class Visualization extends Component
      * Return the data series for each defined data column.
      * Each series contains a 'name' and 'data' value
      *
-     * @return array ;
+     * @return array
      */
 
-    public function getDataSeries()
+    public function getDataSeries(): array
     {
         $dataColumns = $this->getDataColumns();
 
@@ -207,10 +207,10 @@ abstract class Visualization extends Component
      * Return the data series for each defined data column.
      * Each series contains a 'name' and 'data' value
      *
-     * @return array ;
+     * @return array
      */
 
-    public function getTimeSeries()
+    public function getTimeSeries(): array
     {
         $dataColumns = $this->getDataColumns();
         $labelColumn = $this->getLabelColumn();
@@ -275,7 +275,9 @@ abstract class Visualization extends Component
      */
     public function getSettingsHtml($settings): string
     {
-        return Craft::$app->getView()->renderTemplate($this->settingsTemplate, ['settings' => $settings]);
+        return Craft::$app->getView()->renderTemplate($this->settingsTemplate, [
+            'settings' => $settings
+        ]);
     }
 
     /**
@@ -293,11 +295,10 @@ abstract class Visualization extends Component
      */
     public function getVisualizationHtml(array $options = []): string
     {
-        return Craft::$app->getView()->renderTemplate($this->resultsTemplate,
-            [
-                'visualization' => $this,
-                'options' => $options,
-            ]);
+        return Craft::$app->getView()->renderTemplate($this->resultsTemplate, [
+            'visualization' => $this,
+            'options' => $options,
+        ]);
     }
 
 }
