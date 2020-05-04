@@ -2,12 +2,7 @@
 
 namespace barrelstrength\sproutbasereports\base;
 
-use Craft;
 use craft\base\Component;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use yii\base\Exception;
 
 /**
  * Class Visualization
@@ -18,12 +13,8 @@ use yii\base\Exception;
  * @property array $settings
  * @property array $dataSeries
  */
-abstract class Visualization extends Component
+abstract class Visualization extends Component implements VisualizationInterface
 {
-    protected $settingsTemplate = '';
-
-    protected $resultsTemplate = '';
-
     /**
      * if this is a date time report stores the earliest timestamp value from the data series
      */
@@ -150,6 +141,14 @@ abstract class Visualization extends Component
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getSettingsHtml(array $settings): string
+    {
+        return '';
+    }
+
+    /**
      * Return the data series for each defined data column.
      * Each series contains a 'name' and 'data' value
      *
@@ -237,44 +236,4 @@ abstract class Visualization extends Component
 
         return $dataSeries;
     }
-
-    /**
-     * Returns the visualization settings template
-     *
-     * @param $settings
-     *
-     * @return string
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws Exception
-     */
-    public function getSettingsHtml($settings): string
-    {
-        return Craft::$app->getView()->renderTemplate($this->settingsTemplate, [
-            'settings' => $settings
-        ]);
-    }
-
-    /**
-     * Returns the visualization results HTML
-     *
-     * @params $options values to pass through to the javascript charting instance
-     *
-     * @param array $options
-     *
-     * @return string
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws Exception
-     */
-    public function getVisualizationHtml(array $options = []): string
-    {
-        return Craft::$app->getView()->renderTemplate($this->resultsTemplate, [
-            'visualization' => $this,
-            'options' => $options,
-        ]);
-    }
-
 }
