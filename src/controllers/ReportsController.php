@@ -9,6 +9,7 @@ namespace barrelstrength\sproutbasereports\controllers;
 
 use barrelstrength\sproutbase\controllers\SharedController;
 use barrelstrength\sproutbasereports\base\DataSource;
+use barrelstrength\sproutbasereports\base\Visualization;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
@@ -172,20 +173,17 @@ class ReportsController extends SharedController
             $sortColumnPosition = null;
         }
 
-        $settings = json_decode($report->settings, true);
+        $visualizationSettings = $report->getSetting('visualization');
+        $visualizationType = $visualizationSettings['type'] ?? null;
+        $visualization = class_exists($visualizationType) ? new $visualizationType() : null;
 
-        try {
-            if ((array_key_exists('visualization', $settings)) && (array_key_exists('type', $settings['visualization'])) && ($settings['visualization']['type'] != '')) {
-                $visualization = new $settings['visualization']['type'];
-                $visualization->setSettings($settings['visualization']);
-                $visualization->setLabels($labels);
-                $visualization->setValues($values);
-                $visualization->setTitle($report->name);
-            } else {
-                $visualization = false;
-            }
-        } catch (Exception $error) {
-            $visualization = false;
+        if ($visualization instanceof Visualization) {
+            $visualization->setSettings($visualizationSettings);
+            $visualization->setLabels($labels);
+            $visualization->setValues($values);
+            $visualization->setTitle($report->name);
+        } else {
+            $visualization = null;
         }
 
         return $this->renderTemplate('sprout-base-reports/results/index', [
