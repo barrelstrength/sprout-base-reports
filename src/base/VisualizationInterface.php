@@ -27,13 +27,12 @@ interface VisualizationInterface
      *
      * @return array
      */
-
     public function getDataColumns(): array;
 
-    /** Returns the column name to be used as the label series
+    /**
+     * Returns the column name to be used as the label series
      *
      * @return string
      */
-
     public function getLabelColumn(): string;
 }
