@@ -24,8 +24,6 @@ abstract class Visualization extends Component
 
     protected $resultsTemplate = '';
 
-    protected $title = '';
-
     /**
      * if this is a date time report stores the earliest timestamp value from the data series
      */
@@ -55,28 +53,6 @@ abstract class Visualization extends Component
      */
 
     protected $labels;
-
-    /**
-     * Returns the visualization title
-     *
-     * @returns string
-     */
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * Set the report title
-     *
-     * @param string title
-     */
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-    }
 
     /**
      * Returns the first (earliest) timestamp value from the data series for a time series visualization

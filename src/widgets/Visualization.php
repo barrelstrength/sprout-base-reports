@@ -122,7 +122,6 @@ class Visualization extends Widget
                 $visualization->setSettings($settings['visualization']);
                 $visualization->setLabels($labels);
                 $visualization->setValues($values);
-                $visualization->setTitle($report->name);
             } else {
                 $visualization = false;
             }

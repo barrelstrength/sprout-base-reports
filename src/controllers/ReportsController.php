@@ -181,7 +181,6 @@ class ReportsController extends SharedController
             $visualization->setSettings($visualizationSettings);
             $visualization->setLabels($labels);
             $visualization->setValues($values);
-            $visualization->setTitle($report->name);
         } else {
             $visualization = null;
         }
