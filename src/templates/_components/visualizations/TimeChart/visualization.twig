@@ -37,8 +37,8 @@
     labels: {{ visualization.getLabels()|json_encode()|raw }},
     dataSeries: {{ visualization.getTimeSeries()|json_encode()|raw }},
     options: {{ options|json_encode()|raw }},
-    startDate: {{ visualization.getFirstDate()|raw }},
-    endDate: {{ visualization.getLastDate()|raw }},
+    startDate: {{ visualization.getStartDate()|raw }},
+    endDate: {{ visualization.getEndDate()|raw }},
     });
 
     chart.create();

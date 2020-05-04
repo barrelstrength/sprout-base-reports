@@ -18,12 +18,12 @@ abstract class Visualization extends Component implements VisualizationInterface
     /**
      * if this is a date time report stores the earliest timestamp value from the data series
      */
-    protected $firstDate = 0;
+    protected $startDate = 0;
 
     /**
      * if this is a date time report stores the latest timestamp value from the data series
      */
-    protected $lastDate = 0;
+    protected $endDate = 0;
 
     protected $dataColumns;
 
@@ -50,9 +50,9 @@ abstract class Visualization extends Component implements VisualizationInterface
      *
      * @returns Number
      */
-    public function getFirstDate()
+    public function getStartDate()
     {
-        return $this->firstDate;
+        return $this->startDate;
     }
 
     /**
@@ -60,22 +60,9 @@ abstract class Visualization extends Component implements VisualizationInterface
      *
      * @returns Number
      */
-    public function getLastDate()
+    public function getEndDate()
     {
-        return $this->lastDate;
-    }
-
-    /**
-     * Set the visualization settings
-     *
-     * Settings must include ['labelColumn' => string, 'dataColumns' => array(string)]
-     *
-     * @param array $settings
-     */
-
-    public function setSettings($settings)
-    {
-        $this->settings = $settings;
+        return $this->endDate;
     }
 
     /**
@@ -101,7 +88,6 @@ abstract class Visualization extends Component implements VisualizationInterface
      *
      * @return string
      */
-
     public function getLabelColumn(): string
     {
         if ($this->settings && array_key_exists('labelColumn', $this->settings)) {
@@ -109,6 +95,19 @@ abstract class Visualization extends Component implements VisualizationInterface
         }
 
         return false;
+    }
+
+    /**
+     * Set the visualization settings
+     *
+     * Settings must include ['labelColumn' => string, 'dataColumns' => array(string)]
+     *
+     * @param array $settings
+     */
+
+    public function setSettings($settings)
+    {
+        $this->settings = $settings;
     }
 
     public function setValues(array $values)
@@ -219,12 +218,12 @@ abstract class Visualization extends Component implements VisualizationInterface
                     $time *= 1000;
                     $point['x'] = $time;
 
-                    if ($this->firstDate == 0 || $time < $this->firstDate) {
-                        $this->firstDate = $time;
+                    if ($this->startDate == 0 || $time < $this->startDate) {
+                        $this->startDate = $time;
                     }
 
-                    if ($this->lastDate == 0 || $time > $this->lastDate) {
-                        $this->lastDate = $time;
+                    if ($this->endDate == 0 || $time > $this->endDate) {
+                        $this->endDate = $time;
                     }
                 }
 
