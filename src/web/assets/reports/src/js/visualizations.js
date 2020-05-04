@@ -1,188 +1,219 @@
 (function($) {
-  var SproutVisualizations = Garnish.Base.extend(
-    {
 
-      init: function() {
-        this.chart = null;
-        this.firstDate = 0;
-        this.lastDate = 0;
+  /** global ApexCharts */
 
-        //setup listeners for date ranges
-        $('input[name="reportDateFrom[date]"]').on('change', this.updateVisualizationDate.bind(this));
-        $('input[name="reportDateTo[date]"]').on('change', this.updateVisualizationDate.bind(this));
-      },
+  /**
+   * Manage available subclasses
+   */
+  class SproutReportsViz {
+    constructor(type, settings) {
+      switch(type) {
+        case 'barChart': return new BarChart(settings);
+        case 'lineChart': return new LineChart(settings);
+        case 'pieChart': return new PieChart(settings);
+        case 'timeSeriesChart': return new TimeSeriesChart(settings);
+      }
+    }
+  }
 
-      updateVisualizationDate(event) {
-        event.preventDefault();
-        var fromDate = $('input[name="reportDateFrom[date]"]').val();
-        var toDate = $('input[name="reportDateTo[date]"]').val();
+  /**
+   * Base Visualization class with shared methods.
+   */
+  class SproutReportsChart {
 
-        fromDate = fromDate != '' ? fromDate : this.firstDate;
-        toDate = toDate != '' ? toDate : this.lastDate;
+    constructor(settings) {
+      this.chartSelector = settings.chartSelector ?? '#chart';
+      this.labels = settings.labels ?? [];
+      this.dataSeries = settings.dataSeries ?? [];
+      this.options = settings.options ?? [];
 
-        this.chart.zoomX(
-          new Date(fromDate).getTime(),
-          new Date(toDate).getTime()
-        );
+      this.chart = null;
+      this.defaultStartDate = settings.startDate ?? 0;
+      this.defaultEndDate = settings.endDate ?? 0;
 
-        return false;
+      //setup listeners for date ranges
+      this.startDate = $('input[name="reportDateFrom[date]"]');
+      this.endDate = $('input[name="reportDateTo[date]"]');
 
-      },
+      this.startDate.on('change', this.updateVisualizationDate.bind(this));
+      this.endDate.on('change', this.updateVisualizationDate.bind(this));
+    }
 
-      createChart(chartSelector, settings) {
-        this.chart = new ApexCharts(document.querySelector(chartSelector), settings);
-        this.chart.render();
-      },
+    updateVisualizationDate(event) {
+      event.preventDefault();
+      let currentStartDate = $('input[name="reportDateFrom[date]"]').val();
+      let currentEndDate = $('input[name="reportDateTo[date]"]').val();
 
-      createLineChart(title, labels, dataSeries, options, chartSelector) {
-        var settings = {
-          series: dataSeries,
-          chart: {
-            height: 500,
-            type: 'line',
-            zoom: {
-              enabled: false
-            }
-          },
-          dataLabels: {
+      currentStartDate = currentStartDate !== '' ? currentStartDate : this.defaultStartDate;
+      currentEndDate = currentEndDate !== '' ? currentEndDate : this.defaultEndDate;
+
+      this.chart.zoomX(
+        new Date(currentStartDate).getTime(),
+        new Date(currentEndDate).getTime()
+      );
+
+      return false;
+    }
+
+    create() {
+      return null;
+    }
+
+    draw(settings) {
+      jQuery.extend(settings, this.options);
+      this.chart = new ApexCharts(document.querySelector(this.chartSelector), settings);
+      this.chart.render();
+    }
+  }
+
+  class BarChart extends SproutReportsChart {
+    create() {
+      const settings = {
+        series: this.dataSeries,
+        chart: {
+          height: 380,
+          type: 'bar',
+          zoom: {
             enabled: false
-          },
-          stroke: {
-            curve: 'straight'
-          },
-          grid: {
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5
-            },
-          },
-          xaxis: {
-            categories: labels
           }
-        };
-
-        jQuery.extend(settings, options);
-        this.createChart(chartSelector, settings);
-      },
-
-      createBarChart(title, labels, dataSeries, options, chartSelector) {
-        var settings = {
-          series: dataSeries,
-          chart: {
-            height: 500,
-            type: 'bar',
-            zoom: {
-              enabled: false
-            }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
           },
-          plotOptions: {
-            bar: {
-              horizontal: true,
-            }
-          },
-          dataLabels: {
+        },
+        xaxis: {
+          categories: this.labels
+        }
+      };
+
+      this.draw(settings);
+    }
+  }
+
+  class LineChart extends SproutReportsChart {
+    create() {
+      const settings = {
+        series: this.dataSeries,
+        chart: {
+          height: 380,
+          type: 'line',
+          zoom: {
             enabled: false
-          },
-          stroke: {
-            curve: 'straight'
-          },
-          grid: {
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5
-            },
-          },
-          xaxis: {
-            categories: labels
           }
-        };
-        jQuery.extend(settings, options);
-        this.createChart(chartSelector, settings);
-      },
-
-      createPieChart(title, labels, dataSeries, options, chartSelector) {
-        var settings = {
-          series: dataSeries[0].data,
-          chart: {
-            width: 500,
-            type: 'pie',
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
           },
-          labels: labels,
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200
-                },
-                legend: {
-                  position: 'bottom'
-                }
+        },
+        xaxis: {
+          categories: this.labels
+        }
+      };
+
+      this.draw(settings);
+    }
+  }
+
+  class PieChart extends SproutReportsChart {
+    create() {
+      const settings = {
+        series: this.dataSeries[0].data,
+        chart: {
+          width: 380,
+          type: 'pie',
+        },
+        labels: this.labels,
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200
+              },
+              legend: {
+                position: 'bottom'
               }
             }
-          ]
-        };
-        jQuery.extend(settings, options);
-        this.createChart(chartSelector, settings);
-      },
-
-      createTimeChart(title, labels, dataSeries, options, chartSelector) {
-        var settings = {
-          series: dataSeries,
-          chart: {
-            height: 500,
-            type: 'line',
-            zoom: {
-              enabled: true
-            },
-            toolbar: {
-              show: true,
-              offsetX: 0,
-              offsetY: 0,
-              tools: {
-                download: false,
-                selection: true,
-                zoom: true,
-                zoomin: true,
-                zoomout: true,
-                pan: true,
-                reset: true,
-                customIcons: []
-              },
-              autoSelected: 'zoom'
-            }
-          },
-          dataLabels: {
-            enabled: false
-          },
-          stroke: {
-            curve: 'straight'
-          },
-          grid: {
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5
-            },
-          },
-          xaxis: {
-            type: 'datetime'
           }
-        };
-        jQuery.extend(settings, options);
-        this.createChart(chartSelector, settings);
-      },
+        ]
+      };
 
-      setFirstDate(value) {
-        this.firstDate = value;
-      },
+      this.draw(settings);
+    }
+  }
 
-      setLastDate(value) {
-        this.lastDate = value;
-      }
+  class TimeSeriesChart extends SproutReportsChart {
 
-    });
+    create() {
+      const settings = {
+        series: this.dataSeries,
+        chart: {
+          height: 380,
+          type: 'line',
+          zoom: {
+            enabled: true
+          },
+          toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+              download: false,
+              selection: true,
+              zoom: true,
+              zoomin: true,
+              zoomout: true,
+              pan: true,
+              reset: true,
+              customIcons: []
+            },
+            autoSelected: 'zoom'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+          type: 'datetime',
+          min: this.defaultStartDate,
+          max: this.defaultEndDate
+        }
+      };
 
-  Garnish.$doc.ready(function() {
-    Craft.SproutVisualizations = new SproutVisualizations();
-  });
+      this.draw(settings);
+    }
+  }
+
+  window.SproutReportsViz = SproutReportsViz;
+
 })(jQuery);

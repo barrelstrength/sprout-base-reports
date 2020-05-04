@@ -1,5 +1,14 @@
 <div id="chart"></div>
 
 {% js on ready %}
-    Craft.SproutVisualizations.createLineChart('{{ visualization.getTitle() }}', {{ visualization.getLabels()|json_encode()|raw }}, {{ visualization.getDataSeries()|json_encode()|raw }}, {{ options|json_encode()|raw }}, '#chart');
+
+    var chart = new SproutReportsViz('lineChart', {
+    chartSelector: '#chart'
+    labels: '{{ visualization.getLabels()|json_encode()|raw }}',
+    dataSeries: '{{ visualization.getDataSeries()|json_encode()|raw }}',
+    options: '{{ options|json_encode()|raw }}',
+    });
+
+    chart.create();
+
 {% endjs %}
