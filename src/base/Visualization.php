@@ -3,6 +3,7 @@
 namespace barrelstrength\sproutbasereports\base;
 
 use craft\base\Component;
+use Craft;
 
 /**
  * Class Visualization
@@ -93,8 +94,33 @@ abstract class Visualization extends Component implements VisualizationInterface
         if ($this->settings && array_key_exists('labelColumn', $this->settings)) {
             return $this->settings['labelColumn'];
         }
-
         return false;
+    }
+
+    /**
+     * Returns the aggregate setting
+     *
+     * @return string
+     */
+    public function getAggregate(): string
+    {
+        if ($this->settings && array_key_exists('aggregate', $this->settings)) {
+            return $this->settings['aggregate'];
+        }
+        return false;
+    }
+
+    /**
+     * Returns the decimals setting
+     *
+     * @return string
+     */
+    public function getDecimals(): string
+    {
+        if ($this->settings && array_key_exists('decimals', $this->settings)) {
+            return $this->settings['decimals'];
+        }
+        return 0;
     }
 
     /**
@@ -185,53 +211,106 @@ abstract class Visualization extends Component implements VisualizationInterface
 
     public function getTimeSeries(): array
     {
-        $dataColumns = $this->getDataColumns();
-        $labelColumn = $this->getLabelColumn();
+      $dataColumns = $this->getDataColumns();
+      $labelColumn = $this->getLabelColumn();
+      $aggregate = 'average'; //$this->getAggregate();
+      $decimals = $this->getDecimals();
 
-        $dataSeries = [];
-        foreach ($dataColumns as $dataColumn) {
+      $dataSeries = [];
+      foreach ($dataColumns as $dataColumn) {
 
-            $data = [];
+          $data = [];
 
-            foreach ($this->values as $row) {
-                $point = [];
-                if (array_key_exists($dataColumn, $row)) {
-                    $point['y'] = $row[$dataColumn];
-                } else {
-                    $dataIndex = array_search($dataColumn, $this->labels, true);
-                    $point['y'] = $row[$dataIndex];
+          foreach ($this->values as $row) {
+              $point = [];
+              if (array_key_exists($dataColumn, $row)) {
+                $value = $row[$dataColumn];
+              } else {
+                  $dataIndex = array_search($dataColumn, $this->labels, true);
+                  $value = $row[$dataIndex];
+              }
+
+              $point['y'] = $value;
+
+
+              if (array_key_exists($labelColumn, $row)) {
+                  $point['x'] = $row[$labelColumn];
+              } else {
+                  $labelIndex = array_search($labelColumn, $this->labels, true);
+                  $point['x'] = $row[$labelIndex];
+              }
+
+              //convert value to timestamp
+              //incoming date format should be in ISO-8601 format, ie 2020-04-27T15:19:21+00:00
+              //in Twig this entry.postDate|date('c')
+              $time = strtotime($point['x']);
+              if ($time) {
+                $time *= 1000;
+                $point['x'] = $time;
+
+                if ($this->startDate == 0 || $time < $this->startDate) {
+                    $this->startDate = $time;
                 }
 
-                if (array_key_exists($labelColumn, $row)) {
-                    $point['x'] = $row[$labelColumn];
-                } else {
-                    $labelIndex = array_search($labelColumn, $this->labels, true);
-                    $point['x'] = $row[$labelIndex];
+                if ($this->endDate == 0 || $time > $this->endDate) {
+                    $this->endDate = $time;
                 }
+              }
 
-                //convert value to timestamp
-                //incoming date format should be in ISO-8601 format, ie 2020-04-27T15:19:21+00:00
-                //in Twig this entry.postDate|date('c')
-                $time = strtotime($point['x']);
-                if ($time) {
-                    $time *= 1000;
-                    $point['x'] = $time;
-
-                    if ($this->startDate == 0 || $time < $this->startDate) {
-                        $this->startDate = $time;
-                    }
-
-                    if ($this->endDate == 0 || $time > $this->endDate) {
-                        $this->endDate = $time;
-                    }
+              if ($aggregate){
+                //check to see if time value exists in data set,
+                //if not create as array to values into for aggregate calculation
+                if (array_key_exists($point['x'], $data) == false) {
+                  $data[$point['x']] = [];
                 }
-
+                $data[$point['x']][] = $point['y'];
+              } else {
                 $data[] = $point;
+              }
+          }
+
+          //aggregate the data values
+          if ($aggregate){
+            $aggregateData = [];
+            foreach($data as $key => $row){
+              if(is_callable(array($this, $aggregate))) {
+                $aggregateData[] = ['x' => $key, 'y' => number_format($this->$aggregate($row), $decimals)];
+              }
             }
+            $data = $aggregateData;
+          }
 
-            $dataSeries[] = ['name' => $dataColumn, 'data' => $data];
-        }
+          //sort data based on the 'x' (time) attribute
+          usort($data, [$this, 'timeSort']);
 
-        return $dataSeries;
+          $dataSeries[] = ['name' => $dataColumn, 'data' => $data];
+      }
+      return $dataSeries;
     }
+
+    private function timeSort($a, $b)
+    {
+        if ($a['x'] == $b['x']) {
+            return 0;
+        }
+        return ($a['x'] < $b['x']) ? -1 : 1;
+    }
+
+    private function sum($values)
+    {
+      return array_sum ($values);
+    }
+
+    private function count($values)
+    {
+      return count($values);
+    }
+
+    private function average($values)
+    {
+      return array_sum($values)/count($values);
+    }
+
+
+
 }

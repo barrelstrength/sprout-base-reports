@@ -42,4 +42,18 @@ class Visualizations extends Component
 
         return $visualizations;
     }
+
+    /**
+     * Get the list of aggregate functions to use for aggregating visualization data
+     */
+
+    public function getAggregates(): array
+    {
+      $aggregates = [];
+      $aggregates[] = ['label' => 'None', 'value' => ''];
+      $aggregates[] = ['label' => 'Sum', 'value' => 'sum'];
+      $aggregates[] = ['label' => 'Count', 'value' => 'count'];
+      $aggregates[] = ['label' => 'Average', 'value' => 'average'];
+      return $aggregates;
+    }
 }

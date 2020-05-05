@@ -26,6 +26,7 @@
   class SproutReportsChart {
 
     constructor(settings) {
+
       this.chartSelector = settings.chartSelector ?? '#chart';
       this.labels = settings.labels ?? [];
       this.dataSeries = settings.dataSeries ?? [];
@@ -64,7 +65,6 @@
     }
 
     draw(settings) {
-      jQuery.extend(settings, this.options);
       this.chart = new ApexCharts(document.querySelector(this.chartSelector), settings);
       this.chart.render();
     }
@@ -102,6 +102,9 @@
           categories: this.labels
         }
       };
+
+      console.log('CREATE');
+      console.log(this.dataSeries);
 
       this.draw(settings);
     }

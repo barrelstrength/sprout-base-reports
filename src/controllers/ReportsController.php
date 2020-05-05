@@ -292,7 +292,13 @@ class ReportsController extends SharedController
 
         //determine if the report settings have the basic visualization settings
         if ($settings === null || array_key_exists('visualization', $settings) === false) {
-            $settings['visualization'] = ['type' => '', 'labelColumn' => '', 'dataColumns' => ['']];
+          $settings['visualization'] = [
+            'type' => '',
+            'labelColumn' => '',
+            'dataColumns' => [''],
+            'aggregate' => '',
+            'decimals' => 0
+          ];
         }
 
         //determine if the report settings have the basic visualization settings
@@ -303,6 +309,16 @@ class ReportsController extends SharedController
         //determine if the report settings have the basic visualization settings
         if (array_key_exists('dataColumns', $settings['visualization']) === false) {
             $settings['visualization']['dataColumns'] = [''];
+        }
+
+        //determine if the report settings have the basic visualization settings
+        if (array_key_exists('aggregate', $settings['visualization']) === false) {
+          $settings['visualization']['aggregate'] = '';
+        }
+
+        //determine if the report settings have the basic visualization settings
+        if (array_key_exists('decimals', $settings['visualization']) === false) {
+          $settings['visualization']['decimals'] = 0;
         }
 
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
