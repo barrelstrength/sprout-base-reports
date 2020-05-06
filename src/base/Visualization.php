@@ -213,7 +213,7 @@ abstract class Visualization extends Component implements VisualizationInterface
     {
       $dataColumns = $this->getDataColumns();
       $labelColumn = $this->getLabelColumn();
-      $aggregate = 'average'; //$this->getAggregate();
+      $aggregate = $this->getAggregate();
       $decimals = $this->getDecimals();
 
       $dataSeries = [];
