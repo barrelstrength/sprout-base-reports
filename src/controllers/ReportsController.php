@@ -476,8 +476,9 @@ class ReportsController extends SharedController
                 $dataSource->isExport = true;
                 $labels = $dataSource->getDefaultLabels($report, $settings);
                 $values = $dataSource->getResults($report, $settings);
+                $delimiter = $report->getSettings()['delimiter'] ?? null;
 
-                SproutBaseReports::$app->exports->toCsv($values, $labels, $filename);
+                SproutBaseReports::$app->exports->toCsv($values, $labels, $filename, $delimiter);
             }
         }
     }

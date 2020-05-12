@@ -60,11 +60,12 @@ class Exports extends Component
     /**
      * Takes an array of values and options labels and creates a downloadable CSV file
      *
-     * @param array  $values
-     * @param array  $labels
-     * @param string $filename
+     * @param array         $values
+     * @param array         $labels
+     * @param string        $filename
+     * @param string|null   $delimiter
      */
-    public function toCsv(array &$values, array $labels = [], $filename = 'export.csv')
+    public function toCsv(array &$values, array $labels = [], $filename = 'export.csv', $delimiter = null)
     {
         $filename = str_replace('.csv', '', $filename).'.csv';
 
@@ -76,6 +77,10 @@ class Exports extends Component
         }
 
         $csv = Writer::createFromFileObject(new SplTempFileObject());
+
+        if ($delimiter) {
+            $csv->setDelimiter($delimiter);
+        }
 
         $csv->insertOne($labels);
         $csv->insertAll($values);
