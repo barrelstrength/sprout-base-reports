@@ -78,6 +78,7 @@ class Exports extends Component
 
         $csv = Writer::createFromFileObject(new SplTempFileObject());
 
+        // Defaults to comma-delimited
         if ($delimiter) {
             $csv->setDelimiter($delimiter);
         }
