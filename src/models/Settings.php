@@ -25,6 +25,11 @@ class Settings extends Model implements SproutSettingsInterface, SharedPermissio
     public $defaultPageLength = 10;
 
     /**
+     * @var string
+     */
+    public $defaultExportDelimiter = ',';
+
+    /**
      * @inheritdoc
      */
     public function getSettingsNavItems(): array

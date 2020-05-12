@@ -44,6 +44,7 @@ class Install extends Migration
                     'allowHtml' => $this->boolean(),
                     'sortOrder' => $this->string(),
                     'sortColumn' => $this->string(),
+                    'delimiter' => $this->string(),
                     'emailColumn' => $this->string(),
                     'settings' => $this->text(),
                     'enabled' => $this->boolean(),

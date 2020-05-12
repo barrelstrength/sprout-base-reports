@@ -41,6 +41,9 @@ use yii\web\NotFoundHttpException;
  */
 class Report extends Element
 {
+    const DELIMITER_COMMA = ',';
+    const DELIMITER_SEMICOLON = ';';
+
     public $id;
 
     public $name;
@@ -58,6 +61,8 @@ class Report extends Element
     public $sortOrder;
 
     public $sortColumn;
+
+    public $delimiter;
 
     public $emailColumn;
 
@@ -493,6 +498,7 @@ class Report extends Element
         $reportRecord->allowHtml = $this->allowHtml;
         $reportRecord->sortOrder = $this->sortOrder;
         $reportRecord->sortColumn = $this->sortColumn;
+        $reportRecord->delimiter = $this->delimiter;
         $reportRecord->emailColumn = $this->emailColumn;
         $reportRecord->settings = $this->settings;
         $reportRecord->enabled = $this->enabled;

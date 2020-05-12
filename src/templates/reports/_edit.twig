@@ -169,6 +169,16 @@
             errors: report is defined ? report.getErrors('sortColumn') : ""
         }) }}
 
+        {{ forms.field({
+            label: 'Delimiter <span class="info">Select the delimiter to use when exporting the report.</span>'|t('sprout-base-reports'),
+            placeholder: ',',
+        }, sproutFields.selectOther({
+            name: 'delimiter',
+            options: delimiterOptions,
+            value: report.delimiter ?? settings.defaultExportDelimiter,
+            otherPlaceholderText: ','|t('sprout-base-reports')
+        })) }}
+
         {% if dataSource.isAllowHtmlEditable() %}
             {{ forms.lightSwitchField({
                 label: "Allow HTML <span class='info'>Render HTML in your report results. Don't enable this setting if you allow user submitted content.</span>"|t('sprout-base-reports'),

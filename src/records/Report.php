@@ -24,6 +24,7 @@ use yii\db\ActiveQueryInterface;
  * @property bool                 $allowHtml
  * @property string               $sortOrder
  * @property string               $sortColumn
+ * @property string               $delimiter
  * @property string               $emailColumn
  * @property string               $settings
  * @property int                  $dataSourceId

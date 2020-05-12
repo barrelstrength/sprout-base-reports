@@ -34,6 +34,8 @@ class ReportQuery extends ElementQuery
 
     public $sortColumn;
 
+    public $delimiter;
+
     public $emailColumn;
 
     public $settings;
@@ -80,6 +82,7 @@ class ReportQuery extends ElementQuery
             'sproutreports_reports.allowHtml',
             'sproutreports_reports.sortOrder',
             'sproutreports_reports.sortColumn',
+            'sproutreports_reports.delimiter',
             'sproutreports_reports.emailColumn',
             'sproutreports_reports.settings',
             'sproutreports_reports.groupId',

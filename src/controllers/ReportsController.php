@@ -267,6 +267,17 @@ class ReportsController extends SharedController
             'value' => 'custom'
         ];
 
+        $delimiterOptions = [
+            [
+                'label' => Craft::t('sprout-base-reports', 'Comma'),
+                'value' => $reportElement::DELIMITER_COMMA,
+            ],
+            [
+                'label' => Craft::t('sprout-base-reports', 'Semi-colon'),
+                'value' => $reportElement::DELIMITER_SEMICOLON,
+            ]
+        ];
+
         return $this->renderTemplate('sprout-base-reports/reports/_edit', [
             'report' => $reportElement,
             'dataSource' => $dataSource,
@@ -275,7 +286,9 @@ class ReportsController extends SharedController
             'continueEditingUrl' => $dataSource->getUrl("/$dataSourceId/edit/{id}"),
             'pluginHandle' => $this->pluginHandle,
             'viewContext' => $this->viewContext,
-            'emailColumnOptions' => $emailColumnOptions
+            'emailColumnOptions' => $emailColumnOptions,
+            'delimiterOptions' => $delimiterOptions,
+            'settings' => SproutBaseReports::$app->getReportsSettings()
         ]);
     }
 
@@ -477,7 +490,7 @@ class ReportsController extends SharedController
                 $labels = $dataSource->getDefaultLabels($report, $settings);
                 $values = $dataSource->getResults($report, $settings);
 
-                SproutBaseReports::$app->exports->toCsv($values, $labels, $filename);
+                SproutBaseReports::$app->exports->toCsv($values, $labels, $filename, $report->delimiter);
             }
         }
     }
@@ -519,6 +532,7 @@ class ReportsController extends SharedController
         $report->groupId = $request->getBodyParam('groupId');
         $report->sortOrder = $request->getBodyParam('sortOrder');
         $report->sortColumn = $request->getBodyParam('sortColumn');
+        $report->delimiter = $request->getBodyParam('delimiter');
 
         $dataSource = $report->getDataSource();
 

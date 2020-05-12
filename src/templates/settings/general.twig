@@ -39,3 +39,16 @@
     value: settings.defaultPageLength,
     warning: config.defaultPageLength is defined ? configWarning('defaultPageLength')
 }) }}
+
+{{ forms.selectField({
+    label: "Default Export Delimiter"|t('sprout-base-reports'),
+    instructions: "Set the default export delimiter setting when creating new reports."|t('sprout-base-reports'),
+    name: 'defaultExportDelimiter',
+    placeholder: ',',
+    options: [
+        { label: 'Comma', value: ',' },
+        { label: 'Semi-colon', value: ';' }
+    ],
+    value: settings.defaultExportDelimiter,
+    warning: config.defaultExportDelimiter is defined ? configWarning('defaultExportDelimiter')
+}) }}
