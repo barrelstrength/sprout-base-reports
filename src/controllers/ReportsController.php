@@ -275,6 +275,10 @@ class ReportsController extends SharedController
             [
                 'label' => Craft::t('sprout-base-reports', 'Semi-colon'),
                 'value' => $reportElement::DELIMITER_SEMICOLON,
+            ],
+            [
+                'label' => Craft::t('sprout-base-reports', 'Tab'),
+                'value' => $reportElement::DELIMITER_TAB,
             ]
         ];
 

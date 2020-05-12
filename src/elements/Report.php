@@ -43,6 +43,7 @@ class Report extends Element
 {
     const DELIMITER_COMMA = ',';
     const DELIMITER_SEMICOLON = ';';
+    const DELIMITER_TAB = "\t";
 
     public $id;
 
