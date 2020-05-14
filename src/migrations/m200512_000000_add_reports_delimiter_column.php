@@ -34,8 +34,9 @@ class m200512_000000_add_reports_delimiter_column extends Migration
 
         /** @noinspection ClassConstantCanBeUsedInspection */
         $this->update('{{%sprout_settings}}', [
-            'model' => 'barrelstrength\sproutbasereports\models\Settings',
             'settings' => json_encode($settings)
+        ], [
+            'model' => 'barrelstrength\sproutbasereports\models\Settings'
         ]);
 
         return true;

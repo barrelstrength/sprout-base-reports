@@ -53,8 +53,9 @@ class m200501_000000_migrate_shared_report_settings extends Migration
 
         /** @noinspection ClassConstantCanBeUsedInspection */
         $this->update('{{%sprout_settings}}', [
-            'model' => 'barrelstrength\sproutbasereports\models\Settings',
             'settings' => json_encode($newReportsSharedSettings)
+        ], [
+            'model' => 'barrelstrength\sproutbasereports\models\Settings'
         ]);
 
         Craft::$app->getProjectConfig()->remove(Plugins::CONFIG_PLUGINS_KEY.'.'.$pluginHandle.'.settings', 'Migrated Sprout Reports settings so shared sprout settings table.');
