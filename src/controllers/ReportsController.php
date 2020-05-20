@@ -394,16 +394,15 @@ class ReportsController extends SharedController
         $this->requirePermission($this->permissions['sproutReports-editReports']);
 
         $reportId = Craft::$app->getRequest()->getBodyParam('id');
+        $report = Craft::$app->getElements()->getElementById($reportId);
 
-        if ($record = ReportRecord::findOne($reportId)) {
-            $record->delete();
-
-            Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report deleted.'));
-
-            return $this->redirectToPostedUrl($record);
+        if (!$report || !Craft::$app->getElements()->deleteElement($report, true)) {
+            throw new NotFoundHttpException('Unable to delete report.');
         }
 
-        throw new NotFoundHttpException('Report not found.');
+        Craft::$app->getSession()->setNotice(Craft::t('sprout-base-reports', 'Report deleted.'));
+
+        return $this->redirectToPostedUrl();
     }
 
     /**

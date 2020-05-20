@@ -5,6 +5,7 @@ namespace barrelstrength\sproutbasereports\elements\actions;
 use Craft;
 use craft\elements\actions\Delete;
 use craft\elements\db\ElementQueryInterface;
+use Throwable;
 
 /**
  * DeleteReport represents a Delete reports element action.
@@ -30,10 +31,14 @@ class DeleteReport extends Delete
      * @param ElementQueryInterface $query
      *
      * @return bool
+     * @throws Throwable
      */
     public function performAction(ElementQueryInterface $query): bool
     {
-        parent::performAction($query);
+        $elementsService = Craft::$app->getElements();
+        foreach ($query->all() as $element) {
+            $elementsService->deleteElement($element, true);
+        }
 
         $this->setMessage(Craft::t('sprout-base-reports', 'Reports deleted.'));
 
