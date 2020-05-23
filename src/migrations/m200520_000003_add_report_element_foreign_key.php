@@ -36,7 +36,7 @@ class m200520_000003_add_report_element_foreign_key extends Migration
         return false;
     }
 
-    protected function cleanUpOrphanedReports(): void
+    protected function cleanUpOrphanedReports()
     {
         $reportTableReportIds = (new Query())
             ->select('reports.id')
