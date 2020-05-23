@@ -3,11 +3,13 @@
 namespace barrelstrength\sproutbasereports\migrations;
 
 use craft\db\Migration;
+use yii\base\NotSupportedException;
 
 class m200520_000002_update_datasourceId_column_type extends Migration
 {
     /**
-     * @inheritdoc
+     * @return bool
+     * @throws NotSupportedException
      */
     public function safeUp(): bool
     {

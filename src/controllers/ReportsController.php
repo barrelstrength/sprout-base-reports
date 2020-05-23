@@ -12,7 +12,6 @@ use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\models\ReportGroup;
 use barrelstrength\sproutbasereports\models\Settings as SproutBaseReportsSettings;
-use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use barrelstrength\sproutbasereports\SproutBaseReports;
 use Craft;
 use craft\errors\ElementNotFoundException;
@@ -385,7 +384,6 @@ class ReportsController extends SharedController
      * @return Response
      * @throws \Exception
      * @throws Throwable
-     * @throws StaleObjectException
      * @throws BadRequestHttpException
      */
     public function actionDeleteReport(): Response

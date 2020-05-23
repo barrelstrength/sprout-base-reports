@@ -5,6 +5,7 @@ namespace barrelstrength\sproutbasereports\migrations;
 use Craft;
 use craft\db\Migration;
 use craft\db\Query;
+use Exception;
 
 class m200520_000003_add_report_element_foreign_key extends Migration
 {
@@ -19,7 +20,7 @@ class m200520_000003_add_report_element_foreign_key extends Migration
         try {
             $this->addForeignKey(null, '{{%sproutreports_reports}}',
                 ['id'], '{{%elements}}', ['id'], 'CASCADE');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Craft::info('Report Element Foreign Key already exists', __METHOD__);
         }
 
@@ -36,6 +37,7 @@ class m200520_000003_add_report_element_foreign_key extends Migration
         return false;
     }
 
+    /** @noinspection ClassConstantCanBeUsedInspection */
     protected function cleanUpOrphanedReports()
     {
         $reportTableReportIds = (new Query())

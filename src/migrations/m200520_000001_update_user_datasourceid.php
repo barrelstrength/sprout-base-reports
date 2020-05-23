@@ -9,6 +9,7 @@ class m200520_000001_update_user_datasourceid extends Migration
 {
     /**
      * @inheritdoc
+     * @noinspection ClassConstantCanBeUsedInspection
      */
     public function safeUp(): bool
     {
