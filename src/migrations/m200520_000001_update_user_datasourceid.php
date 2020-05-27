@@ -24,12 +24,12 @@ class m200520_000001_update_user_datasourceid extends Migration
         if ($userDataSourceId) {
             $this->update('{{%sproutreports_reports}}', [
                 'dataSourceId' => $userDataSourceId
-            ], ['dataSourceId' => 'sproutreports.users'], [], false);
+            ], ['dataSourceId' => "CAST('sproutreports.users' AS VARCHAR)"], [], false);
         } else {
             // Remove unused User data sources so the next migration
             // adding a foreign key doesn't fail
             $this->delete('{{%sproutreports_reports}}', [
-                'dataSourceId' => 'sproutreports.users'
+                'dataSourceId' => "CAST('sproutreports.users' AS VARCHAR)"
             ]);
         }
 
