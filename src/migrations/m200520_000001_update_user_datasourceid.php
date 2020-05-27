@@ -13,6 +13,10 @@ class m200520_000001_update_user_datasourceid extends Migration
      */
     public function safeUp(): bool
     {
+        if ($this->db->getIsPgsql()) {
+            return true;
+        }
+
         $userDataSourceId = (new Query())
             ->select('id')
             ->from('{{%sproutreports_datasources}}')
