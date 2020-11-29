@@ -2,9 +2,15 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
+use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\records\Report as ReportRecord;
+use Craft;
 use craft\db\Migration;
 use craft\db\Query;
+use craft\errors\ElementNotFoundException;
+use Throwable;
 use yii\base\NotSupportedException;
+use yii\db\Exception;
 
 /**
  * m180307_042132_craft3_schema_changes migration.
@@ -12,23 +18,40 @@ use yii\base\NotSupportedException;
 class m180307_042132_craft3_schema_changes extends Migration
 {
     /**
-     * @inheritdoc
-     *
+     * @return bool
      * @throws NotSupportedException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function safeUp(): bool
     {
         // Update Reports Table columns
-        if (!$this->db->columnExists('{{%sproutreports_reports}}', 'hasNameFormat')) {
-            $this->addColumn('{{%sproutreports_reports}}', 'hasNameFormat', $this->integer()->after('name'));
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'hasNameFormat')) {
+            $this->addColumn(ReportRecord::tableName(), 'hasNameFormat', $this->integer()->after('name'));
         }
 
-        if (!$this->db->columnExists('{{%sproutreports_reports}}', 'nameFormat')) {
-            $this->addColumn('{{%sproutreports_reports}}', 'nameFormat', $this->string()->after('name'));
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'nameFormat')) {
+            $this->addColumn(ReportRecord::tableName(), 'nameFormat', $this->string()->after('name'));
         }
 
-        if (!$this->db->columnExists('{{%sproutreports_reports}}', 'settings')) {
-            $this->renameColumn('{{%sproutreports_reports}}', 'options', 'settings');
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'sortOrder')) {
+            $this->addColumn(ReportRecord::tableName(), 'sortOrder', $this->string()->after('allowHtml'));
+
+            $this->addColumn(ReportRecord::tableName(), 'sortColumn', $this->string()->after('sortOrder'));
+        }
+
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'emailColumn')) {
+            $this->addColumn(ReportRecord::tableName(), 'emailColumn', $this->string()->after('allowHtml'));
+        }
+
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'delimiter')) {
+            $this->addColumn(ReportRecord::tableName(), 'delimiter', $this->string()->after('sortColumn'));
+        }
+
+        if (!$this->db->columnExists(ReportRecord::tableName(), 'settings')) {
+            $this->renameColumn(ReportRecord::tableName(), 'options', 'settings');
         }
 
         // Update Data Source Table columns
@@ -38,7 +61,7 @@ class m180307_042132_craft3_schema_changes extends Migration
 
         $dataSourcesMap = [
             'sproutreports.query' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomQuery',
-            'sproutreports.twig' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomTwigTemplate'
+            'sproutreports.twig' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomTwigTemplate',
         ];
 
         // Update our Data Source records and related IDs in the Reports table
@@ -64,7 +87,7 @@ class m180307_042132_craft3_schema_changes extends Migration
             if ($dataSource === null) {
                 $this->insert('{{%sproutreports_datasources}}', [
                     'type' => $dataSourceClass,
-                    'allowNew' => 1
+                    'allowNew' => 1,
                 ]);
                 $dataSource['id'] = $this->db->getLastInsertID('{{%sproutreports_datasources}}');
                 $dataSource['allowNew'] = 1;
@@ -73,22 +96,80 @@ class m180307_042132_craft3_schema_changes extends Migration
             // Update our existing or new Data Source
             $this->update('{{%sproutreports_datasources}}', [
                 'type' => $dataSourceClass,
-                'allowNew' => $dataSource['allowNew'] ?? 1
+                'allowNew' => $dataSource['allowNew'] ?? 1,
             ], [
-                'id' => $dataSource['id']
+                'id' => $dataSource['id'],
             ], [], false);
 
             // Update any related dataSourceIds in our Reports table
             $this->update('{{%sproutreports_reports}}', [
-                'dataSourceId' => $dataSource['id']
+                'dataSourceId' => $dataSource['id'],
             ], [
-                'dataSourceId' => $oldDataSourceId
+                'dataSourceId' => $oldDataSourceId,
             ], [], false);
         }
 
         // Remove Data Source Table columns
         if ($this->db->columnExists('{{%sproutreports_datasources}}', 'options')) {
             $this->dropColumn('{{%sproutreports_datasources}}', 'options');
+        }
+
+        // Make Report Records Elements
+        $query = new Query();
+        $db = Craft::$app->getDb();
+
+        // Get all reports from the report table
+        $reports = $query->select('*')
+            ->from(['{{%sproutreports_reports}}'])
+            ->all();
+
+        if (empty($reports)) {
+            return true;
+        }
+
+        foreach ($reports as $report) {
+
+            // Only convert report record to element if it doesn't exist in the elements table
+            $elementExists = $query->select('id')
+                ->from('{{%elements}}')
+                ->where([
+                    'id' => $report['id'],
+                    'type' => 'barrelstrength\sproutbasereports\elements\Report',
+                ])
+                ->one();
+
+            if ($elementExists) {
+                continue;
+            }
+
+            $db->createCommand()->delete('{{%sproutreports_reports}}',
+                ['id' => $report['id']])->execute();
+
+            unset($report['id']);
+
+            $reportElement = new Report();
+
+            // Migrated attributes
+            $reportElement->dataSourceId = $report['dataSourceId'];
+            $reportElement->groupId = $report['groupId'];
+            $reportElement->name = $report['name'];
+            $reportElement->nameFormat = $report['nameFormat'];
+            $reportElement->handle = $report['handle'];
+            $reportElement->description = $report['description'];
+            $reportElement->allowHtml = $report['allowHtml'];
+            $reportElement->enabled = $report['enabled'];
+            $reportElement->settings = $report['settings'];
+            $reportElement->dateCreated = $report['dateCreated'];
+            $reportElement->dateUpdated = $report['dateUpdated'];
+
+            // New attributes
+            $reportElement->hasNameFormat = !empty($report['nameFormat']) ? 1 : 0;
+            $reportElement->sortOrder = '';
+            $reportElement->sortColumn = '';
+            $reportElement->delimiter = '';
+            $reportElement->emailColumn = '';
+
+            Craft::$app->getElements()->saveElement($reportElement, false);
         }
 
         return true;
