@@ -33,25 +33,43 @@ class m200520_000002_update_datasourceId_column_type extends Migration
         return true;
     }
 
-    public function cleanUpUsersDataSourceStuff() {
+    public function cleanUpUsersDataSourceStuff()
+    {
 
         $usersDataSourceId = (new Query())
             ->select('id')
             ->from('{{%sproutreports_datasources}}')
             ->where([
-                'type' => 'barrelstrength\sproutbasereports\datasources\Users'
+                'type' => 'barrelstrength\sproutbasereports\datasources\Users',
             ])
             ->scalar();
+
+        if (!$usersDataSourceId) {
+            $this->insert('{{%sproutreports_datasources}}', [
+                'viewContext' => 'sprout-reports',
+                'pluginHandle' => 'sprout-reports',
+                'type' => 'barrelstrength\sproutbasereports\datasources\Users',
+                'allowNew' => 1,
+            ]);
+
+            $usersDataSourceId = (new Query())
+                ->select('id')
+                ->from('{{%sproutreports_datasources}}')
+                ->where([
+                    'type' => 'barrelstrength\sproutbasereports\datasources\Users',
+                ])
+                ->scalar();
+        }
 
         if ($usersDataSourceId) {
             // update reports table with this ID
             $this->update('{{%sproutreports_reports}}', [
-                'dataSourceId' => $usersDataSourceId
+                'dataSourceId' => $usersDataSourceId,
             ], ['dataSourceId' => 'sproutreports.users'], [], false);
         } else {
             // remove all rows from reports table that match dataSourceId sproutreports.users
             $this->delete('{{%sproutreports_reports}}', [
-                'dataSourceId' => 'sproutreports.users'
+                'dataSourceId' => 'sproutreports.users',
             ]);
         }
     }
