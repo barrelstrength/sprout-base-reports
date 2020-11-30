@@ -4,13 +4,10 @@ namespace barrelstrength\sproutbasereports\migrations;
 
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\records\Report as ReportRecord;
-use Craft;
 use craft\db\Migration;
 use craft\db\Query;
-use craft\errors\ElementNotFoundException;
-use Throwable;
 use yii\base\NotSupportedException;
-use yii\db\Exception;
+use Craft;
 
 /**
  * m180307_042132_craft3_schema_changes migration.
@@ -18,12 +15,9 @@ use yii\db\Exception;
 class m180307_042132_craft3_schema_changes extends Migration
 {
     /**
-     * @return bool
+     * @inheritdoc
+     *
      * @throws NotSupportedException
-     * @throws Throwable
-     * @throws ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws Exception
      */
     public function safeUp(): bool
     {
@@ -59,9 +53,11 @@ class m180307_042132_craft3_schema_changes extends Migration
             $this->renameColumn('{{%sproutreports_datasources}}', 'dataSourceId', 'type');
         }
 
+        $this->prepExistingDataSourcesUsingOldDataSourceIdFormat();
+
         $dataSourcesMap = [
             'sproutreports.query' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomQuery',
-            'sproutreports.twig' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomTwigTemplate',
+            'sproutreports.twig' => 'barrelstrength\sproutreports\integrations\sproutreports\datasources\CustomTwigTemplate'
         ];
 
         // Update our Data Source records and related IDs in the Reports table
@@ -87,7 +83,7 @@ class m180307_042132_craft3_schema_changes extends Migration
             if ($dataSource === null) {
                 $this->insert('{{%sproutreports_datasources}}', [
                     'type' => $dataSourceClass,
-                    'allowNew' => 1,
+                    'allowNew' => 1
                 ]);
                 $dataSource['id'] = $this->db->getLastInsertID('{{%sproutreports_datasources}}');
                 $dataSource['allowNew'] = 1;
@@ -96,16 +92,16 @@ class m180307_042132_craft3_schema_changes extends Migration
             // Update our existing or new Data Source
             $this->update('{{%sproutreports_datasources}}', [
                 'type' => $dataSourceClass,
-                'allowNew' => $dataSource['allowNew'] ?? 1,
+                'allowNew' => $dataSource['allowNew'] ?? 1
             ], [
-                'id' => $dataSource['id'],
+                'id' => $dataSource['id']
             ], [], false);
 
             // Update any related dataSourceIds in our Reports table
             $this->update('{{%sproutreports_reports}}', [
-                'dataSourceId' => $dataSource['id'],
+                'dataSourceId' => $dataSource['id']
             ], [
-                'dataSourceId' => $oldDataSourceId,
+                'dataSourceId' => $oldDataSourceId
             ], [], false);
         }
 
@@ -134,7 +130,7 @@ class m180307_042132_craft3_schema_changes extends Migration
                 ->from('{{%elements}}')
                 ->where([
                     'id' => $report['id'],
-                    'type' => 'barrelstrength\sproutbasereports\elements\Report',
+                    'type' => 'barrelstrength\sproutbasereports\elements\Report'
                 ])
                 ->one();
 
@@ -160,7 +156,7 @@ class m180307_042132_craft3_schema_changes extends Migration
             $reportElement->enabled = $report['enabled'];
             $reportElement->settings = $report['settings'];
             $reportElement->dateCreated = $report['dateCreated'];
-            $reportElement->dateUpdated = $report['dateUpdated'];
+            $reportElement->dateCreated = $report['dateCreated'];
 
             // New attributes
             $reportElement->hasNameFormat = !empty($report['nameFormat']) ? 1 : 0;
@@ -183,5 +179,28 @@ class m180307_042132_craft3_schema_changes extends Migration
         echo "m180307_042132_craft3_schema_changes cannot be reverted.\n";
 
         return false;
+    }
+
+    // Developers have to make sure the old datasources are saved in the db
+    // before triggering the upgrade/migrations or this won't do anything
+    public function prepExistingDataSourcesUsingOldDataSourceIdFormat() {
+
+        $dataSourcesInDb = (new Query())
+            ->select(['id', 'type'])
+            ->from('{{%sproutreports_datasources}}')
+            ->all();
+
+        if (!$dataSourcesInDb) {
+            return;
+        }
+
+        foreach($dataSourcesInDb as $dataSource) {
+            $dataSourceId = $dataSource['id'];
+            $oldDataSourceId = $dataSource['type'];
+
+            $this->update('{{%sproutreports_reports}}', [
+                'dataSourceId' => $dataSourceId,
+            ], ['dataSourceId' => $oldDataSourceId], [], false);
+        }
     }
 }

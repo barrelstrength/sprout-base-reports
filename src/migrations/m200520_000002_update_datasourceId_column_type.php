@@ -2,6 +2,7 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
+use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use craft\db\Migration;
 use craft\db\Query;
 use yii\base\NotSupportedException;
@@ -19,7 +20,7 @@ class m200520_000002_update_datasourceId_column_type extends Migration
         // Updates foreign key if it does not exist. Try catch avoid errors if it exist
         if ($this->db->columnExists($reportTable, 'dataSourceId')) {
 
-            $this->cleanUpUsersDataSourceStuff();
+            $this->cleanUpSproutDataSourceStuff();
 
             if ($this->db->getIsPgsql()) {
                 // Manually construct the SQL for Postgres`
@@ -33,44 +34,76 @@ class m200520_000002_update_datasourceId_column_type extends Migration
         return true;
     }
 
-    public function cleanUpUsersDataSourceStuff()
+    // This use case will be solved by the above workflow and is
+    // here as a legacy fix for too-specific of a use case
+    public function cleanUpSproutDataSourceStuff()
     {
+        $dataSourcesMap = [
+            'sproutreports.users' => 'barrelstrength\sproutbasereports\datasources\Users',
+            'sproutreportscommerce.orderhistory' => 'barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceOrderHistoryDataSource',
+            'sproutreportscommerce.productrevenue' => 'barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceProductRevenueDataSource'
+        ];
 
-        $usersDataSourceId = (new Query())
-            ->select('id')
-            ->from('{{%sproutreports_datasources}}')
-            ->where([
-                'type' => 'barrelstrength\sproutbasereports\datasources\Users',
-            ])
-            ->scalar();
-
-        if (!$usersDataSourceId) {
-            $this->insert('{{%sproutreports_datasources}}', [
-                'viewContext' => 'sprout-reports',
-                'pluginHandle' => 'sprout-reports',
-                'type' => 'barrelstrength\sproutbasereports\datasources\Users',
-                'allowNew' => 1,
-            ]);
-
-            $usersDataSourceId = (new Query())
+        foreach ($dataSourcesMap as $oldDataSource => $newDataSource) {
+            // Try to find a new data srouce
+            $newDataSourceId = (new Query())
                 ->select('id')
                 ->from('{{%sproutreports_datasources}}')
                 ->where([
-                    'type' => 'barrelstrength\sproutbasereports\datasources\Users',
+                    'type' => $newDataSource,
                 ])
                 ->scalar();
-        }
 
-        if ($usersDataSourceId) {
-            // update reports table with this ID
-            $this->update('{{%sproutreports_reports}}', [
-                'dataSourceId' => $usersDataSourceId,
-            ], ['dataSourceId' => 'sproutreports.users'], [], false);
-        } else {
-            // remove all rows from reports table that match dataSourceId sproutreports.users
-            $this->delete('{{%sproutreports_reports}}', [
-                'dataSourceId' => 'sproutreports.users',
+            if (!$newDataSourceId) {
+                // Scenario 1: an old data source may exist in the sproutreports_reports table.dataSourceId column
+                // If we don't find a new version of the datasource, insert one
+                $this->insert('{{%sproutreports_datasources}}', [
+                    'viewContext' => 'sprout-reports',
+                    'pluginHandle' => 'sprout-reports',
+                    'type' => $newDataSource,
+                    'allowNew' => 1
+                ]);
+
+                $newDataSourceId = $this->db->getLastInsertID();
+            }
+
+            // Scenario 2: old data sources might exist in the sproutreports_datasources.type column
+            // Check for a matching datasources using the old syntax
+            $oldDataSourceIds = (new Query())
+                ->select('id')
+                ->from('{{%sproutreports_datasources}}')
+                ->where([
+                    'type' => $oldDataSource,
+                ])
+                ->all();
+
+            // Delete any old Data Sources
+            $this->delete('{{%sproutreports_datasources}}', [
+                'type' => $oldDataSource
             ]);
+
+            if ($newDataSourceId) {
+                // update reports table with this ID
+                $this->update('{{%sproutreports_reports}}', [
+                    'dataSourceId' => $newDataSourceId,
+                ], ['dataSourceId' => $oldDataSource], [], false);
+
+                if ($oldDataSourceIds) {
+                    foreach ($oldDataSourceIds as $oldDataSourceId) {
+                        // Update any reports with old dataSourceIds and make sure they are new
+                        $this->update('{{%sproutreports_reports}}', [
+                            'dataSourceId' => $newDataSourceId,
+                        ], ['dataSourceId' => $oldDataSourceId], [], false);
+                    }
+                }
+            } else {
+                // remove all rows from reports table that match dataSourceId sproutreports.users
+                $this->delete('{{%sproutreports_reports}}', [
+                    'dataSourceId' => $oldDataSource,
+                ]);
+            }
+
+
         }
     }
 
