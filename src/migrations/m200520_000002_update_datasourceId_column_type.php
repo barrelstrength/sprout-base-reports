@@ -2,7 +2,6 @@
 
 namespace barrelstrength\sproutbasereports\migrations;
 
-use barrelstrength\sproutbasereports\records\Report as ReportRecord;
 use craft\db\Migration;
 use craft\db\Query;
 use yii\base\NotSupportedException;
@@ -40,8 +39,9 @@ class m200520_000002_update_datasourceId_column_type extends Migration
     {
         $dataSourcesMap = [
             'sproutreports.users' => 'barrelstrength\sproutbasereports\datasources\Users',
+            'sproutreports.categories' => 'barrelstrength\sproutreportscategories\integrations\sproutreports\datasources\Categories',
             'sproutreportscommerce.orderhistory' => 'barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceOrderHistoryDataSource',
-            'sproutreportscommerce.productrevenue' => 'barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceProductRevenueDataSource'
+            'sproutreportscommerce.productrevenue' => 'barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceProductRevenueDataSource',
         ];
 
         foreach ($dataSourcesMap as $oldDataSource => $newDataSource) {
@@ -61,7 +61,7 @@ class m200520_000002_update_datasourceId_column_type extends Migration
                     'viewContext' => 'sprout-reports',
                     'pluginHandle' => 'sprout-reports',
                     'type' => $newDataSource,
-                    'allowNew' => 1
+                    'allowNew' => 1,
                 ]);
 
                 $newDataSourceId = $this->db->getLastInsertID();
@@ -79,7 +79,7 @@ class m200520_000002_update_datasourceId_column_type extends Migration
 
             // Delete any old Data Sources
             $this->delete('{{%sproutreports_datasources}}', [
-                'type' => $oldDataSource
+                'type' => $oldDataSource,
             ]);
 
             if ($newDataSourceId) {
@@ -102,8 +102,6 @@ class m200520_000002_update_datasourceId_column_type extends Migration
                     'dataSourceId' => $oldDataSource,
                 ]);
             }
-
-
         }
     }
 
