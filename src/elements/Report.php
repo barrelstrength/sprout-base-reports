@@ -184,7 +184,7 @@ class Report extends Element
     protected static function defineSortOptions(): array
     {
         $attributes = [
-            'name' => Craft::t('sprout-base-reports', 'Name'),
+            'sproutreports_reports.name' => Craft::t('sprout-base-reports', 'Name'),
             'dataSourceId' => Craft::t('sprout-base-reports', 'Data Source')
         ];
 
