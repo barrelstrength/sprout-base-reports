@@ -75,7 +75,7 @@ class m200520_000002_update_datasourceId_column_type extends Migration
                 ->where([
                     'type' => $oldDataSource,
                 ])
-                ->all();
+                ->scalar();
 
             // Delete any old Data Sources
             $this->delete('{{%sproutreports_datasources}}', [
