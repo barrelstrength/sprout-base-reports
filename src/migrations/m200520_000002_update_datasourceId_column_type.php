@@ -59,7 +59,6 @@ class m200520_000002_update_datasourceId_column_type extends Migration
                 // If we don't find a new version of the datasource, insert one
                 $this->insert('{{%sproutreports_datasources}}', [
                     'viewContext' => 'sprout-reports',
-                    'pluginHandle' => 'sprout-reports',
                     'type' => $newDataSource,
                     'allowNew' => 1,
                 ]);
