@@ -1,7 +1,7 @@
 {
   "name": "barrelstrength/sprout-base-reports",
   "description": "Common reports libraries for Sprout Plugins for Craft CMS",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "type": "yii-module",
   "license": "proprietary",
   "authors": [
