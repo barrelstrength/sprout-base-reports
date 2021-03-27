@@ -14,10 +14,8 @@ class m200520_000002_update_datasourceId_column_type extends Migration
      */
     public function safeUp(): bool
     {
-        $reportTable = '{{%sproutreports_reports}}';
-
         // Updates foreign key if it does not exist. Try catch avoid errors if it exist
-        if ($this->db->columnExists($reportTable, 'dataSourceId')) {
+        if ($this->db->columnExists('{{%sproutreports_reports}}', 'dataSourceId')) {
 
             $this->cleanUpSproutDataSourceStuff();
 
@@ -57,12 +55,21 @@ class m200520_000002_update_datasourceId_column_type extends Migration
             if (!$newDataSourceId) {
                 // Scenario 1: an old data source may exist in the sproutreports_reports table.dataSourceId column
                 // If we don't find a new version of the datasource, insert one
-                $this->insert('{{%sproutreports_datasources}}', [
+
+                $updatedValues = [
                     'viewContext' => 'sprout-reports',
-                    'pluginHandle' => 'sprout-reports',
                     'type' => $newDataSource,
                     'allowNew' => 1,
-                ]);
+                ];
+
+                // If the plugin was installed on C3 and not upgraded
+                // from C2, the pluginHandle column may be missing.
+                // If so, make sure not to try to add something to it
+                if ($this->db->columnExists('{{%sproutreports_datasources}}', 'pluginHandle')) {
+                    $updatedValues['pluginHandle'] = 'sprout-reports';
+                }
+
+                $this->insert('{{%sproutreports_datasources}}', $updatedValues);
 
                 $newDataSourceId = $this->db->getLastInsertID();
             }
