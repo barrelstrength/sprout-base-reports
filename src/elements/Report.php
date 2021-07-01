@@ -471,6 +471,14 @@ class Report extends Element
         $this->addError('results', $message);
     }
 
+    public function beforeSave(bool $isNew): bool
+    {
+        // Make sure emailColumn is set to null, to support :empty: syntax for postgres
+        $this->emailColumn = $this->emailColumn ?: null;
+
+        return parent::beforeSave($isNew);
+    }
+    
     /**
      * @param bool $isNew
      *
