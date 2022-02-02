@@ -11,6 +11,7 @@ use Craft;
 use craft\helpers\Json;
 use Exception;
 use League\Csv\Writer;
+use League\Csv\Reader;
 use SplTempFileObject;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -77,6 +78,7 @@ class Exports extends Component
         }
 
         $csv = Writer::createFromFileObject(new SplTempFileObject());
+        $csv->setOutputBOM(Reader::BOM_UTF8);
 
         // Defaults to comma-delimited
         if ($delimiter) {
