@@ -108,16 +108,26 @@ class CustomTwigTemplate extends DataSource
         if (isset($settings['settingsTemplate']) && $settings['settingsTemplate'] != '') {
             $customSettingsTemplatePath = Craft::$app->getPath()->getSiteTemplatesPath().'/'.$settings['settingsTemplate'];
 
-            $customSettingsFileContent = null;
+            try {
+                $customSettingsFileContent = file_get_contents($customSettingsTemplatePath);
+            } catch(Exception $e) {
+                // If we fail to load a file, we're probably missing a file extension and working with
+                // the old setting before we added the template selector field
+                $customSettingsFileContent = null;
+            }
 
-            foreach (Craft::$app->getConfig()->getGeneral()->defaultTemplateExtensions as $extension) {
-                if (file_exists($customSettingsTemplatePath.'.'.$extension)) {
-                    $customSettingsFileContent = file_get_contents($customSettingsTemplatePath.'.'.$extension);
-                    break;
+            // Didn't find anything, perhaps the setting was selected by the new template selector
+            if ($customSettingsFileContent === null) {
+                foreach (Craft::$app->getConfig()->getGeneral()->defaultTemplateExtensions as $extension) {
+                    if (file_exists($customSettingsTemplatePath.'.'.$extension)) {
+                        $customSettingsFileContent = file_get_contents($customSettingsTemplatePath.'.'.$extension);
+                        break;
+                    }
                 }
             }
 
-            if (null !== $customSettingsFileContent) {
+            if ($customSettingsFileContent !== null) {
+
                 // Add support for processing Template Settings by including Craft CP Form Macros and
                 // wrapping all settings fields in the `settings` namespace
                 $customSettingsHtmlWithExtras = $customSettingsFileContent;
